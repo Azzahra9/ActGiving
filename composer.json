@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "knuckleswtf/scribe": "^5.11"
+    }
+}

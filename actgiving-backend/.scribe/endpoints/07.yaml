@@ -1,0 +1,213 @@
+name: 'Pencairan Dana'
+description: |-
+
+  Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/campaigns/{id}/disbursements'
+    metadata:
+      custom: []
+      groupName: 'Pencairan Dana'
+      groupDescription: |-
+
+        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Ajukan Pencairan Dana (Inisiator)'
+      description: 'Inisiator: Mengajukan Pencairan Dana (FR-11).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 6420
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      bank_name:
+        custom: []
+        name: bank_name
+        description: 'Must not be greater than 100 characters.'
+        required: true
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      bank_account:
+        custom: []
+        name: bank_account
+        description: 'Must not be greater than 50 characters.'
+        required: true
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      amount: 6420
+      bank_name: 'n'
+      bank_account: g
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/campaigns/{id}/disbursements'
+    metadata:
+      custom: []
+      groupName: 'Pencairan Dana'
+      groupDescription: |-
+
+        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Riwayat Pencairan Kampanye (Inisiator)'
+      description: 'Inisiator: Melihat Riwayat Pencairan Dana Kampanye Miliknya.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/disbursements/{id}/status'
+    metadata:
+      custom: []
+      groupName: 'Pencairan Dana'
+      groupDescription: |-
+
+        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Setujui / Tolak Pencairan Dana (Admin, ACID)'
+      description: |-
+        Admin: Menyetujui atau Menolak Pencairan Dana (FR-11).
+        WAJIB ACID Transaction & lockForUpdate() untuk mencegah double-withdraw.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the disbursement.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: approved
+        type: string
+        enumValues:
+          - approved
+          - rejected
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      admin_notes:
+        custom: []
+        name: admin_notes
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      status: approved
+      admin_notes: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
