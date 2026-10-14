@@ -1,0 +1,121 @@
+# ============================================================
+# .gitignore Root - ActGiving Monorepo
+# ============================================================
+# File ini diletakkan di folder ROOT (D:\ACTGIVING\)
+# dan mencakup aturan untuk Backend (Laravel) dan Frontend (Next.js)
+# ============================================================
+
+
+# ============================================================
+# BACKEND - Laravel (actgiving-backend/)
+# ============================================================
+
+# Dependency packages (di-generate ulang via: composer install)
+actgiving-backend/vendor/
+
+# File environment RAHASIA (berisi password DB, APP_KEY, dll.)
+actgiving-backend/.env
+actgiving-backend/.env.backup
+actgiving-backend/.env.production
+
+# Cache & file yang digenerate otomatis oleh Laravel
+actgiving-backend/bootstrap/cache/*.php
+actgiving-backend/storage/*.key
+actgiving-backend/storage/pail/
+actgiving-backend/storage/logs/*.log
+actgiving-backend/storage/app/public/
+actgiving-backend/public/storage
+actgiving-backend/public/hot
+actgiving-backend/public/build
+
+# Hasil generate asset (node_modules frontend Laravel Mix, jika ada)
+actgiving-backend/node_modules/
+
+# File testing & IDE
+actgiving-backend/.phpunit.result.cache
+actgiving-backend/.phpunit.cache/
+actgiving-backend/_ide_helper.php
+actgiving-backend/.idea/
+actgiving-backend/.vscode/
+actgiving-backend/.zed/
+actgiving-backend/.cursor/
+actgiving-backend/.nova/
+
+# Laravel Sanctum / Auth
+actgiving-backend/auth.json
+
+# Misc
+actgiving-backend/Homestead.json
+actgiving-backend/Homestead.yaml
+
+
+# ============================================================
+# FRONTEND - Next.js (actgiving-frontend/)
+# ============================================================
+
+# Dependency packages (di-generate ulang via: npm install)
+actgiving-frontend/node_modules/
+
+# File environment RAHASIA (berisi API keys, secrets frontend)
+actgiving-frontend/.env
+actgiving-frontend/.env.local
+actgiving-frontend/.env.development.local
+actgiving-frontend/.env.test.local
+actgiving-frontend/.env.production.local
+
+# Hasil build Next.js (di-generate ulang via: npm run build)
+actgiving-frontend/.next/
+actgiving-frontend/out/
+actgiving-frontend/build/
+
+# Coverage & debug logs
+actgiving-frontend/coverage/
+actgiving-frontend/npm-debug.log*
+actgiving-frontend/yarn-debug.log*
+actgiving-frontend/yarn-error.log*
+actgiving-frontend/.pnpm-debug.log*
+
+# Vercel deployment
+actgiving-frontend/.vercel
+
+# TypeScript cache
+actgiving-frontend/*.tsbuildinfo
+actgiving-frontend/next-env.d.ts
+
+# Yarn
+actgiving-frontend/.yarn/*
+!actgiving-frontend/.yarn/patches
+!actgiving-frontend/.yarn/plugins
+!actgiving-frontend/.yarn/releases
+!actgiving-frontend/.yarn/versions
+actgiving-frontend/.pnp.*
+
+
+# ============================================================
+# SISTEM OPERASI & EDITOR (Berlaku untuk seluruh proyek)
+# ============================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# JetBrains IDE (IntelliJ, PhpStorm, WebStorm)
+.idea/
+
+# VS Code
+.vscode/
+
+# Sertifikat SSL
+*.pem
+
+# General log files
+*.log
