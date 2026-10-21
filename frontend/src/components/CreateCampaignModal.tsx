@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, 
+  X,
+  Upload,
+  Pencil, 
   PlusCircle, 
   Coins, 
   Users, 
@@ -23,6 +25,8 @@ interface CreateCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddCampaign: (newCampaign: Campaign) => void;
+  onUpdateCampaign?: (updatedCampaign: Campaign) => void;
+  campaignToEdit?: Campaign | null;
   currentUser?: UserProfile;
   onSwitchToInisiator?: () => void;
 }
@@ -79,6 +83,8 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   isOpen,
   onClose,
   onAddCampaign,
+  onUpdateCampaign,
+  campaignToEdit,
   currentUser,
   onSwitchToInisiator
 }) => {
@@ -108,6 +114,25 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   }, [isOpen]);
   const [locationCity, setLocationCity] = useState(currentUser?.city || 'Bandung');
   const [description, setDescription] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setErrorMessage('Ukuran file foto maksimal 5 MB.');
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setErrorMessage(null);
+    }
+  };
 
   // Mode Dana fields
   const [targetFundsStr, setTargetFundsStr] = useState('25000000');
@@ -130,14 +155,38 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    if (isOpen && currentUser && currentUser.role !== 'guest') {
-      setInitiatorName(currentUser.name);
-      if (currentUser.city) setLocationCity(currentUser.city);
+    if (isOpen) {
+      if (campaignToEdit) {
+        setTitle(campaignToEdit.title || '');
+        setCategory(campaignToEdit.category || 'Bencana Alam');
+        setMode(campaignToEdit.mode || 'keduanya');
+        setLocationCity(campaignToEdit.locationCity || 'Bandung');
+        setDescription(campaignToEdit.description || '');
+        setTargetFundsStr(String(campaignToEdit.targetFunds || 25000000));
+        setTargetVolunteersStr(String(campaignToEdit.targetVolunteers || 20));
+        setEventTime(campaignToEdit.eventTime || '08:00 - 16:00 WIB');
+        setTasksStr(
+          Array.isArray(campaignToEdit.taskCriteria)
+            ? campaignToEdit.taskCriteria.join(', ')
+            : 'Distribusi bantuan, Membantu di posko evakuasi'
+        );
+        setImagePreview(campaignToEdit.imageUrl || null);
+        setImageFile(null);
+      } else {
+        if (currentUser && currentUser.role !== 'guest') {
+          setInitiatorName(currentUser.name);
+          if (currentUser.city) setLocationCity(currentUser.city);
+        }
+        setTitle('');
+        setDescription('');
+        setImageFile(null);
+        setImagePreview(null);
+      }
       setErrorMessage(null);
       setIsSuccess(false);
       setIsSubmitting(false);
     }
-  }, [isOpen, currentUser]);
+  }, [isOpen, campaignToEdit, currentUser]);
 
   if (!isOpen) return null;
 
@@ -154,49 +203,49 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
       const targetAmount = mode === 'relawan' ? 0 : parseInt(targetFundsStr.replace(/\D/g, '') || '0', 10);
       const targetVolunteers = mode === 'dana' ? 0 : parseInt(targetVolunteersStr.replace(/\D/g, '') || '0', 10);
 
-      // Hit POST /api/campaigns (Sanctum protected)
-      const response = await api.post('/campaigns', {
-        category_id: categoryId,
-        title: title.trim(),
-        description: description.trim(),
-        campaign_mode: backendMode,
-        target_amount: targetAmount,
-        target_volunteers: targetVolunteers,
-        location: locationCity,
-        activity_date: activityDate || null,
-      });
+      // Gunakan FormData untuk mengirim data teks dan file gambar (multipart/form-data)
+      const formData = new FormData();
+      formData.append('category_id', String(categoryId));
+      formData.append('title', title.trim());
+      formData.append('description', description.trim());
+      formData.append('campaign_mode', backendMode);
+      formData.append('target_amount', String(targetAmount));
+      formData.append('target_volunteers', String(targetVolunteers));
+      formData.append('location', locationCity);
+      if (activityDate) {
+        formData.append('activity_date', activityDate);
+      }
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
 
-      const responseData = response.data;
-      if (responseData?.data) {
-        const createdCampaign = mapBackendCampaignToFrontend(responseData.data);
-        onAddCampaign(createdCampaign);
+      let response;
+      if (campaignToEdit) {
+        // Update kampanye existing (Gunakan POST dengan _method=PUT untuk parsing multipart di Laravel)
+        formData.append('_method', 'PUT');
+        response = await api.post(`/campaigns/${campaignToEdit.id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (response.data?.data) {
+          const updatedCampaign = mapBackendCampaignToFrontend(response.data.data);
+          onUpdateCampaign?.(updatedCampaign);
+        }
       } else {
-        // Fallback jika response custom
-        const fallbackCamp: Campaign = {
-          id: `camp-${Date.now()}`,
-          title: title.trim(),
-          initiatorName: initiatorName.trim() || 'Inisiator Kemanusiaan',
-          initiatorRole: 'Inisiator Terverifikasi',
-          category,
-          mode,
-          locationCity,
-          distanceKm: 1.5,
-          imageUrl: 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
-          description: description.trim(),
-          targetFunds: targetAmount,
-          collectedFunds: 0,
-          targetVolunteers: targetVolunteers,
-          filledVolunteers: 0,
-          eventDate: activityDate,
-          eventTime: eventTime,
-          status: 'pending_approval',
-        };
-        onAddCampaign(fallbackCamp);
+        // Buat kampanye baru
+        response = await api.post('/campaigns', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (response.data?.data) {
+          const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
+          onAddCampaign(createdCampaign);
+        }
       }
 
       setIsSuccess(true);
     } catch (err: any) {
-      console.error('Create campaign error:', err);
+      console.error('Save campaign error:', err);
       if (err.response?.data?.errors) {
         const errors = err.response.data.errors;
         const firstKey = Object.keys(errors)[0];
@@ -228,10 +277,10 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
           <div>
             <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
               <PlusCircle className="w-3.5 h-3.5 text-blue-600" />
-              <span>Inisiasi Kampanye Aksi (REST API)</span>
+              <span>{campaignToEdit ? 'Perbarui Data Kampanye (REST API)' : 'Inisiasi Kampanye Aksi (REST API)'}</span>
             </div>
             <h3 className="text-base font-bold text-slate-900">
-              Buka Galang Aksi Sosial Baru
+              {campaignToEdit ? 'Edit Inisiasi Kampanye Aksi' : 'Buka Galang Aksi Sosial Baru'}
             </h3>
           </div>
           <button
@@ -351,6 +400,54 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                   <Heart className="w-5 h-5 mx-auto mb-1 text-blue-600" />
                   <div>Dana & Relawan</div>
                 </button>
+              </div>
+            </div>
+
+            {/* Upload Foto Banner Kampanye */}
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <label className="block font-semibold text-slate-700 text-xs">
+                Foto Banner Kampanye <span className="text-slate-400 font-normal">(Maks. 5MB, format JPG/PNG/WebP)</span>
+              </label>
+              <div className="flex items-center gap-3">
+                {imagePreview ? (
+                  <div className="relative w-28 h-20 rounded-xl overflow-hidden border border-slate-200 shrink-0 group shadow-xs">
+                    <img src={imagePreview} alt="Preview Banner" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
+                      className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-rose-600 text-white rounded-md transition-colors cursor-pointer"
+                      title="Hapus / Ganti Foto"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-28 h-20 rounded-xl border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center text-slate-400 shrink-0">
+                    <Upload className="w-5 h-5 mb-0.5 text-blue-500" />
+                    <span className="text-[10px] font-medium text-slate-500">Pilih Foto</span>
+                  </div>
+                )}
+
+                <div className="flex-1">
+                  <label className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs cursor-pointer shadow-xs transition-colors">
+                    <Upload className="w-4 h-4 text-blue-600" />
+                    <span>{imageFile ? 'Ganti File Foto' : 'Pilih Berkas Foto'}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg,image/webp"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                    {imageFile
+                      ? `File: ${imageFile.name} (${(imageFile.size / 1024).toFixed(0)} KB)`
+                      : 'Unggah foto nyata kegiatan agar kampanye lebih kredibel bagi donatur & relawan.'}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -522,7 +619,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                   <span>Menyimpan ke Laravel Backend...</span>
                 </>
               ) : (
-                <span>Simpan & Terbitkan Kampanye Aksi Baru</span>
+                <span>{campaignToEdit ? 'Simpan Perubahan Kampanye' : 'Simpan & Terbitkan Kampanye Aksi Baru'}</span>
               )}
             </button>
           </form>
@@ -531,7 +628,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
             <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Kampanye Berhasil Dibuat!</h3>
+            <h3 className="text-lg font-bold text-slate-900">{campaignToEdit ? 'Perubahan Kampanye Berhasil Disimpan!' : 'Kampanye Berhasil Dibuat!'}</h3>
             <p className="text-xs text-slate-600 max-w-sm mx-auto">
               Pengajuan aksi barumu telah tersimpan di REST API Laravel dan berstatus <strong className="text-slate-900">Menunggu Verifikasi Admin</strong> sesuai prosedur SRS ActGiving.
             </p>

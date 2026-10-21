@@ -103,8 +103,16 @@ class CampaignController extends Controller
             'target_amount' => 'required_if:campaign_mode,fund_only,both|numeric|min:0',
             'target_volunteers' => 'required_if:campaign_mode,volunteer_only,both|integer|min:0',
             'location' => 'required|string|max:255',
-            'activity_date' => 'nullable|date|after_or_equal:today',
+            'activity_date' => 'nullable|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $uploader = app(\App\Services\FileUploadService::class);
+            $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
+            $imageUrl = $uploadResult['url'];
+        }
 
         $campaign = Campaign::create([
             'user_id' => $request->user()->id,
@@ -118,6 +126,7 @@ class CampaignController extends Controller
             'current_volunteers' => 0,
             'location' => $validated['location'],
             'activity_date' => $validated['activity_date'] ?? null,
+            'image_url' => $imageUrl,
             'status' => 'pending', // Menunggu moderasi admin
         ]);
 
@@ -161,18 +170,50 @@ class CampaignController extends Controller
             'category_id' => 'sometimes|exists:categories,id',
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
+            'campaign_mode' => 'sometimes|in:fund_only,volunteer_only,both',
             'location' => 'sometimes|string|max:255',
             'activity_date' => 'nullable|date',
             'target_amount' => 'sometimes|numeric|min:0',
             'target_volunteers' => 'sometimes|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        if ($request->hasFile('image')) {
+            $uploader = app(\App\Services\FileUploadService::class);
+            if ($campaign->image_url) {
+                $uploader->delete($campaign->image_url);
+            }
+            $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
+            $validated['image_url'] = $uploadResult['url'];
+        }
 
         $campaign->update($validated);
 
         return response()->json([
             'success' => true,
             'message' => 'Data kampanye berhasil diperbarui',
-            'data' => $campaign,
+            'data' => $campaign->load('category'),
+        ]);
+    }
+
+    /**
+     * Hapus Kampanye (Inisiator)
+     */
+    public function destroy(Request $request, $id): JsonResponse
+    {
+        $campaign = Campaign::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        if ($campaign->image_url) {
+            app(\App\Services\FileUploadService::class)->delete($campaign->image_url);
+        }
+
+        $campaign->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kampanye berhasil dihapus.',
         ]);
     }
 

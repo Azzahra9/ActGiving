@@ -3,7 +3,7 @@ import {
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
   ExternalLink, TrendingUp, Calendar, MapPin, Search, Check, Sparkles,
-  Camera, Trash2, Plus, ReceiptText, Layers, FileCheck2, ZoomIn, ArrowRight
+  Camera, Trash2, Pencil, Plus, ReceiptText, Layers, FileCheck2, ZoomIn, ArrowRight
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
 import api from '../../lib/axios';
@@ -15,6 +15,8 @@ interface InisiatorDashboardViewProps {
   campaigns: Campaign[];
   onExplorePublic: () => void;
   onOpenCreateCampaign: () => void;
+  onEditCampaign?: (campaign: Campaign) => void;
+  onDeleteCampaign?: (campaignId: string) => void;
   onAddLpj: (campaignId: string, lpj: LpjItem) => void;
   onOpenLpjModal: (campaign: Campaign) => void;
   activeTab?: 'kampanye' | 'lpj' | 'relawan' | 'panduan';
@@ -26,6 +28,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   campaigns,
   onExplorePublic,
   onOpenCreateCampaign,
+  onEditCampaign,
+  onDeleteCampaign,
   onAddLpj,
   onOpenLpjModal,
   activeTab: propActiveTab,
@@ -118,6 +122,23 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const totalRelawanTerdaftar = myCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
   const totalTargetRelawan = myCampaigns.reduce((acc, c) => acc + (c.targetVolunteers || 0), 0);
   const totalLpjCount = myCampaigns.reduce((acc, c) => acc + (c.lpjReports?.length || 0), 0);
+
+    const handleDeleteCampaign = async (camp: Campaign) => {
+    const isConfirmed = window.confirm(
+      `Apakah Anda yakin ingin menghapus kampanye "${camp.title}"? Seluruh data yang terkait akan dihapus secara permanen.`
+    );
+    if (!isConfirmed) return;
+
+    try {
+      await api.delete(`/campaigns/${camp.id}`);
+      showToast(`Kampanye "${camp.title}" berhasil dihapus.`);
+      setInitiatorCampaigns((prev) => prev.filter((c) => c.id !== camp.id));
+      onDeleteCampaign?.(camp.id);
+    } catch (err: any) {
+      console.error('Delete campaign error:', err);
+      showToast(err.response?.data?.message || 'Gagal menghapus kampanye dari backend.');
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -474,29 +495,55 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                     </div>
 
                     {/* Bottom action buttons */}
-                    <div className="bg-slate-50 p-3 border-t border-slate-200 flex items-center justify-between gap-2 text-xs">
-                      <div className="text-[11px] text-slate-500">
+                    <div className="bg-slate-50 p-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="text-[11px] text-slate-500 font-medium">
                         {camp.lpjReports?.length || 0} Bukti LPJ Terbit
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {/* Tombol Edit Kampanye */}
                         <button
-                          onClick={() => onOpenLpjModal(camp)}
-                          className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+                          type="button"
+                          onClick={() => onEditCampaign?.(camp)}
+                          className="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                          title="Edit Data Kampanye"
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Lihat LPJ Publik</span>
+                          <Pencil className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Edit</span>
                         </button>
 
+                        {/* Tombol Hapus Kampanye */}
                         <button
+                          type="button"
+                          onClick={() => handleDeleteCampaign(camp)}
+                          className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                          title="Hapus Kampanye"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Hapus</span>
+                        </button>
+
+                        {/* Tombol Lihat LPJ */}
+                        <button
+                          type="button"
+                          onClick={() => onOpenLpjModal(camp)}
+                          className="px-2.5 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold rounded-xl transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-slate-500" />
+                          <span>Lihat LPJ</span>
+                        </button>
+
+                        {/* Tombol Unggah LPJ Baru */}
+                        <button
+                          type="button"
                           onClick={() => {
                             setSelectedCampaignId(camp.id);
                             setActiveTab('lpj');
                           }}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors flex items-center gap-1 shadow-xs cursor-pointer"
                         >
                           <Upload className="w-3.5 h-3.5" />
-                          <span>Unggah LPJ Baru</span>
+                          <span>+ LPJ</span>
                         </button>
                       </div>
                     </div>

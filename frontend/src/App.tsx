@@ -99,6 +99,25 @@ export default function App() {
   const [volunteerCampaign, setVolunteerCampaign] = useState<Campaign | null>(null);
   const [lpjCampaign, setLpjCampaign] = useState<Campaign | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [campaignToEdit, setCampaignToEdit] = useState<Campaign | null>(null);
+
+  const handleOpenCreateCampaign = () => {
+    setCampaignToEdit(null);
+    setIsCreateOpen(true);
+  };
+
+  const handleOpenEditCampaign = (camp: Campaign) => {
+    setCampaignToEdit(camp);
+    setIsCreateOpen(true);
+  };
+
+  const handleUpdateCampaign = (updated: Campaign) => {
+    setCampaigns((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
+
+  const handleDeleteCampaign = (campaignId: string) => {
+    setCampaigns((prev) => prev.filter((c) => c.id !== campaignId));
+  };
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
   const [sourceModalMode, setSourceModalMode] = useState<'hifi' | 'wireframe'>('hifi');
@@ -288,7 +307,7 @@ export default function App() {
             setActiveView('admin_dashboard');
           }}
           campaigns={campaigns}
-          onOpenCreateCampaign={() => setIsCreateOpen(true)}
+          onOpenCreateCampaign={handleOpenCreateCampaign}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSourceModal={() => setIsSourceOpen(true)}
           onSelectUser={handleSelectUser}
@@ -312,7 +331,7 @@ export default function App() {
           currentUser={currentUser}
           activeView={activeView}
           onNavigateView={setActiveView}
-          onOpenCreateCampaign={() => setIsCreateOpen(true)}
+          onOpenCreateCampaign={handleOpenCreateCampaign}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenSourceModal={() => handleOpenSourceModal('hifi')}
           onOpenWireframeModal={() => handleOpenSourceModal('wireframe')}
@@ -345,7 +364,9 @@ export default function App() {
               currentUser={currentUser}
               campaigns={campaigns}
               onExplorePublic={() => setActiveView('public')}
-              onOpenCreateCampaign={() => setIsCreateOpen(true)}
+              onOpenCreateCampaign={handleOpenCreateCampaign}
+              onEditCampaign={handleOpenEditCampaign}
+              onDeleteCampaign={handleDeleteCampaign}
               onAddLpj={handleAddLpj}
               onOpenLpjModal={(camp) => setLpjCampaign(camp)}
               activeTab={inisiatorTab}
@@ -558,8 +579,13 @@ export default function App() {
       {/* MODAL 4: Create Campaign Multi-Option (SRS Subbab 2.2 & FR-06) */}
       <CreateCampaignModal
         isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        onClose={() => {
+          setIsCreateOpen(false);
+          setCampaignToEdit(null);
+        }}
         onAddCampaign={handleAddCampaign}
+        onUpdateCampaign={handleUpdateCampaign}
+        campaignToEdit={campaignToEdit}
         currentUser={currentUser}
         onSwitchToInisiator={() => setIsAuthOpen(true)}
       />

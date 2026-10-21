@@ -24,6 +24,7 @@ class Campaign extends Model
         'activity_date',
         'status',
         'campaign_mode',
+        'image_url',
     ];
 
     protected function casts(): array

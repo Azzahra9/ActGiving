@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/campaigns', [CampaignController::class, 'store']);
     Route::get('/my-campaigns', [CampaignController::class, 'myCampaigns']);
     Route::put('/campaigns/{id}', [CampaignController::class, 'update']);
+    Route::delete('/campaigns/{id}', [CampaignController::class, 'destroy']);
     Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']);
     Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']);
     Route::post('/campaigns/{id}/lpj', [LPJController::class, 'store']); // FR-12: Upload LPJ via FileUploadService
