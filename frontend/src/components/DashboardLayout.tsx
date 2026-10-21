@@ -10,12 +10,10 @@ import {
   Upload, 
   PlusCircle, 
   Compass, 
-  Home, 
-  CheckCircle2, 
+CheckCircle2, 
   Menu, 
   X, 
-  ArrowLeft,
-  ChevronRight,
+ChevronRight,
   Sparkles,
   TrendingUp,
   Activity,
@@ -145,7 +143,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight text-white font-['Space_Grotesk']">
+              <span className="text-lg font-bold tracking-tight text-white font-sans">
                 Act<span className="text-brand-blue">Giving</span>
               </span>
               <p className="text-[10px] text-slate-400 uppercase tracking-wider">Aksi Nyata & Transparan</p>
@@ -242,19 +240,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             </nav>
           </div>
 
-          {/* Quick Back to Public Portal */}
-          <div className="pt-2 border-t border-navy-border">
-            <button
-              onClick={() => {
-                onNavigateView('public');
-                setMobileSidebarOpen(false);
-              }}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:bg-navy-card hover:text-white transition-all"
-            >
-              <Home className="w-4 h-4 text-brand-blue" />
-              <span>Lihat Beranda Publik</span>
-            </button>
-          </div>
+
         </div>
 
         {/* Footer in Sidebar */}
@@ -291,18 +277,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className="font-bold text-sm tracking-tight font-['Space_Grotesk']">
+            <span className="font-bold text-sm tracking-tight font-sans">
               Act<span className="text-brand-blue">Giving</span>
             </span>
           </div>
 
-          <button
-            onClick={() => onNavigateView('public')}
-            className="flex items-center gap-1 text-xs text-slate-300 hover:text-white bg-navy-card px-2.5 py-1.5 rounded-lg border border-navy-border"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Beranda</span>
-          </button>
+
         </header>
 
         {/* Top Dark Hero Workspace Banner */}
@@ -324,7 +304,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <h1 className="text-xl sm:text-2xl font-bold font-['Space_Grotesk'] text-white">
+                    <h1 className="text-xl sm:text-2xl font-bold font-sans text-white">
                       {currentUser.name}
                     </h1>
                     <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${meta.badgeColor}`}>
@@ -373,7 +353,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                     </div>
 
                     <div className="space-y-1">
-                      <div className="text-xl sm:text-2xl font-black text-white font-['Space_Grotesk'] truncate">
+                      <div className="text-xl sm:text-2xl font-black text-white font-sans truncate">
                         {stat.value}
                       </div>
                       {(stat.subtext || stat.trend) && (

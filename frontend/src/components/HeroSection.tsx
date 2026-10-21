@@ -42,7 +42,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.18] font-['Space_Grotesk']">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.18] font-sans">
               Kebaikan Nyata, <span className="text-brand-blue">Tercatat Terbuka</span> Hingga Titik Lapangan.
             </h1>
 
@@ -72,7 +72,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
             {/* 3 Trust Metric Indicators */}
             <div className="mt-10 pt-8 border-t border-slate-200/80 grid grid-cols-3 gap-6 max-w-lg">
               <div>
-                <div className="text-xl sm:text-2xl font-black text-slate-900 font-['Space_Grotesk']">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 font-sans">
                   100%
                 </div>
                 <div className="text-xs text-slate-500 font-medium mt-0.5">
@@ -81,7 +81,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
               </div>
 
               <div>
-                <div className="text-xl sm:text-2xl font-black text-slate-900 font-['Space_Grotesk']">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 font-sans">
                   QRIS & VA
                 </div>
                 <div className="text-xs text-slate-500 font-medium mt-0.5">
@@ -90,7 +90,7 @@ export const HeroSection: React.FC<HeroSectionProps> = () => {
               </div>
 
               <div>
-                <div className="text-xl sm:text-2xl font-black text-slate-900 font-['Space_Grotesk']">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 font-sans">
                   Live Foto
                 </div>
                 <div className="text-xs text-slate-500 font-medium mt-0.5">

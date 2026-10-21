@@ -13,9 +13,7 @@ import {
   LogOut, 
   ShieldCheck, 
   Building2, 
-  Award, 
-  ArrowLeft 
-} from 'lucide-react';
+  Award, } from 'lucide-react';
 import { UserProfile, ActiveView } from '../types';
 import { DEMO_USERS } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
@@ -128,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold tracking-tight text-slate-900 font-['Space_Grotesk']">
+                  <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
                     Act<span className="text-brand-blue">Giving</span>
                   </span>
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full border border-blue-200">
@@ -180,15 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span>Panduan Donatur</span>
                 </button>
               </>
-            ) : (
-              <button
-                onClick={() => onNavigateView('public')}
-                className="flex items-center gap-1.5 text-slate-700 hover:text-brand-blue font-bold transition-colors bg-blue-50/50 hover:bg-blue-100/60 px-3.5 py-1.5 rounded-xl border border-blue-200 cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4 text-brand-blue" />
-                <span>Kembali ke Beranda Publik</span>
-              </button>
-            )}
+            ) : null}
           </nav>
 
           {/* ======================================================= */}

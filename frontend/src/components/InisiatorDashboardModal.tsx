@@ -75,7 +75,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white font-['Space_Grotesk']">Dashboard Manajemen Inisiator</h3>
+                <h3 className="text-base font-bold text-white font-sans">Dashboard Manajemen Inisiator</h3>
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-900/60 text-blue-200 px-2 py-0.5 rounded border border-blue-700/60">
                   Inisiator Terverifikasi
                 </span>

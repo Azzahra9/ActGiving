@@ -1,39 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap');
 @import "tailwindcss";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../tailwind.config.js";
 
 @theme {
   --font-sans: "Plus Jakarta Sans", sans-serif;
-  --font-heading: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
-
-  --color-navy-darkest: #070C1E;
-  --color-navy-sidebar: #0B132B;
-  --color-navy-card: #131D3B;
-  --color-navy-header: #0E1A38;
-  --color-navy-border: #1E294B;
-
-  --color-brand-blue: #2563EB;
-  --color-brand-blue-hover: #1D4ED8;
-  --color-brand-blue-light: #EFF6FF;
-  --color-brand-blue-border: #BFDBFE;
-
-  --color-brand-green: #059669;
-  --color-brand-green-hover: #047857;
-  --color-brand-green-light: #ECFDF5;
-
-  --color-surface-bg: #F8FAFC;
-  --color-surface-card: #FFFFFF;
-  --color-surface-border: #E2E8F0;
 }
 
 body {
-  font-family: "Plus Jakarta Sans", sans-serif;
-  color: #1e293b;
+  font-family: var(--font-sans);
   background-color: #f8fafc;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: #1e293b;
 }

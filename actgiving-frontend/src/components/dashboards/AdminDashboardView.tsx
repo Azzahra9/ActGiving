@@ -115,7 +115,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl sm:text-2xl font-bold font-['Space_Grotesk'] text-white">
+                <h1 className="text-xl sm:text-2xl font-bold font-sans text-white">
                   {currentUser.name}
                 </h1>
                 <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -141,28 +141,28 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-400 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-blue-400 font-sans">
                 {pendingCampaigns.length}
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">Menunggu Review</div>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-400 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-sky-400 font-sans">
                 {activeCampaigns.length}
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">Kampanye Aktif</div>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-xl sm:text-2xl font-black text-white font-['Space_Grotesk']">
+              <div className="text-xl sm:text-2xl font-black text-white font-sans">
                 {formatRupiah(totalFundsCollected)}
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">Total Donasi Platform</div>
             </div>
 
             <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-300 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-sky-300 font-sans">
                 {totalVolunteers}
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">Total Relawan</div>
@@ -212,7 +212,6 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Navigasi Sidebar:</span>
             <span className="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-800 rounded-lg border border-blue-200 capitalize">
               Mode Super Admin
             </span>

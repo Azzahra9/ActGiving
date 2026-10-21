@@ -5,14 +5,11 @@ import {
   Compass, 
   BookOpen, 
   PlusCircle, 
-  FileCode, 
-  ShieldCheck, 
+ShieldCheck, 
   Sparkles, 
   Award, 
   Building2, 
-  ChevronLeft, 
-  ChevronRight, 
-  X, 
+X, 
   Activity, 
   Users, 
   Home,
@@ -189,7 +186,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(!isCollapsedDesktop || isOpenMobile) && (
               <div className="truncate">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-bold tracking-tight text-white font-['Space_Grotesk']">
+                  <span className="text-lg font-bold tracking-tight text-white font-sans">
                     Act<span className="text-blue-400">Giving</span>
                   </span>
                 </div>
@@ -208,17 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <X className="w-5 h-5" />
             </button>
 
-            <button
-              onClick={onToggleCollapseDesktop}
-              className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              title={isCollapsedDesktop ? 'Perluas Sidebar' : 'Ciutkan Sidebar'}
-            >
-              {isCollapsedDesktop ? (
-                <ChevronRight className="w-4 h-4" />
-              ) : (
-                <ChevronLeft className="w-4 h-4" />
-              )}
-            </button>
+            
           </div>
         </div>
 
@@ -386,7 +373,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] ${
                   isCollapsedDesktop && !isOpenMobile ? 'px-0' : ''
                 }`}
-                title="+ Buka Galang Aksi Baru"
+                title="Buka Galang Aksi Baru"
               >
                 <PlusCircle className="w-4 h-4 shrink-0" />
                 {(!isCollapsedDesktop || isOpenMobile) && (
@@ -689,51 +676,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* ======================================================== */}
-          {/* UNIVERSAL SECTION: BERANDA PUBLIK (JIKA LAGI DI DASHBOARD) */}
-          {/* ======================================================== */}
-          {currentRole !== 'guest' && (
-            <div className="pt-2 border-t border-slate-800">
-              {(!isCollapsedDesktop || isOpenMobile) && (
-                <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                  Portal Publik
-                </p>
-              )}
-              <button
-                onClick={() => handlePublicNavClick()}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all ${
-                  isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''
-                }`}
-                title="Lihat Beranda & Katalog Publik"
-              >
-                <Home className="w-4 h-4 shrink-0 text-slate-400" />
-                {(!isCollapsedDesktop || isOpenMobile) && (
-                  <span className="truncate">Lihat Beranda Publik</span>
-                )}
-              </button>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* UNIVERSAL: MODAL KODE HTML                               */}
-          {/* ======================================================== */}
-          <div className="pt-2 border-t border-slate-800">
-            <button
-              onClick={() => {
-                onOpenSourceModal();
-                onCloseMobile();
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition-all ${
-                isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''
-              }`}
-              title="Lihat Kode HTML Lengkap"
-            >
-              <FileCode className="w-4 h-4 shrink-0 text-blue-400" />
-              {(!isCollapsedDesktop || isOpenMobile) && (
-                <span className="truncate">Kode HTML Mandiri</span>
-              )}
-            </button>
-          </div>
+          
         </div>
 
         {/* 3. Footer / Status Sistem */}

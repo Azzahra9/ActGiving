@@ -196,7 +196,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                 <Lock className="w-3.5 h-3.5 text-blue-600" />
                 Otorisasi Khusus Peran Inisiator
               </div>
-              <h3 className="text-lg font-bold text-slate-900 font-['Space_Grotesk']">
+              <h3 className="text-lg font-bold text-slate-900 font-sans">
                 Hanya Inisiator Terverifikasi yang Berwenang Membuka Aksi
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">

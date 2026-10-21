@@ -103,7 +103,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
             />
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl sm:text-2xl font-bold font-['Space_Grotesk'] text-white">
+                <h1 className="text-xl sm:text-2xl font-bold font-sans text-white">
                   {currentUser.name}
                 </h1>
                 <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -129,28 +129,28 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-white font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-white font-sans">
                 {joinedCampaigns.length}
               </div>
               <div className="text-[11px] text-blue-200 mt-0.5">Aksi Diikuti</div>
             </div>
 
             <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-400 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-sky-400 font-sans">
                 18 Jam
               </div>
               <div className="text-[11px] text-blue-200 mt-0.5">Jam Kontribusi</div>
             </div>
 
             <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-300 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-blue-300 font-sans">
                 {joinedCampaigns.length}
               </div>
               <div className="text-[11px] text-blue-200 mt-0.5">E-Sertifikat</div>
             </div>
 
             <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-200 font-['Space_Grotesk']">
+              <div className="text-2xl font-black text-blue-200 font-sans">
                 850
               </div>
               <div className="text-[11px] text-blue-200 mt-0.5">Poin Reputasi</div>
@@ -203,7 +203,6 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Navigasi Sidebar:</span>
             <span className="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-700 rounded-lg border border-blue-200 capitalize">
               Mode Relawan
             </span>
@@ -638,7 +637,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
 
               <div className="flex items-center justify-center gap-2 mb-2">
                 <HeartHandshake className="w-6 h-6 text-blue-600" />
-                <span className="font-bold text-slate-900 font-['Space_Grotesk'] text-lg">
+                <span className="font-bold text-slate-900 font-sans text-lg">
                   ActGiving Indonesia
                 </span>
               </div>
@@ -650,7 +649,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                 Diberikan dengan hormat dan apresiasi setinggi-tingginya kepada:
               </p>
 
-              <div className="text-2xl sm:text-3xl font-bold font-['Space_Grotesk'] text-blue-900 border-b-2 border-blue-200 pb-2 inline-block px-8 mb-4">
+              <div className="text-2xl sm:text-3xl font-bold font-sans text-blue-900 border-b-2 border-blue-200 pb-2 inline-block px-8 mb-4">
                 {currentUser.name}
               </div>
 

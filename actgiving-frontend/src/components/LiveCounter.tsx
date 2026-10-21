@@ -34,7 +34,7 @@ export const LiveCounter: React.FC<LiveCounterProps> = ({
               </span>
               <span>Pusat Transparansi Penyaluran</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold tracking-tight font-['Space_Grotesk'] text-white">
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight font-sans text-white">
               Dampak Nyata Komunitas ActGiving
             </h3>
           </div>
@@ -56,7 +56,7 @@ export const LiveCounter: React.FC<LiveCounterProps> = ({
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
               Total Donasi Simulasi Terhimpun
             </p>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Space_Grotesk'] text-sky-300">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans text-sky-300">
               {formatRupiah(totalDonationRp)}
             </div>
             <p className="mt-2 text-xs text-slate-400">
@@ -72,7 +72,7 @@ export const LiveCounter: React.FC<LiveCounterProps> = ({
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
               Total Relawan Aktif Bergabung
             </p>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Space_Grotesk'] text-sky-200">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans text-sky-200">
               {formatNumber(totalVolunteers)} <span className="text-lg font-normal text-slate-400">Orang</span>
             </div>
             <p className="mt-2 text-xs text-slate-400">
@@ -88,7 +88,7 @@ export const LiveCounter: React.FC<LiveCounterProps> = ({
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
               Program Tuntas Terverifikasi
             </p>
-            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-['Space_Grotesk'] text-blue-200">
+            <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-sans text-blue-200">
               {completedPrograms} <span className="text-lg font-normal text-slate-400">Aksi Selesai</span>
             </div>
             <p className="mt-2 text-xs text-slate-400">

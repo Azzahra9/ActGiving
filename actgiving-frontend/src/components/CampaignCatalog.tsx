@@ -66,7 +66,7 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-brand-blue text-[10px] font-bold uppercase tracking-wider mb-2">
               <span>Katalog Terbuka</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-['Space_Grotesk']">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sans">
               Pilih Kampanye & Mulai Berbagi
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -128,7 +128,7 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
             <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <WifiOff className="w-7 h-7" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 font-['Space_Grotesk']">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 font-sans">
               Gagal Memuat Kampanye
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed mb-6">
@@ -152,7 +152,7 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
             <div className="w-14 h-14 rounded-2xl bg-blue-50 text-brand-blue flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-7 h-7" />
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 font-['Space_Grotesk']">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2 font-sans">
               Tidak Ada Kampanye yang Cocok
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed mb-6">

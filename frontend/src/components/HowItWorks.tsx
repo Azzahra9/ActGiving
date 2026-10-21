@@ -38,7 +38,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold mb-3">
             <span>Panduan Interaktif Penggunaan</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-['Space_Grotesk']">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sans">
             Cara Kerja ActGiving
           </h2>
           <p className="mt-2 text-sm sm:text-base text-slate-600">

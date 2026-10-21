@@ -436,7 +436,7 @@ export default function App() {
                 <span>Akuntabilitas Terpadu</span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-['Space_Grotesk']">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
                 Statistik Penyaluran & Keterlibatan Publik
               </h2>
 
@@ -448,7 +448,7 @@ export default function App() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-10">
                 {/* Card 1: Total Donasi Terkumpul */}
                 <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-['Space_Grotesk'] tracking-tight">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
                     {totalDonationRp ? formatRupiah(totalDonationRp) : 'Rp 194.500.000'}
                   </div>
                   <p className="text-xs text-slate-400 mt-2 font-medium">
@@ -458,7 +458,7 @@ export default function App() {
 
                 {/* Card 2: Penerima Manfaat */}
                 <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-['Space_Grotesk'] tracking-tight">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
                     2.840 Jiwa
                   </div>
                   <p className="text-xs text-slate-400 mt-2 font-medium">
@@ -468,7 +468,7 @@ export default function App() {
 
                 {/* Card 3: Relawan */}
                 <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-['Space_Grotesk'] tracking-tight">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
                     {totalVolunteers > 0 ? `${totalVolunteers} Relawan` : '142 Relawan'}
                   </div>
                   <p className="text-xs text-slate-400 mt-2 font-medium">
@@ -478,7 +478,7 @@ export default function App() {
 
                 {/* Card 4: LPJ Terbit & Terverifikasi */}
                 <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-brand-green font-['Space_Grotesk'] tracking-tight">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-brand-green font-sans tracking-tight">
                     100%
                   </div>
                   <p className="text-xs text-slate-400 mt-2 font-medium">
@@ -498,7 +498,7 @@ export default function App() {
                   <HeartHandshake className="w-4 h-4" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white font-['Space_Grotesk'] text-sm tracking-tight">
+                  <span className="font-bold text-white font-sans text-sm tracking-tight">
                     Act<span className="text-brand-blue">Giving</span>
                   </span>
                   <span className="text-slate-600 hidden sm:inline">|</span>

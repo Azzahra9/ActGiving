@@ -186,7 +186,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl sm:text-2xl font-bold font-['Space_Grotesk'] text-white">
+                <h1 className="text-xl sm:text-2xl font-bold font-sans text-white">
                   {currentUser.name}
                 </h1>
                 <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -215,7 +215,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
             className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all shrink-0 hover:scale-105"
           >
             <PlusCircle className="w-5 h-5" />
-            <span>+ Buka Galang Aksi Baru</span>
+            <span>Buka Galang Aksi Baru</span>
           </button>
         </div>
 
@@ -226,7 +226,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <span className="text-xs text-blue-300">Total Donasi Dikelola</span>
               <DollarSign className="w-4 h-4 text-sky-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-['Space_Grotesk']">
+            <div className="text-xl sm:text-2xl font-black text-white font-sans">
               {formatRupiah(totalDanaTerkumpul)}
             </div>
             <div className="text-[11px] text-blue-300/80 mt-1">
@@ -239,7 +239,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <span className="text-xs text-blue-300">Relawan Terhimpun</span>
               <Users className="w-4 h-4 text-blue-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-['Space_Grotesk']">
+            <div className="text-xl sm:text-2xl font-black text-white font-sans">
               {totalRelawanTerdaftar} Orang
             </div>
             <div className="text-[11px] text-blue-300/80 mt-1">
@@ -252,7 +252,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <span className="text-xs text-blue-300">Kampanye Dikelola</span>
               <Building2 className="w-4 h-4 text-sky-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-['Space_Grotesk']">
+            <div className="text-xl sm:text-2xl font-black text-white font-sans">
               {myCampaigns.length} Program
             </div>
             <div className="text-[11px] text-blue-300/80 mt-1">
@@ -265,7 +265,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <span className="text-xs text-blue-300">Akuntabilitas LPJ</span>
               <FileText className="w-4 h-4 text-sky-400" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-sky-400 font-['Space_Grotesk']">
+            <div className="text-xl sm:text-2xl font-black text-sky-400 font-sans">
               100% Sah
             </div>
             <div className="text-[11px] text-blue-300/80 mt-1">
@@ -316,7 +316,6 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Navigasi Sidebar:</span>
             <span className="text-xs font-bold px-3 py-1 bg-blue-50 text-blue-800 rounded-lg border border-blue-200 capitalize">
               Mode Inisiator
             </span>
@@ -338,7 +337,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                 className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>+ Buat Kampanye</span>
+                <span>Buat Kampanye</span>
               </button>
             </div>
 
