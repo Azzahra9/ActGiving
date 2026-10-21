@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Wireframe / Sketsa Kasar Admin & Auditor (Semua Menu Memanjang)</title>
+  <meta name="description" content="Sketsa kasar / Low-Fidelity Wireframe (Blueprint UI) Admin & Auditor ActGiving dengan Sidebar Navigasi dan 4 Menu ditampilkan memanjang ke bawah (Moderasi Kampanye, Audit LPJ Web, Rekonsiliasi Transaksi, Konfigurasi Sistem) siap import Figma." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .wf-cross-box {
+      position: relative;
+      background-color: #f1f5f9;
+      border: 2px dashed #94a3b8;
+      overflow: hidden;
+    }
+    .wf-cross-box::before, .wf-cross-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+      pointer-events: none;
+    }
+    .wf-cross-box::after {
+      background: linear-gradient(to bottom right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+    }
+    .wf-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 1px dashed #64748b;
+      background: #f8fafc;
+      color: #334155;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased flex min-h-screen">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT SIDEBAR WIREFRAME (280px FIXED)                                   -->
+  <!-- ========================================================================= -->
+  <aside class="w-72 bg-slate-900 text-slate-200 border-r-2 border-slate-700 flex flex-col shrink-0 fixed inset-y-0 left-0 z-50 font-mono text-xs">
+    
+    <!-- Sidebar Header Wireframe -->
+    <div class="h-16 px-4 flex items-center justify-between border-b-2 border-slate-700 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 border border-slate-500 bg-slate-800 flex items-center justify-center font-bold text-white text-[11px]">
+          [LOGO]
+        </div>
+        <div>
+          <span class="font-bold text-sm tracking-tight text-white">ActGiving</span>
+          <p class="text-[10px] text-slate-400">WF-SIDEBAR: ADMIN</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Body Wireframe -->
+    <div class="flex-1 overflow-y-auto p-3 space-y-4">
+      
+      <!-- User Profile Box Wireframe -->
+      <div class="border border-dashed border-slate-600 p-3 bg-slate-800/80 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[9px] text-slate-400 uppercase">[HAK AKSES RESMI]</span>
+          <span class="px-1.5 py-0.2 bg-slate-700 text-purple-300 border border-slate-500 text-[9px] font-bold">SUPER ADMIN</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full border border-slate-500 bg-slate-700 flex items-center justify-center font-bold text-[10px] text-white">
+            [AD]
+          </div>
+          <div>
+            <p class="font-bold text-white text-[11px]">Super Administrator</p>
+            <p class="text-[10px] text-slate-400">Kantor Pusat ActGiving</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Anchor Links Wireframe -->
+      <div class="space-y-1">
+        <p class="px-2 text-[10px] font-bold uppercase text-slate-400 mb-1.5">[KONSOL PENGAWASAN]</p>
+        
+        <a href="#wf-admin-moderasi" class="flex items-center justify-between p-2.5 bg-slate-800 border border-slate-600 text-white font-bold hover:bg-slate-700">
+          <span>1. Moderasi Kampanye</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-600">2 ANTREAN</span>
+        </a>
+
+        <a href="#wf-admin-audit" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>2. Audit LPJ Web</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">1 MASUK</span>
+        </a>
+
+        <a href="#wf-admin-transaksi" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>3. Rekonsiliasi Transaksi</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">LIVE</span>
+        </a>
+
+        <a href="#wf-admin-sistem" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>4. Konfigurasi Sistem</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">CONFIG</span>
+        </a>
+      </div>
+
+      <!-- Quick Metrics Wireframe -->
+      <div class="p-2.5 border border-slate-700 bg-slate-950/60 text-[10px] space-y-1">
+        <div class="flex justify-between text-slate-400"><span>Mutasi Donasi:</span><strong class="text-white">Rp 231.850.000</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Gateway QRIS/VA:</span><strong class="text-emerald-400">100% Normal</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Integritas Audit:</span><strong class="text-white">100% Bersih</strong></div>
+      </div>
+
+      <!-- Switcher to Other Roles Wireframe -->
+      <div class="pt-2 border-t border-slate-800 space-y-1">
+        <p class="text-[9px] text-slate-400 uppercase">[PINDAH ROLE WIREFRAME]:</p>
+        <div class="grid grid-cols-2 gap-1 text-[10px]">
+          <a href="/actgiving_wireframe_donatur.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center hover:bg-slate-700">Donatur WF</a>
+          <a href="/actgiving_wireframe_relawan.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center hover:bg-slate-700">Relawan WF</a>
+          <a href="/actgiving_wireframe_inisiator.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center col-span-2 hover:bg-slate-700">Inisiator WF</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-3 border-t-2 border-slate-700 bg-slate-950">
+      <a href="/actgiving_admin.html" class="block py-2 text-center border border-blue-500 bg-blue-900/60 text-blue-200 text-[11px] font-bold hover:bg-blue-800">
+        Lihat Desain Hi-Fi ↗
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN CANVAS WIREFRAME (SEMUA MENU MEMANJANG KE BAWAH)                  -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 pl-72">
+    
+    <!-- Top Header Bar Wireframe -->
+    <header class="h-16 bg-white border-b-2 border-slate-300 px-6 flex items-center justify-between sticky top-0 z-30 font-mono text-xs">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="wf-badge">WIREFRAME LO-FI</span>
+          <h2 class="text-sm font-bold text-slate-900">Konsol Admin & Auditor • Full Extended View</h2>
+        </div>
+        <p class="text-[11px] text-slate-500">Semua 4 menu pengawasan ditampilkan berurutan memanjang ke bawah siap convert Figma.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 border border-slate-400 bg-slate-100 font-bold text-[11px]">
+          AUDIT LEVEL: SUPERVISOR
+        </span>
+      </div>
+    </header>
+
+    <!-- Quick Sticky Nav Jumper -->
+    <div class="bg-slate-200 border-b-2 border-slate-300 px-6 py-2.5 sticky top-16 z-20 font-mono text-xs">
+      <div class="max-w-6xl mx-auto flex items-center gap-2 overflow-x-auto">
+        <span class="text-slate-600 font-bold text-[11px] uppercase">[LOMPAT SECTION]:</span>
+        <a href="#wf-admin-moderasi" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">1. Moderasi (2)</a>
+        <a href="#wf-admin-audit" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">2. Audit LPJ Web (1)</a>
+        <a href="#wf-admin-transaksi" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">3. Transaksi Live</a>
+        <a href="#wf-admin-sistem" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">4. Konfigurasi Sistem</a>
+      </div>
+    </div>
+
+    <!-- MAIN EXTENDED SECTIONS CONTAINER -->
+    <div class="p-6 max-w-6xl mx-auto w-full space-y-12 font-mono">
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 1: MENU SIDEBAR 1 - MODERASI KAMPANYE BARU                    -->
+      <!-- ===================================================================== -->
+      <section id="wf-admin-moderasi" class="space-y-4 pt-2">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 1]</span>
+              <h3 class="text-base font-bold text-slate-900">Moderasi & Persetujuan Kampanye Baru (2 Antrean)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Tinjau kelayakan program inisiator dan keabsahan legalitas sebelum diterbitkan ke publik.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">2 Proposal Menunggu Review</span>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          
+          <!-- Proposal 1 -->
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-3 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="wf-badge">STATUS: MENUNGGU VERIFIKASI</span>
+                  <span class="text-slate-500 text-[10px]">Diajukan: 23 September 2026</span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">Bantuan Sarana Air Bersih Desa Kekeringan Gunungkidul</h4>
+                <p class="text-slate-600 text-[11px]">Pembuatan sumur bor sedalam 65 meter dan tandon penampung 5.000 liter bagi 180 KK dusun.</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <div class="px-4 py-2 bg-slate-800 text-white font-bold border border-slate-800">[BTN: Setujui & Terbitkan]</div>
+                <div class="px-3 py-2 bg-slate-100 text-slate-700 font-bold border border-slate-300">[BTN: Minta Revisi]</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 border border-slate-300 p-2.5 bg-slate-50 text-[11px]">
+              <div><span class="text-slate-500 block text-[9px]">INISIATOR:</span><strong>Komunitas Air Nusantara</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">TARGET DANA:</span><strong>Rp 35.000.000</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">KUOTA RELAWAN:</span><strong>10 Orang</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">LEGALITAS:</span><strong>Kemenkumham Sah</strong></div>
+            </div>
+          </div>
+
+          <!-- Proposal 2 -->
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-3 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="wf-badge">STATUS: MENUNGGU VERIFIKASI</span>
+                  <span class="text-slate-500 text-[10px]">Diajukan: 22 September 2026</span>
+                </div>
+                <h4 class="font-bold text-slate-900 text-sm">Operasi Katarak Gratis Lansia Nelayan Pesisir Cilacap</h4>
+                <p class="text-slate-600 text-[11px]">Pemeriksaan mata dan operasi katarak terpadu bagi 45 nelayan tradisional bersama RSUD.</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <div class="px-4 py-2 bg-slate-800 text-white font-bold border border-slate-800">[BTN: Setujui & Terbitkan]</div>
+                <div class="px-3 py-2 bg-slate-100 text-slate-700 font-bold border border-slate-300">[BTN: Minta Revisi]</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 border border-slate-300 p-2.5 bg-slate-50 text-[11px]">
+              <div><span class="text-slate-500 block text-[9px]">INISIATOR:</span><strong>Lentera Medis Indonesia</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">TARGET DANA:</span><strong>Rp 48.000.000</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">KUOTA RELAWAN:</span><strong>12 Tenaga Medis</strong></div>
+              <div><span class="text-slate-500 block text-[9px]">LEGALITAS:</span><strong>IDI & Dinkes Sah</strong></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 2: MENU SIDEBAR 2 - AUDIT LPJ DIGITAL WEB                     -->
+      <!-- ===================================================================== -->
+      <section id="wf-admin-audit" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 2]</span>
+              <h3 class="text-base font-bold text-slate-900">Audit Formulir LPJ Digital Web (1 Laporan Masuk)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Audit kesesuaian pos rincian belanja web dan foto dokumentasi kegiatan lapangan.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">Paperless Audit System</span>
+        </div>
+
+        <div class="bg-white border-2 border-slate-800 p-5 space-y-4 text-xs shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-300">
+            <div>
+              <span class="wf-badge">ID LPJ: WEB-LPJ-2026-0902</span>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">Pengadaan 150 Karung Beras & Obat Banjir Dayeuhkolot</h4>
+              <p class="text-slate-500 text-[11px]">Inisiator: <strong>Yayasan Peduli Sahabat</strong> • Realisasi: <strong>Rp 18.500.000</strong></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="px-4 py-2 bg-slate-800 text-white font-bold border border-slate-800">[BTN: Verifikasi & Beri Stempel Sah Web]</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 border border-slate-300 bg-slate-50 space-y-2">
+              <span class="font-bold block">[RINCIAN POS ANGGARAN WEB YANG DIAJUKAN]:</span>
+              <div class="flex justify-between py-1 border-b border-slate-200"><span>• Beras Rojolele 150 Karung</span><strong>Rp 9.750.000</strong></div>
+              <div class="flex justify-between py-1 border-b border-slate-200"><span>• Paket Obat Demam & Salep</span><strong>Rp 4.250.000</strong></div>
+              <div class="flex justify-between py-1"><span>• Sewa Armada Perahu Evakuasi</span><strong>Rp 4.500.000</strong></div>
+            </div>
+
+            <div class="p-3 border border-slate-300 bg-slate-50 space-y-2">
+              <span class="font-bold block">[FOTO KEGIATAN LAPANGAN TERSINKRON]:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="wf-cross-box h-24 flex items-center justify-center p-1 text-center">
+                  <span class="bg-white px-1.5 py-0.5 border border-slate-400 font-bold text-[9px] z-10">[FOTO 1: PENYALURAN]</span>
+                </div>
+                <div class="wf-cross-box h-24 flex items-center justify-center p-1 text-center">
+                  <span class="bg-white px-1.5 py-0.5 border border-slate-400 font-bold text-[9px] z-10">[FOTO 2: EVAKUASI]</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 3: MENU SIDEBAR 3 - REKONSILIASI TRANSAKSI                    -->
+      <!-- ===================================================================== -->
+      <section id="wf-admin-transaksi" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 3]</span>
+              <h3 class="text-base font-bold text-slate-900">Rekonsiliasi Transaksi Gateway Donasi (Real-Time Live)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Aliran donasi masuk dari QRIS, BCA VA, Mandiri VA, dan BRI VA dengan status settlement.</p>
+          </div>
+          <div class="px-3 py-1 bg-slate-100 text-slate-700 font-bold border border-slate-400 text-xs">
+            [BTN: Ekspor Mutasi CSV]
+          </div>
+        </div>
+
+        <div class="border-2 border-slate-800 overflow-x-auto bg-white">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-200 border-b-2 border-slate-800 text-[11px]">
+              <tr>
+                <th class="p-2.5">Waktu</th>
+                <th class="p-2.5">Ref ID</th>
+                <th class="p-2.5">Donatur (Guest / Akun)</th>
+                <th class="p-2.5">Program Tujuan</th>
+                <th class="p-2.5">Kanal</th>
+                <th class="p-2.5">Nominal</th>
+                <th class="p-2.5">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y border-slate-300">
+              <tr class="bg-white">
+                <td class="p-2.5 text-slate-500">23/09 21:44</td>
+                <td class="p-2.5 font-bold">TRX-QR-8910</td>
+                <td class="p-2.5">Hamba Allah (Guest)</td>
+                <td class="p-2.5">Tanggap Banjir Dayeuhkolot</td>
+                <td class="p-2.5">[QRIS]</td>
+                <td class="p-2.5 font-bold">Rp 500.000</td>
+                <td class="p-2.5"><span class="wf-badge">SETTLED</span></td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-2.5 text-slate-500">23/09 21:12</td>
+                <td class="p-2.5 font-bold">TRX-VA-7741</td>
+                <td class="p-2.5">Budi Santoso</td>
+                <td class="p-2.5">Renovasi MI Al-Ikhlas</td>
+                <td class="p-2.5">[BCA VA]</td>
+                <td class="p-2.5 font-bold">Rp 1.000.000</td>
+                <td class="p-2.5"><span class="wf-badge">SETTLED</span></td>
+              </tr>
+              <tr class="bg-white">
+                <td class="p-2.5 text-slate-500">23/09 20:30</td>
+                <td class="p-2.5 font-bold">TRX-QR-6623</td>
+                <td class="p-2.5">Siti Nurhaliza (Guest)</td>
+                <td class="p-2.5">Bersih Pantai & Mangrove</td>
+                <td class="p-2.5">[QRIS]</td>
+                <td class="p-2.5 font-bold">Rp 250.000</td>
+                <td class="p-2.5"><span class="wf-badge">SETTLED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 4: MENU SIDEBAR 4 - KONFIGURASI SISTEM                        -->
+      <!-- ===================================================================== -->
+      <section id="wf-admin-sistem" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 4]</span>
+              <h3 class="text-base font-bold text-slate-900">Konfigurasi Sistem & Parameter Gateway</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Pengaturan fee 0% platform, toleransi masa aktif pembayaran, dan notifikasi.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">Sistem Siaga Penuh</span>
+        </div>
+
+        <div class="bg-white border-2 border-slate-800 p-5 space-y-4 text-xs shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-600 mb-1">[INPUT: Fee Platform (%)]</label>
+              <input type="text" value="0% (Bebas Potongan / Transparan)" class="w-full p-2 border border-slate-400 bg-slate-50 font-bold" readonly />
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1">[INPUT: Waktu Kadaluarsa QRIS]</label>
+              <input type="text" value="15 Menit" class="w-full p-2 border border-slate-400 bg-slate-50 font-bold" />
+            </div>
+            <div>
+              <label class="block text-slate-600 mb-1">[INPUT: Notifikasi Gateway WA]</label>
+              <input type="text" value="Aktif (Auto WA & SMS)" class="w-full p-2 border border-slate-400 bg-slate-50 font-bold" />
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <div class="px-5 py-2 bg-slate-800 text-white font-bold border border-slate-800">
+              [BTN: Simpan Perubahan Parameter]
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer Wireframe -->
+    <footer class="bg-slate-950 text-slate-400 py-6 px-6 border-t-2 border-slate-800 font-mono text-xs text-center mt-auto">
+      <p class="text-slate-300 font-bold">[FOOTER: WIREFRAME / SKETSA KASAR LO-FI - KONSOL ADMIN & AUDITOR]</p>
+      <p class="text-[10px] text-slate-500">Seluruh 4 menu pengawasan tersaji memanjang ke bawah siap convert Figma.</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

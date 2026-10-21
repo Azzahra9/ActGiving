@@ -1,0 +1,219 @@
+name: 'Pendaftaran Relawan'
+description: |-
+
+  Pendaftaran dan seleksi relawan kegiatan kampanye.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/campaigns/{id}/registrations'
+    metadata:
+      custom: []
+      groupName: 'Pendaftaran Relawan'
+      groupDescription: |-
+
+        Pendaftaran dan seleksi relawan kegiatan kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar Pelamar Relawan (Inisiator)'
+      description: 'Inisiator: Melihat daftar pelamar relawan pada kampanyenya.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/volunteer-registrations/{id}/status'
+    metadata:
+      custom: []
+      groupName: 'Pendaftaran Relawan'
+      groupDescription: |-
+
+        Pendaftaran dan seleksi relawan kegiatan kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Seleksi Relawan - Accept/Reject (Inisiator, ACID)'
+      description: |-
+        Inisiator: Seleksi Status Relawan (accepted / rejected).
+        WAJIB ACID Transaction & lockForUpdate() untuk mencegah over-capacity.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the volunteer registration.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: rejected
+        type: string
+        enumValues:
+          - accepted
+          - rejected
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: rejected
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/campaigns/{id}/volunteer-register'
+    metadata:
+      custom: []
+      groupName: 'Pendaftaran Relawan'
+      groupDescription: |-
+
+        Pendaftaran dan seleksi relawan kegiatan kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar sebagai Relawan'
+      description: 'Relawan: Mendaftar ke suatu kampanye.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      skills:
+        custom: []
+        name: skills
+        description: 'Must not be greater than 1000 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      skills: b
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/my-volunteer-registrations
+    metadata:
+      custom: []
+      groupName: 'Pendaftaran Relawan'
+      groupDescription: |-
+
+        Pendaftaran dan seleksi relawan kegiatan kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Riwayat Pendaftaran Relawan Saya'
+      description: 'Relawan: Melihat daftar kegiatan kerelawanan yang pernah didaftar.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

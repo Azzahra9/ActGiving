@@ -1,0 +1,130 @@
+name: 'Laporan Pertanggungjawaban (LPJ)'
+description: |-
+
+  Upload bukti laporan kegiatan kampanye (FR-12).
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/campaigns/{id}/lpj'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Upload bukti laporan kegiatan kampanye (FR-12).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar LPJ Kampanye'
+      description: 'Menampilkan riwayat LPJ suatu kampanye.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":{"campaign_id":1,"campaign_title":"Tanggap Darurat Erupsi Gunung Semeru","lpj_reports":[]}}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/campaigns/{id}/lpj'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Upload bukti laporan kegiatan kampanye (FR-12).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Upload LPJ & Bukti Gambar (Inisiator, FR-12)'
+      description: |-
+        Inisiator: Mengunggah Laporan Pertanggungjawaban (LPJ) beserta bukti gambar fisik.
+        Menggunakan FileUploadService untuk menyimpan ke public storage disk.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      description:
+        custom: []
+        name: description
+        description: 'Must be at least 10 characters.'
+        required: true
+        example: 'Eius et animi quos velit et.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      proof_image:
+        custom: []
+        name: proof_image
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: true
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      description: 'Eius et animi quos velit et.'
+    fileParameters:
+      proof_image: null
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

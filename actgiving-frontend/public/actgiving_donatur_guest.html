@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Donatur & Guest (Katalog, Donasi QRIS/VA, Galeri Foto Kegiatan & LPJ)</title>
+  <meta name="description" content="Portal Publik ActGiving untuk Donatur & Tamu: Katalog Aksi, Guest Checkout Donasi QRIS/VA, Galeri Dokumentasi Foto Kegiatan Lapangan, dan Form LPJ Digital Terbuka." />
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            blue: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900 flex flex-col min-h-screen">
+
+  <!-- ==================== HEADER (NAVIGASI PUBLIK TANPA SIDEBAR) ==================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo ActGiving -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-700 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-600/20 group-hover:scale-105 transition-transform">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-2xl font-bold tracking-tight text-slate-900">
+                Act<span class="text-blue-600">Giving</span>
+              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                Portal Donatur
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 font-medium">Donasi Cepat & Transparansi Lapangan Terbuka</p>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <a href="#katalog-aksi" class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" /></svg>
+            Eksplorasi Katalog
+          </a>
+          <a href="#galeri-kegiatan" class="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Foto Kegiatan & LPJ
+          </a>
+          <a href="#transparansi-counter" class="hover:text-blue-600 transition-colors">
+            Transparansi Live
+          </a>
+          <a href="#tutorial-interaktif" class="hover:text-blue-600 transition-colors">
+            Panduan Donatur
+          </a>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="flex items-center gap-3">
+          <a href="#katalog-aksi" class="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Donasi Sekarang</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-blue-50/50 via-white to-slate-50 pt-12 pb-16 border-b border-slate-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left Hero Content -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200">
+            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span>Guest Checkout Tanpa Login • Transparansi Form LPJ Real-Time</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            Kebaikan Nyata, <span class="text-blue-600">Tercatat Terbuka</span> Hingga Titik Lapangan.
+          </h1>
+
+          <p class="text-base text-slate-600 leading-relaxed max-w-2xl">
+            Salurkan bantuan donasi secara instan menggunakan QRIS & Virtual Account tanpa hambatan login. Pantau foto kegiatan dan laporan pertanggungjawaban digital langsung yang diisi oleh inisiator terverifikasi.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#katalog-aksi" class="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-md shadow-blue-600/20 transition-all flex items-center gap-2">
+              <span>Pilih Aksi Kebaikan</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+
+            <a href="#galeri-kegiatan" class="px-5 py-3.5 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-2xl border border-slate-300 transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Lihat Foto Kegiatan Lapangan</span>
+            </a>
+          </div>
+
+          <!-- Feature Bullets -->
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+            <div>
+              <div class="text-xl font-extrabold text-blue-600">100%</div>
+              <div class="text-xs text-slate-500 font-medium">Bebas Biaya Guest</div>
+            </div>
+            <div>
+              <div class="text-xl font-extrabold text-slate-900">QRIS & VA</div>
+              <div class="text-xs text-slate-500 font-medium">Verifikasi Otomatis</div>
+            </div>
+            <div>
+              <div class="text-xl font-extrabold text-blue-600">Live Foto</div>
+              <div class="text-xs text-slate-500 font-medium">Dokumentasi Aksi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual Card -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xl space-y-5 relative">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                Penyaluran Terverifikasi Terkini
+              </span>
+              <span class="text-xs text-slate-400">14 Menit Lalu</span>
+            </div>
+
+            <div class="relative aspect-video rounded-2xl overflow-hidden bg-slate-100">
+              <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80" alt="Penyaluran Bantuan" class="w-full h-full object-cover">
+              <div class="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-xs text-white px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1">
+                <svg class="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <span>Posko Banjir Dayeuhkolot, Bandung</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Penyaluran 150 Karung Beras & Obat-obatan</h3>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                Realisasi LPJ Digital: <strong class="text-blue-700">Rp 18.500.000</strong> disalurkan langsung oleh 22 relawan untuk 420 warga pengungsi.
+              </p>
+            </div>
+
+            <button onclick="openLpjDemo()" class="w-full py-2.5 bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 transition-colors flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span>Lihat Rincian Formulir LPJ Digital</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== KATALOG AKSI & FILTER (GUEST / DONATUR) ==================== -->
+  <section id="katalog-aksi" class="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
+          Katalog Terbuka
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+          Pilih Kampanye & Mulai Berbagi
+        </h2>
+        <p class="text-xs text-slate-600 mt-1">
+          Dukung pendanaan aksi atau daftarkan diri sebagai relawan langsung tanpa hambatan.
+        </p>
+      </div>
+
+      <!-- Filter Kategori Tabs -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-2 no-scrollbar">
+        <button onclick="filterCampaigns('Semua')" class="cat-btn active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs">Semua</button>
+        <button onclick="filterCampaigns('Bencana Alam')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Bencana Alam</button>
+        <button onclick="filterCampaigns('Pendidikan')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Pendidikan</button>
+        <button onclick="filterCampaigns('Kesehatan')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Kesehatan</button>
+        <button onclick="filterCampaigns('Lingkungan Hidup')" class="cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Lingkungan</button>
+      </div>
+    </div>
+
+    <!-- Grid Kartu Kampanye -->
+    <div id="campaign-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Kartu 1: Bencana Alam (Keduanya) -->
+      <div class="camp-card bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between" data-category="Bencana Alam">
+        <div>
+          <div class="relative aspect-video bg-slate-100">
+            <img src="https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80" alt="Banjir Bandung" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs">Bencana Alam</span>
+            </div>
+            <div class="absolute bottom-3 inset-x-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-700 text-white shadow-md">Mode: Dana & Relawan</span>
+              <button onclick="openLpjDetail('camp-01')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-950/80 hover:bg-blue-600 text-white backdrop-blur-xs border border-white/20 transition-colors">
+                Foto LPJ
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="flex items-center gap-1.5 text-xs text-slate-500">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              <span>Kab. Bandung, Jawa Barat</span>
+            </div>
+
+            <h3 class="font-bold text-slate-900 text-base leading-snug">
+              Tanggap Darurat Banjir Bandang Dayeuhkolot: Dapur Umum & Logistik
+            </h3>
+
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+              Penyediaan posko dapur umum darurat, air bersih, serta pendistribusian obat-obatan bagi warga pengungsi terdampak banjir.
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1.5 pt-2">
+              <div class="flex justify-between text-xs font-bold">
+                <span class="text-blue-700">Rp 34.500.000</span>
+                <span class="text-slate-500">Target Rp 50.000.000</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 69%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 pt-0 space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="openDonateModal('Tanggap Darurat Banjir Bandang Dayeuhkolot', 34500000, 50000000)" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs">
+              Donasi Sekarang
+            </button>
+            <button onclick="alert('Form pendaftaran relawan terbuka. Silakan buka file actgiving_relawan.html untuk pengalaman relawan lengkap.')" class="py-2.5 px-3 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-xl text-xs font-bold transition-colors">
+              Daftar Relawan
+            </button>
+          </div>
+          <button onclick="openLpjDetail('camp-01')" class="w-full py-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-700 flex items-center justify-center gap-1">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Lihat Form LPJ & Foto Dokumentasi (1 Laporan Terbit)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kartu 2: Lingkungan Hidup (Relawan) -->
+      <div class="camp-card bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between" data-category="Lingkungan Hidup">
+        <div>
+          <div class="relative aspect-video bg-slate-100">
+            <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80" alt="Mangrove" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs">Lingkungan Hidup</span>
+            </div>
+            <div class="absolute bottom-3 inset-x-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white shadow-md">Mode: Butuh Relawan</span>
+              <button onclick="openLpjDetail('camp-02')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-950/80 hover:bg-blue-600 text-white backdrop-blur-xs border border-white/20 transition-colors">
+                Foto LPJ
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="flex items-center gap-1.5 text-xs text-slate-500">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              <span>Muara Gembong, Bekasi</span>
+            </div>
+
+            <h3 class="font-bold text-slate-900 text-base leading-snug">
+              Aksi Bersih Pantai & Penanaman 1.000 Mangrove Pesisir
+            </h3>
+
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+              Relawan terjun langsung menanam bibit mangrove penahan abrasi serta membersihkan limbah plastik di pesisir utara.
+            </p>
+
+            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center justify-between text-xs">
+              <span class="text-slate-500">Relawan Bergabung:</span>
+              <span class="font-bold text-sky-700">34 / 50 Kuota</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 pt-0 space-y-2">
+          <button onclick="alert('Pendaftaran relawan berhasil dicatat!')" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5">
+            Daftar Jadi Relawan
+          </button>
+          <button onclick="openLpjDetail('camp-02')" class="w-full py-1.5 text-[11px] font-medium text-slate-500 hover:text-blue-700 flex items-center justify-center gap-1">
+            <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Lihat Dokumentasi Foto Kegiatan Lapangan</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kartu 3: Pendidikan (Dana) -->
+      <div class="camp-card bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between" data-category="Pendidikan">
+        <div>
+          <div class="relative aspect-video bg-slate-100">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80" alt="Sekolah Rusak" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3 flex gap-1.5">
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs">Pendidikan</span>
+            </div>
+            <div class="absolute bottom-3 inset-x-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-md">Mode: Butuh Dana</span>
+              <button onclick="openLpjDetail('camp-03')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-950/80 hover:bg-blue-600 text-white backdrop-blur-xs border border-white/20 transition-colors">
+                Foto LPJ
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="flex items-center gap-1.5 text-xs text-slate-500">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+              <span>Kab. Sleman, D.I. Yogyakarta</span>
+            </div>
+
+            <h3 class="font-bold text-slate-900 text-base leading-snug">
+              Renovasi 3 Ruang Kelas Rusak Berat MI Al-Ikhlas Kalitirto
+            </h3>
+
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+              Penggantian atap lapuk dan tembok retak agar 64 siswa madrasah dapat belajar dengan aman saat musim hujan.
+            </p>
+
+            <div class="space-y-1.5 pt-2">
+              <div class="flex justify-between text-xs font-bold">
+                <span class="text-blue-700">Rp 18.200.000</span>
+                <span class="text-slate-500">Target Rp 25.000.000</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 72.8%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 pt-0 space-y-2">
+          <div class="flex gap-2">
+            <button onclick="openDonateModal('Renovasi 3 Ruang Kelas Rusak Berat MI Al-Ikhlas', 18200000, 25000000)" class="flex-1 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs">
+              Donasi Sekarang
+            </button>
+            <button onclick="openLpjDetail('camp-03')" class="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors border border-slate-200">
+              Foto LPJ
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== DOKUMENTASI FOTO KEGIATAN & LPJ TERHUBUNG ==================== -->
+  <section id="galeri-kegiatan" class="py-16 bg-white border-y border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-8">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-2">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Dokumentasi Kegiatan & LPJ Terhubung</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Foto Kegiatan Lapangan & Realisasi Aksi
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed max-w-2xl">
+            Dokumentasi langsung dari lapangan yang diisi oleh inisiator melalui formulir LPJ digital web tanpa dokumen kertas. Semua foto terhubung langsung dengan rincian anggaran.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 text-xs text-slate-600">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span>Foto Terverifikasi Terbuka</span>
+        </div>
+      </div>
+
+      <!-- Grid Foto Kegiatan -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Foto 1 -->
+        <div class="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div class="relative aspect-16/10 bg-slate-100 overflow-hidden cursor-pointer" onclick="openLpjDetail('camp-01')">
+            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80" alt="Beras Dayeuhkolot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-60"></div>
+            <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900/80 text-white text-[10px] font-bold">Bencana Alam</span>
+              <span class="px-2 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-semibold">LPJ Digital Sah</span>
+            </div>
+            <div class="absolute bottom-3 left-3 text-white text-xs">
+              <div class="flex items-center gap-1 text-[11px] text-slate-200">
+                <svg class="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <span>Posko Dayeuhkolot RW 04 & RW 07, Bandung</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="text-[11px] text-slate-500">04 September 2026 • Penyaluran Batch 1</div>
+            <h4 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+              Penyaluran Batch 1: Pembelian 150 Karung Beras & Obat-obatan
+            </h4>
+            <p class="text-xs text-slate-600 line-clamp-2">
+              Distribusi logistik langsung ke posko pengungsian. Relawan menyalurkan paket pangan dan obat demam serta gatal.
+            </p>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                Rp 18.500.000
+              </span>
+              <button onclick="openLpjDetail('camp-01')" class="font-bold text-blue-700 hover:underline">
+                Buka Form LPJ →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 2 -->
+        <div class="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div class="relative aspect-16/10 bg-slate-100 overflow-hidden cursor-pointer" onclick="openLpjDetail('camp-02')">
+            <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80" alt="Tanam Mangrove" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-60"></div>
+            <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900/80 text-white text-[10px] font-bold">Lingkungan</span>
+              <span class="px-2 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-semibold">LPJ Digital Sah</span>
+            </div>
+            <div class="absolute bottom-3 left-3 text-white text-xs">
+              <div class="flex items-center gap-1 text-[11px] text-slate-200">
+                <svg class="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <span>Pesisir Muara Gembong, Bekasi</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="text-[11px] text-slate-500">16 September 2026 • Bersih Pantai & Tanam 350 Bibit</div>
+            <h4 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+              Dokumentasi Aksi Bersih Pantai & Penanaman 350 Bibit Tahap 1
+            </h4>
+            <p class="text-xs text-slate-600 line-clamp-2">
+              Sebanyak 34 relawan berhasil mengangkut 480 kg sampah plastik laut dan menanam bibit mangrove Rhizophora.
+            </p>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                Rp 3.200.000
+              </span>
+              <button onclick="openLpjDetail('camp-02')" class="font-bold text-blue-700 hover:underline">
+                Buka Form LPJ →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Foto 3 -->
+        <div class="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div class="relative aspect-16/10 bg-slate-100 overflow-hidden cursor-pointer" onclick="openLpjDetail('camp-03')">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80" alt="Sekolah MI" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-60"></div>
+            <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-900/80 text-white text-[10px] font-bold">Pendidikan</span>
+              <span class="px-2 py-1 rounded-lg bg-blue-600 text-white text-[10px] font-semibold">LPJ Digital Sah</span>
+            </div>
+            <div class="absolute bottom-3 left-3 text-white text-xs">
+              <div class="flex items-center gap-1 text-[11px] text-slate-200">
+                <svg class="w-3 h-3 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <span>MI Al-Ikhlas Kalitirto, Sleman</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 space-y-3">
+            <div class="text-[11px] text-slate-500">28 Agustus 2026 • Rangka Baja & Semen</div>
+            <h4 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+              Pemasangan Material Rangka Baja Ringan & Semen Tahap 1
+            </h4>
+            <p class="text-xs text-slate-600 line-clamp-2">
+              Pemasangan rangka baja ringan dan perbaikan plesteran dinding ruang kelas 3 & 4 bersama warga desa.
+            </p>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                Rp 14.750.000
+              </span>
+              <button onclick="openLpjDetail('camp-03')" class="font-bold text-blue-700 hover:underline">
+                Buka Form LPJ →
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TRANSPARANSI LIVE COUNTER ==================== -->
+  <section id="transparansi-counter" class="py-14 bg-slate-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+      <div class="max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-950 px-3 py-1 rounded-full border border-blue-800">
+          Akuntabilitas Terpadu
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          Statistik Penyaluran & Keterlibatan Publik
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400">
+          Setiap donasi dan partisipasi relawan tercatat secara otomatis dan diaudit terbuka.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700">
+          <div class="text-2xl sm:text-3xl font-extrabold text-blue-400">Rp 194.500.000</div>
+          <div class="text-xs text-slate-400 mt-1">Total Donasi Terkumpul</div>
+        </div>
+        <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700">
+          <div class="text-2xl sm:text-3xl font-extrabold text-white">2.840 Jiwa</div>
+          <div class="text-xs text-slate-400 mt-1">Penerima Manfaat Lapangan</div>
+        </div>
+        <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700">
+          <div class="text-2xl sm:text-3xl font-extrabold text-sky-400">142 Relawan</div>
+          <div class="text-xs text-slate-400 mt-1">Aksi Aktif Terjun Langsung</div>
+        </div>
+        <div class="bg-slate-800/80 p-6 rounded-3xl border border-slate-700">
+          <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">100%</div>
+          <div class="text-xs text-slate-400 mt-1">LPJ Form Web Terverifikasi</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== GUEST CHECKOUT MODAL (INTERACTIVE DONASI) ==================== -->
+  <div id="modalDonate" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700">Guest Checkout Donasi</span>
+          <h3 id="donateCampTitle" class="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-sm">
+            Nama Kampanye
+          </h3>
+        </div>
+        <button onclick="closeDonateModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-full">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-4 text-xs">
+        
+        <!-- Step 1: Nominal -->
+        <div>
+          <label class="font-bold text-slate-700 block mb-2">Pilih Nominal Donasi:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setNominal(25000)" class="nom-btn py-2 px-3 rounded-xl border border-slate-200 font-bold hover:border-blue-600 hover:text-blue-600">Rp 25.000</button>
+            <button onclick="setNominal(50000)" class="nom-btn py-2 px-3 rounded-xl border border-blue-600 bg-blue-50 text-blue-700 font-bold">Rp 50.000</button>
+            <button onclick="setNominal(100000)" class="nom-btn py-2 px-3 rounded-xl border border-slate-200 font-bold hover:border-blue-600 hover:text-blue-600">Rp 100.000</button>
+          </div>
+          <div class="mt-2">
+            <input id="inputCustomNominal" type="number" placeholder="Atau ketik nominal lain (min Rp 10.000)" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <!-- Step 2: Identitas Guest -->
+        <div class="space-y-2">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Nama Lengkap Donatur:</label>
+            <input id="inputDonorName" type="text" value="Hamba Allah" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">No WhatsApp / Email (Untuk Bukti Donasi):</label>
+            <input id="inputDonorContact" type="text" placeholder="0812xxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+          </div>
+        </div>
+
+        <!-- Step 3: Metode Bayar -->
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Metode Pembayaran Instan:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="setMethod('qris')" id="btnMethodQris" class="py-2.5 px-3 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold flex items-center justify-center gap-1.5">
+              <span>QRIS Instan</span>
+            </button>
+            <button onclick="setMethod('va')" id="btnMethodVa" class="py-2.5 px-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:border-blue-600 flex items-center justify-center gap-1.5">
+              <span>BCA / Mandiri VA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button onclick="processPaymentSimulation()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition-colors">
+          Lanjut ke Pembayaran QRIS / VA
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LPJ DIGITAL TRANSPARENCY MODAL ==================== -->
+  <div id="modalLpj" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700">Formulir LPJ Digital Sah & Terbuka</span>
+          <h3 id="lpjCampTitle" class="text-base font-bold text-slate-900 truncate max-w-md">
+            Laporan Realisasi Kampanye
+          </h3>
+        </div>
+        <button onclick="closeLpjModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-full">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 max-h-[75vh] overflow-y-auto space-y-5 text-xs">
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-blue-900 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Standar Akuntabilitas ActGiving: LPJ Digital Web Tanpa Berkas Kertas</span>
+          </div>
+          <p class="text-blue-800 text-[11px] leading-relaxed">
+            Data pos belanja di bawah diinput langsung oleh inisiator terverifikasi dan terhubung ke landing page untuk diakses oleh donatur & relawan.
+          </p>
+        </div>
+
+        <!-- Detail Box -->
+        <div class="border border-slate-200 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">LPJ-ACT-2026-0901</span>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">Penyaluran Batch 1: Pembelian 150 Karung Beras & Obat-obatan</h4>
+            </div>
+            <span class="text-slate-500 text-[11px]">04 September 2026</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl text-[11px]">
+            <div>
+              <span class="text-slate-400 block">Total Realisasi:</span>
+              <strong class="text-blue-700 font-bold text-sm">Rp 18.500.000</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block">Penerima:</span>
+              <strong class="text-slate-800 text-sm">420 Jiwa</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block">Relawan:</span>
+              <strong class="text-slate-800 text-sm">22 Orang</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block">Titik Aksi:</span>
+              <strong class="text-slate-800">Dayeuhkolot RW 04</strong>
+            </div>
+          </div>
+
+          <!-- Table Pos Belanja -->
+          <div>
+            <span class="font-bold text-slate-800 block mb-1.5">Rincian Pos Belanja Terstruktur:</span>
+            <table class="w-full border border-slate-200 rounded-xl overflow-hidden text-left">
+              <thead class="bg-slate-50 text-slate-600 text-[11px]">
+                <tr>
+                  <th class="py-2 px-3">Nama Pos Barang / Jasa</th>
+                  <th class="py-2 px-3 text-right">Nominal</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr><td class="py-2 px-3">150 Sak Beras Rojolele 5kg</td><td class="py-2 px-3 text-right font-bold">Rp 9.750.000</td></tr>
+                <tr><td class="py-2 px-3">30 Dus Mie Instan & Telur</td><td class="py-2 px-3 text-right font-bold">Rp 3.600.000</td></tr>
+                <tr><td class="py-2 px-3">Paket Obat & Salep Gatal</td><td class="py-2 px-3 text-right font-bold">Rp 2.650.000</td></tr>
+                <tr><td class="py-2 px-3">BBM & Dapur Umum</td><td class="py-2 px-3 text-right font-bold">Rp 2.500.000</td></tr>
+                <tr class="bg-blue-50 font-bold text-blue-900"><td class="py-2 px-3">Total Akumulasi</td><td class="py-2 px-3 text-right text-blue-700">Rp 18.500.000</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Foto Kegiatan Lapangan -->
+          <div>
+            <span class="font-bold text-slate-800 block mb-1.5">Dokumentasi Foto Kegiatan Lapangan:</span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80" class="rounded-xl h-28 w-full object-cover border border-slate-200">
+              <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80" class="rounded-xl h-28 w-full object-cover border border-slate-200">
+              <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" class="rounded-xl h-28 w-full object-cover border border-slate-200">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
+        <button onclick="closeLpjModal()" class="py-2 px-5 bg-slate-900 text-white rounded-xl font-bold">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-slate-950 text-slate-400 py-10 border-t border-slate-800 text-xs mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-lg font-bold text-white">Act<span class="text-blue-500">Giving</span></span>
+        <span class="text-slate-600">|</span>
+        <span>Sistem Informasi Donasi & Volunteering Terpadu</span>
+      </div>
+      <p class="text-slate-500">
+        © 2026 ActGiving. Desain Modern Blue • Standar Form LPJ Digital Terbuka.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Simple JavaScript Logic -->
+  <script>
+    let selectedNominal = 50000;
+    let selectedMethod = 'qris';
+
+    function setNominal(amount) {
+      selectedNominal = amount;
+      document.getElementById('inputCustomNominal').value = '';
+    }
+
+    function setMethod(method) {
+      selectedMethod = method;
+      const qris = document.getElementById('btnMethodQris');
+      const va = document.getElementById('btnMethodVa');
+      if (method === 'qris') {
+        qris.className = 'py-2.5 px-3 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold flex items-center justify-center gap-1.5';
+        va.className = 'py-2.5 px-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:border-blue-600 flex items-center justify-center gap-1.5';
+      } else {
+        va.className = 'py-2.5 px-3 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold flex items-center justify-center gap-1.5';
+        qris.className = 'py-2.5 px-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:border-blue-600 flex items-center justify-center gap-1.5';
+      }
+    }
+
+    function openDonateModal(title, current, target) {
+      document.getElementById('donateCampTitle').innerText = title;
+      document.getElementById('modalDonate').classList.remove('hidden');
+    }
+
+    function closeDonateModal() {
+      document.getElementById('modalDonate').classList.add('hidden');
+    }
+
+    function processPaymentSimulation() {
+      const custom = document.getElementById('inputCustomNominal').value;
+      const finalAmount = custom ? parseInt(custom) : selectedNominal;
+      const donor = document.getElementById('inputDonorName').value || 'Hamba Allah';
+      alert('Simulasi Pembayaran Berhasil!\n\nTerima kasih, ' + donor + '!\nDonasi sebesar Rp ' + finalAmount.toLocaleString('id-ID') + ' via ' + selectedMethod.toUpperCase() + ' telah tercatat dan tersinkronisasi ke Live Counter.');
+      closeDonateModal();
+    }
+
+    function openLpjDetail(campId) {
+      document.getElementById('modalLpj').classList.remove('hidden');
+    }
+
+    function openLpjDemo() {
+      document.getElementById('modalLpj').classList.remove('hidden');
+    }
+
+    function closeLpjModal() {
+      document.getElementById('modalLpj').classList.add('hidden');
+    }
+
+    function filterCampaigns(cat) {
+      const cards = document.querySelectorAll('.camp-card');
+      const btns = document.querySelectorAll('.cat-btn');
+      btns.forEach(b => {
+        if (b.innerText.includes(cat)) {
+          b.className = 'cat-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-xs';
+        } else {
+          b.className = 'cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700';
+        }
+      });
+      cards.forEach(c => {
+        if (cat === 'Semua' || c.getAttribute('data-category') === cat) {
+          c.style.display = 'flex';
+        } else {
+          c.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

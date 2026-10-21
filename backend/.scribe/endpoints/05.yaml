@@ -1,0 +1,422 @@
+name: Donasi
+description: |-
+
+  Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/guest-checkout
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Guest Checkout (Tanpa Login)'
+      description: |-
+        1. Guest Checkout (Donasi Tamu tanpa Login).
+        Return dummy QRIS / Virtual Account info.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'Must match an existing stored value.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 3357
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      donor_name:
+        custom: []
+        name: donor_name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      donor_email:
+        custom: []
+        name: donor_email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: true
+        example: rowan.gulgowski@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_anonymous:
+        custom: []
+        name: is_anonymous
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_channel:
+        custom: []
+        name: payment_channel
+        description: ''
+        required: true
+        example: mandiri_va
+        type: string
+        enumValues:
+          - qris
+          - bca_va
+          - mandiri_va
+          - bni_va
+          - bri_va
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      campaign_id: architecto
+      amount: 3357
+      donor_name: g
+      donor_email: rowan.gulgowski@example.com
+      is_anonymous: false
+      payment_channel: mandiri_va
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/donations/{reference_code}/status'
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Cek Status Pembayaran'
+      description: 'Cek Status Donasi Berdasarkan Reference Code (Publik).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      reference_code:
+        custom: []
+        name: reference_code
+        description: ''
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      reference_code: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "No query results for model [App\\Models\\Donation]."
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/webhook-simulate
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Simulasi Webhook Pembayaran (ACID)'
+      description: |-
+        Webhook Simulasi Bayar Payment Gateway.
+        WAJIB ACID Transaction & lockForUpdate() untuk Update current_amount secara aman.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      reference_code:
+        custom: []
+        name: reference_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: paid
+        type: string
+        enumValues:
+          - paid
+          - expired
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      reference_code: architecto
+      status: paid
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/user-checkout
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Donasi User Terdaftar'
+      description: 'Checkout Donasi oleh Pengguna Terdaftar (Dual-Role User).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'Must match an existing stored value.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 3357
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_anonymous:
+        custom: []
+        name: is_anonymous
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_channel:
+        custom: []
+        name: payment_channel
+        description: ''
+        required: true
+        example: bni_va
+        type: string
+        enumValues:
+          - qris
+          - bca_va
+          - mandiri_va
+          - bni_va
+          - bri_va
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      campaign_id: architecto
+      amount: 3357
+      is_anonymous: false
+      payment_channel: bni_va
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/my-donations
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Riwayat Donasi Saya'
+      description: 'Riwayat Donasi Pengguna Terdaftar.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/donations/{id}/approval'
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Approval Donasi oleh Inisiator (ACID)'
+      description: |-
+        Manajemen Izin Donasi oleh Inisiator (Approve / Reject).
+        WAJIB ACID Transaction & lockForUpdate().
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the donation.'
+        required: true
+        example: 16
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 16
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      approval:
+        custom: []
+        name: approval
+        description: ''
+        required: true
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      approval: false
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

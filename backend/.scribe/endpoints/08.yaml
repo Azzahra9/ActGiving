@@ -1,0 +1,206 @@
+name: Administrator
+description: |-
+
+  Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/campaigns
+    metadata:
+      custom: []
+      groupName: Administrator
+      groupDescription: |-
+
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Semua Kampanye (Moderasi Admin)'
+      description: 'Admin: Melihat daftar semua kampanye untuk moderasi.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/campaigns/{id}/status'
+    metadata:
+      custom: []
+      groupName: Administrator
+      groupDescription: |-
+
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Ubah Status Kampanye (Admin)'
+      description: 'Admin: Moderasi status kampanye (active / rejected / closed).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: active
+        type: string
+        enumValues:
+          - active
+          - rejected
+          - closed
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: active
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/users
+    metadata:
+      custom: []
+      groupName: Administrator
+      groupDescription: |-
+
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar Pengguna (Admin)'
+      description: 'Admin: Melihat daftar pengguna sistem.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/users/{id}/verify'
+    metadata:
+      custom: []
+      groupName: Administrator
+      groupDescription: |-
+
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Verifikasi Pengguna / Inisiator (Admin)'
+      description: 'Admin: Verifikasi dokumen identitas pengguna/inisiator.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the user.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      is_verified:
+        custom: []
+        name: is_verified
+        description: ''
+        required: true
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      is_verified: true
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

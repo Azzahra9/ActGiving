@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Master Showcase (Semua Role & Semua Menu Memanjang untuk Figma)</title>
+  <meta name="description" content="Platform terpadu ActGiving: Desain Baru Modern Blue. Donatur/Guest (tanpa sidebar), Relawan (dengan Sidebar & semua menu memanjang), Inisiator (dengan Sidebar & semua menu memanjang), dan Admin (dengan Sidebar & semua menu memanjang)." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            blue: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900 flex flex-col min-h-screen">
+
+  <!-- ==================== TOP MASTER ROLE SWITCHER BAR ==================== -->
+  <div class="bg-slate-950 text-white text-xs py-2.5 px-4 sticky top-0 z-50 shadow-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping"></span>
+        <span class="font-bold text-slate-200">Pilih Tampilan Role (Setiap Role Menampilkan Seluruh Menu Memanjang):</span>
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto">
+        <button onclick="switchMasterRole('donatur')" id="masterBtnDonatur" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-xs">
+          🌐 Donatur / Guest (No Sidebar)
+        </button>
+        <button onclick="switchMasterRole('relawan')" id="masterBtnRelawan" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">
+          🤝 Relawan (Sidebar + 4 Menu)
+        </button>
+        <button onclick="switchMasterRole('inisiator')" id="masterBtnInisiator" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">
+          🚀 Inisiator (Sidebar + 4 Menu)
+        </button>
+        <button onclick="switchMasterRole('admin')" id="masterBtnAdmin" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">
+          🛡️ Admin (Sidebar + 4 Menu)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. ROLE DONATUR / GUEST (LANDING PAGE BERSIH TANPA SIDEBAR)              -->
+  <!-- ========================================================================= -->
+  <div id="roleViewDonatur" class="flex flex-col flex-1">
+    
+    <!-- Top Header Donatur -->
+    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-10 z-40 shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-700 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-2xl font-bold tracking-tight text-slate-900 font-display">Act<span class="text-blue-600">Giving</span></span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                  Desain Baru
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium">Sistem Donasi & Kerelawanan Terpadu</p>
+            </div>
+          </div>
+
+          <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold text-slate-600">
+            <a href="#katalog-aksi" class="hover:text-blue-600">Eksplorasi Katalog</a>
+            <a href="#galeri-kegiatan" class="hover:text-blue-600">Foto Kegiatan & LPJ</a>
+            <a href="#transparansi-counter" class="hover:text-blue-600">Transparansi Live</a>
+          </nav>
+
+          <a href="#katalog-aksi" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-xs">
+            Donasi Sekarang
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Donatur -->
+    <section class="relative overflow-hidden bg-gradient-to-b from-blue-50/70 via-white to-slate-50 py-16 lg:py-24 border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+          <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
+          Platform Kemanusiaan & Akuntabilitas Terbuka Indonesia
+        </span>
+
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight font-display max-w-4xl mx-auto leading-tight">
+          Satu Platform, Dua Cara Berbagi: <br class="hidden sm:inline" />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-sky-600">Donasi Dana & Terjun Relawan</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          Semua penyaluran dilaporkan melalui Formulir LPJ Digital langsung di web. Foto kegiatan dan anggaran terbuka tanpa dokumen kertas.
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a href="#katalog-aksi" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md text-sm">
+            Eksplorasi Aksi Terbuka
+          </a>
+          <a href="#galeri-kegiatan" class="px-6 py-3 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl text-sm">
+            Lihat Dokumentasi Foto Kegiatan
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Katalog Aksi -->
+    <section id="katalog-aksi" class="py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-8">
+      <div>
+        <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">Katalog Terbuka</span>
+        <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Pilih Program Aksi Kemanusiaan</h2>
+        <p class="text-xs text-slate-500">Donatur Guest dapat berdonasi tanpa wajib login akun.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Bencana Alam • Dana & Relawan</span>
+            <h3 class="font-bold text-slate-900 text-sm">Tanggap Darurat Banjir Dayeuhkolot</h3>
+            <p class="text-xs text-slate-600">Bantuan posko dapur umum dan evakuasi lansia serta anak terdampak luapan Citarum.</p>
+            <div class="text-xs font-bold text-blue-700">Rp 34.500.000 / Rp 50.000.000</div>
+          </div>
+          <button onclick="alert('Membuka modal donasi QRIS/VA...')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs">
+            Donasi Sekarang (Guest)
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full">Lingkungan • Butuh Relawan</span>
+            <h3 class="font-bold text-slate-900 text-sm">Aksi Bersih Pantai & Tanam 1.000 Mangrove</h3>
+            <p class="text-xs text-slate-600">Pemulihan ekosistem pesisir utara Bekasi bersama warga nelayan tradisional.</p>
+            <div class="text-xs font-bold text-sky-700">34 Relawan Bergabung / Butuh 50</div>
+          </div>
+          <button onclick="switchMasterRole('relawan')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs">
+            Daftar Sebagai Relawan
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs p-5 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Pendidikan • Butuh Dana</span>
+            <h3 class="font-bold text-slate-900 text-sm">Renovasi 3 Ruang Kelas MI Al-Ikhlas</h3>
+            <p class="text-xs text-slate-600">Perbaikan atap dan rangka kelas rapuh demi keselamatan 64 siswa di Sleman, DIY.</p>
+            <div class="text-xs font-bold text-emerald-700">Rp 18.200.000 / Rp 25.000.000</div>
+          </div>
+          <button onclick="alert('Membuka modal donasi QRIS/VA...')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs">
+            Donasi Sekarang (Guest)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Galeri Kegiatan & LPJ Terhubung -->
+    <section id="galeri-kegiatan" class="py-14 bg-white border-y border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div>
+          <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md">Dokumentasi Terbuka</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Foto Kegiatan Lapangan & LPJ Terhubung</h2>
+          <p class="text-xs text-slate-500">Semua foto terhubung langsung ke formulir LPJ digital inisiator tanpa berkas kertas.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden p-4 space-y-3">
+            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80" class="w-full aspect-video rounded-2xl object-cover">
+            <h4 class="font-bold text-xs text-slate-900">Penyaluran 150 Karung Beras & Logistik</h4>
+            <div class="text-[11px] text-blue-700 font-bold">Realisasi: Rp 18.500.000 • 420 Jiwa</div>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden p-4 space-y-3">
+            <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=800&q=80" class="w-full aspect-video rounded-2xl object-cover">
+            <h4 class="font-bold text-xs text-slate-900">Bersih Pantai & Tanam 350 Bibit</h4>
+            <div class="text-[11px] text-blue-700 font-bold">Realisasi: Rp 3.200.000 • 34 Relawan</div>
+          </div>
+
+          <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden p-4 space-y-3">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80" class="w-full aspect-video rounded-2xl object-cover">
+            <h4 class="font-bold text-xs text-slate-900">Material Rangka Baja Ringan MI</h4>
+            <div class="text-[11px] text-blue-700 font-bold">Realisasi: Rp 14.750.000 • 64 Siswa</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transparansi Counter -->
+    <section id="transparansi-counter" class="py-12 bg-slate-900 text-white text-center">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <h2 class="text-2xl font-bold font-display">Transparansi Penyaluran Real-Time</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-4 bg-slate-800 rounded-2xl"><div class="text-xl font-bold text-blue-400">Rp 194.500.000</div><div class="text-xs text-slate-400">Total Donasi</div></div>
+          <div class="p-4 bg-slate-800 rounded-2xl"><div class="text-xl font-bold text-white">2.840 Jiwa</div><div class="text-xs text-slate-400">Penerima Manfaat</div></div>
+          <div class="p-4 bg-slate-800 rounded-2xl"><div class="text-xl font-bold text-sky-400">142 Orang</div><div class="text-xs text-slate-400">Relawan Aktif</div></div>
+          <div class="p-4 bg-slate-800 rounded-2xl"><div class="text-xl font-bold text-emerald-400">100% Sah</div><div class="text-xs text-slate-400">LPJ Digital Web</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Donatur -->
+    <footer class="bg-slate-950 text-slate-400 py-8 border-t border-slate-800 text-xs text-center mt-auto">
+      <p>© 2026 ActGiving - Portal Publik & Donatur Guest. Bersih tanpa sidebar.</p>
+    </footer>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. ROLE RELAWAN (LENGKAP DENGAN SIDEBAR & SEMUA MENU MEMANJANG)           -->
+  <!-- ========================================================================= -->
+  <div id="roleViewRelawan" class="hidden flex-1 relative">
+    <iframe src="/actgiving_relawan.html" class="w-full h-screen border-0"></iframe>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. ROLE INISIATOR (LENGKAP DENGAN SIDEBAR & SEMUA MENU MEMANJANG)         -->
+  <!-- ========================================================================= -->
+  <div id="roleViewInisiator" class="hidden flex-1 relative">
+    <iframe src="/actgiving_inisiator.html" class="w-full h-screen border-0"></iframe>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. ROLE ADMIN (LENGKAP DENGAN SIDEBAR & SEMUA MENU MEMANJANG)             -->
+  <!-- ========================================================================= -->
+  <div id="roleViewAdmin" class="hidden flex-1 relative">
+    <iframe src="/actgiving_admin.html" class="w-full h-screen border-0"></iframe>
+  </div>
+
+  <!-- Script Role Switcher Master -->
+  <script>
+    function switchMasterRole(role) {
+      document.getElementById('roleViewDonatur').classList.add('hidden');
+      document.getElementById('roleViewRelawan').classList.add('hidden');
+      document.getElementById('roleViewInisiator').classList.add('hidden');
+      document.getElementById('roleViewAdmin').classList.add('hidden');
+
+      const bDonatur = document.getElementById('masterBtnDonatur');
+      const bRelawan = document.getElementById('masterBtnRelawan');
+      const bInisiator = document.getElementById('masterBtnInisiator');
+      const bAdmin = document.getElementById('masterBtnAdmin');
+
+      const inactiveClass = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300';
+      const activeClass = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-xs';
+
+      [bDonatur, bRelawan, bInisiator, bAdmin].forEach(b => b.className = inactiveClass);
+
+      if (role === 'donatur') {
+        document.getElementById('roleViewDonatur').classList.remove('hidden');
+        bDonatur.className = activeClass;
+      } else if (role === 'relawan') {
+        document.getElementById('roleViewRelawan').classList.remove('hidden');
+        bRelawan.className = activeClass;
+      } else if (role === 'inisiator') {
+        document.getElementById('roleViewInisiator').classList.remove('hidden');
+        bInisiator.className = activeClass;
+      } else if (role === 'admin') {
+        document.getElementById('roleViewAdmin').classList.remove('hidden');
+        bAdmin.className = activeClass;
+      }
+    }
+  </script>
+</body>
+</html>

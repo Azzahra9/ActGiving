@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Wireframe / Sketsa Kasar Inisiator (Sidebar + Formulir LPJ Web Memanjang)</title>
+  <meta name="description" content="Sketsa kasar / Low-Fidelity Wireframe (Blueprint UI) Inisiator ActGiving dengan Sidebar Navigasi dan 4 Menu memanjang (Kampanye, Form LPJ Digital Web Tanpa Upload Berkas, Seleksi Relawan, Arsip LPJ) siap import Figma." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .wf-cross-box {
+      position: relative;
+      background-color: #f1f5f9;
+      border: 2px dashed #94a3b8;
+      overflow: hidden;
+    }
+    .wf-cross-box::before, .wf-cross-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+      pointer-events: none;
+    }
+    .wf-cross-box::after {
+      background: linear-gradient(to bottom right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+    }
+    .wf-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 1px dashed #64748b;
+      background: #f8fafc;
+      color: #334155;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased flex min-h-screen">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT SIDEBAR WIREFRAME (280px FIXED)                                   -->
+  <!-- ========================================================================= -->
+  <aside class="w-72 bg-slate-900 text-slate-200 border-r-2 border-slate-700 flex flex-col shrink-0 fixed inset-y-0 left-0 z-50 font-mono text-xs">
+    
+    <!-- Sidebar Header Wireframe -->
+    <div class="h-16 px-4 flex items-center justify-between border-b-2 border-slate-700 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 border border-slate-500 bg-slate-800 flex items-center justify-center font-bold text-white text-[11px]">
+          [LOGO]
+        </div>
+        <div>
+          <span class="font-bold text-sm tracking-tight text-white">ActGiving</span>
+          <p class="text-[10px] text-slate-400">WF-SIDEBAR: INISIATOR</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Body Wireframe -->
+    <div class="flex-1 overflow-y-auto p-3 space-y-4">
+      
+      <!-- Organization Profile Wireframe -->
+      <div class="border border-dashed border-slate-600 p-3 bg-slate-800/80 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[9px] text-slate-400 uppercase">[LEMBAGA INISIATOR]</span>
+          <span class="px-1.5 py-0.2 bg-slate-700 text-emerald-400 border border-slate-500 text-[9px] font-bold">KEMENKUMHAM SAH</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full border border-slate-500 bg-slate-700 flex items-center justify-center font-bold text-[10px] text-white">
+            [YP]
+          </div>
+          <div>
+            <p class="font-bold text-white text-[11px]">Yayasan Peduli Sahabat</p>
+            <p class="text-[10px] text-slate-400">Bandung • Kebencanaan</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Anchor Links Wireframe -->
+      <div class="space-y-1">
+        <p class="px-2 text-[10px] font-bold uppercase text-slate-400 mb-1.5">[NAVIGASI MENU INISIATOR]</p>
+        
+        <a href="#wf-inisiator-kampanye" class="flex items-center justify-between p-2.5 bg-slate-800 border border-slate-600 text-white font-bold hover:bg-slate-700">
+          <span>1. Kampanye Saya</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-600">3 AKTIF</span>
+        </a>
+
+        <a href="#wf-inisiator-lpj" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>2. Form LPJ Digital Web</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">NO KERTAS</span>
+        </a>
+
+        <a href="#wf-inisiator-seleksi" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>3. Seleksi Relawan</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">8 MASUK</span>
+        </a>
+
+        <a href="#wf-inisiator-arsip" class="flex items-center justify-between p-2.5 border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white">
+          <span>4. Arsip LPJ Terbit</span>
+          <span class="text-[9px] bg-slate-900 px-1 border border-slate-700">4 SAH</span>
+        </a>
+      </div>
+
+      <!-- Quick Metrics Wireframe -->
+      <div class="p-2.5 border border-slate-700 bg-slate-950/60 text-[10px] space-y-1">
+        <div class="flex justify-between text-slate-400"><span>Donasi Dikelola:</span><strong class="text-white">Rp 52.700.000</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Relawan Lapangan:</span><strong class="text-white">34 Orang</strong></div>
+        <div class="flex justify-between text-slate-400"><span>Kepatuhan LPJ:</span><strong class="text-emerald-400">100% Tertib</strong></div>
+      </div>
+
+      <!-- Switcher to Other Roles Wireframe -->
+      <div class="pt-2 border-t border-slate-800 space-y-1">
+        <p class="text-[9px] text-slate-400 uppercase">[PINDAH ROLE WIREFRAME]:</p>
+        <div class="grid grid-cols-2 gap-1 text-[10px]">
+          <a href="/actgiving_wireframe_donatur.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center hover:bg-slate-700">Donatur WF</a>
+          <a href="/actgiving_wireframe_relawan.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center hover:bg-slate-700">Relawan WF</a>
+          <a href="/actgiving_wireframe_admin.html" class="p-1.5 border border-slate-700 bg-slate-800 text-center col-span-2 hover:bg-slate-700">Admin WF</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-3 border-t-2 border-slate-700 bg-slate-950">
+      <a href="/actgiving_inisiator.html" class="block py-2 text-center border border-blue-500 bg-blue-900/60 text-blue-200 text-[11px] font-bold hover:bg-blue-800">
+        Lihat Desain Hi-Fi ↗
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN CANVAS WIREFRAME (SEMUA MENU MEMANJANG KE BAWAH)                  -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 pl-72">
+    
+    <!-- Top Header Bar Wireframe -->
+    <header class="h-16 bg-white border-b-2 border-slate-300 px-6 flex items-center justify-between sticky top-0 z-30 font-mono text-xs">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="wf-badge">WIREFRAME LO-FI</span>
+          <h2 class="text-sm font-bold text-slate-900">Workspace Inisiator • Full Extended View</h2>
+        </div>
+        <p class="text-[11px] text-slate-500">Seluruh 4 menu inisiator termasuk Formulir LPJ Web tersaji memanjang ke bawah.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 border border-slate-400 bg-slate-100 font-bold text-[11px]">
+          FITUR UTAMA: LPJ FORM WEB
+        </span>
+      </div>
+    </header>
+
+    <!-- Quick Sticky Nav Jumper -->
+    <div class="bg-slate-200 border-b-2 border-slate-300 px-6 py-2.5 sticky top-16 z-20 font-mono text-xs">
+      <div class="max-w-6xl mx-auto flex items-center gap-2 overflow-x-auto">
+        <span class="text-slate-600 font-bold text-[11px] uppercase">[LOMPAT SECTION]:</span>
+        <a href="#wf-inisiator-kampanye" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">1. Kampanye (3)</a>
+        <a href="#wf-inisiator-lpj" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">2. Form LPJ Web</a>
+        <a href="#wf-inisiator-seleksi" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">3. Seleksi Relawan (8)</a>
+        <a href="#wf-inisiator-arsip" class="px-2.5 py-1 bg-white border border-slate-400 font-bold hover:bg-slate-50">4. Arsip LPJ (4)</a>
+      </div>
+    </div>
+
+    <!-- MAIN EXTENDED SECTIONS CONTAINER -->
+    <div class="p-6 max-w-6xl mx-auto w-full space-y-12 font-mono">
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 1: MENU SIDEBAR 1 - KAMPANYE SAYA                             -->
+      <!-- ===================================================================== -->
+      <section id="wf-inisiator-kampanye" class="space-y-4 pt-2">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 1]</span>
+              <h3 class="text-base font-bold text-slate-900">Kampanye Saya & Status Galang Aksi (3 Program)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Pemantauan progres donasi masuk, sisa hari, dan status penugasan relawan.</p>
+          </div>
+          <div class="px-3 py-1 bg-slate-800 text-white font-bold text-xs border border-slate-800">
+            [+ Buat Kampanye Baru]
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          
+          <!-- Card 1 -->
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-3 shadow-sm">
+            <div class="flex justify-between items-center">
+              <span class="wf-badge">SEDANG BERJALAN</span>
+              <span class="text-slate-500 text-[10px]">Sisa 12 Hari</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-xs">Tanggap Darurat Banjir Dayeuhkolot</h4>
+            <div class="space-y-1 font-mono text-[11px]">
+              <div class="w-full bg-slate-200 h-2 border border-slate-400 overflow-hidden">
+                <div class="bg-slate-700 h-full w-[69%]"></div>
+              </div>
+              <div class="flex justify-between">
+                <span>Rp 34.500.000 (69%)</span>
+                <span class="text-slate-500">Target Rp 50Jt</span>
+              </div>
+            </div>
+            <div class="p-2 border border-slate-300 bg-slate-50 text-[10px] space-y-0.5">
+              <div>• Relawan: 14/20 Orang</div>
+              <div>• Penyaluran: Tahap 1 Selesai</div>
+            </div>
+            <div class="w-full py-1.5 bg-slate-800 text-white text-center font-bold text-[10px]">
+              [BTN: Kelola Program & LPJ]
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-3 shadow-sm">
+            <div class="flex justify-between items-center">
+              <span class="wf-badge">TARGET TERCAPAI</span>
+              <span class="text-slate-500 text-[10px]">Fase Penyaluran</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-xs">Renovasi 3 Ruang Kelas MI Al-Ikhlas</h4>
+            <div class="space-y-1 font-mono text-[11px]">
+              <div class="w-full bg-slate-200 h-2 border border-slate-400 overflow-hidden">
+                <div class="bg-slate-700 h-full w-[100%]"></div>
+              </div>
+              <div class="flex justify-between">
+                <span>Rp 25.000.000 (100%)</span>
+                <span class="text-slate-500">Penuh</span>
+              </div>
+            </div>
+            <div class="p-2 border border-slate-300 bg-slate-50 text-[10px] space-y-0.5">
+              <div>• Relawan: 10/10 Terisi</div>
+              <div>• Penyaluran: Pembelian Rangka Baja</div>
+            </div>
+            <div class="w-full py-1.5 bg-slate-800 text-white text-center font-bold text-[10px]">
+              [BTN: Isi LPJ Web Sekarang]
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-3 shadow-sm">
+            <div class="flex justify-between items-center">
+              <span class="wf-badge">VERIFIKASI ADMIN</span>
+              <span class="text-slate-500 text-[10px]">Antrean Audit</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-xs">Bantuan Sarana Air Bersih Gunungkidul</h4>
+            <div class="space-y-1 font-mono text-[11px]">
+              <div class="w-full bg-slate-200 h-2 border border-slate-400 overflow-hidden">
+                <div class="bg-slate-400 h-full w-[0%]"></div>
+              </div>
+              <div class="flex justify-between">
+                <span>Rp 0 (Target Rp 35Jt)</span>
+                <span class="text-slate-500">Baru Diajukan</span>
+              </div>
+            </div>
+            <div class="p-2 border border-slate-300 bg-slate-50 text-[10px] space-y-0.5">
+              <div>• Status: Menunggu Approval Admin</div>
+              <div>• Berkas Legalitas: Lengkap</div>
+            </div>
+            <div class="w-full py-1.5 bg-slate-100 text-slate-800 text-center font-bold text-[10px] border border-slate-300">
+              [BTN: Cek Dokumen Pengajuan]
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 2: MENU SIDEBAR 2 - FORMULIR LPJ DIGITAL LANGSUNG DI WEB       -->
+      <!-- ===================================================================== -->
+      <section id="wf-inisiator-lpj" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 2: FITUR UTAMA]</span>
+              <h3 class="text-base font-bold text-slate-900">Formulir LPJ Digital Langsung di Web (Tanpa Upload Berkas)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Inisiator menginput pos rincian belanja dan foto kegiatan langsung di web browser.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">Paperless System</span>
+        </div>
+
+        <div class="bg-white border-2 border-slate-800 p-6 space-y-5 text-xs shadow-sm">
+          
+          <!-- Campaign Selector Dropdown -->
+          <div class="space-y-1">
+            <label class="block text-slate-700 font-bold">[DROPDOWN: Pilih Kampanye yang Ingin Dibuatkan LPJ]</label>
+            <select class="w-full p-2.5 border-2 border-slate-800 bg-slate-50 font-mono font-bold text-slate-800">
+              <option>Tanggap Darurat Banjir Dayeuhkolot (Realisasi Tahap 1)</option>
+              <option>Renovasi 3 Ruang Kelas MI Al-Ikhlas</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Budget Table Wireframe -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-slate-800 font-bold">[TABEL DINAMIS: Pos Rincian Belanja Anggaran]</label>
+              <div class="px-2.5 py-1 bg-slate-100 border border-slate-400 text-[10px] font-bold cursor-pointer">
+                [+ Tambah Pos Belanja]
+              </div>
+            </div>
+
+            <div class="border-2 border-slate-800 overflow-x-auto">
+              <table class="w-full text-left text-xs font-mono">
+                <thead class="bg-slate-200 border-b-2 border-slate-800 text-[11px]">
+                  <tr>
+                    <th class="p-2.5">No</th>
+                    <th class="p-2.5">Uraian Kebutuhan Lapangan</th>
+                    <th class="p-2.5">Volume / Qty</th>
+                    <th class="p-2.5">Biaya Satuan</th>
+                    <th class="p-2.5">Total Pos</th>
+                    <th class="p-2.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y border-slate-300">
+                  <tr class="bg-white">
+                    <td class="p-2.5 font-bold">1</td>
+                    <td class="p-2.5"><input type="text" value="Beras Rojolele (5kg)" class="w-full p-1 border border-slate-400 bg-slate-50 text-[11px]" /></td>
+                    <td class="p-2.5"><input type="text" value="150 Karung" class="w-24 p-1 border border-slate-400 bg-slate-50 text-[11px]" /></td>
+                    <td class="p-2.5 font-bold">Rp 65.000</td>
+                    <td class="p-2.5 font-bold text-slate-900">Rp 9.750.000</td>
+                    <td class="p-2.5 text-center text-slate-400">[HAPUS]</td>
+                  </tr>
+                  <tr class="bg-slate-50">
+                    <td class="p-2.5 font-bold">2</td>
+                    <td class="p-2.5"><input type="text" value="Obat Demam & Salep Kulit" class="w-full p-1 border border-slate-400 bg-white text-[11px]" /></td>
+                    <td class="p-2.5"><input type="text" value="85 Paket" class="w-24 p-1 border border-slate-400 bg-white text-[11px]" /></td>
+                    <td class="p-2.5 font-bold">Rp 50.000</td>
+                    <td class="p-2.5 font-bold text-slate-900">Rp 4.250.000</td>
+                    <td class="p-2.5 text-center text-slate-400">[HAPUS]</td>
+                  </tr>
+                  <tr class="bg-white">
+                    <td class="p-2.5 font-bold">3</td>
+                    <td class="p-2.5"><input type="text" value="Sewa Perahu Evakuasi Dayung" class="w-full p-1 border border-slate-400 bg-slate-50 text-[11px]" /></td>
+                    <td class="p-2.5"><input type="text" value="3 Armada / 3 Hari" class="w-24 p-1 border border-slate-400 bg-slate-50 text-[11px]" /></td>
+                    <td class="p-2.5 font-bold">Rp 1.500.000</td>
+                    <td class="p-2.5 font-bold text-slate-900">Rp 4.500.000</td>
+                    <td class="p-2.5 text-center text-slate-400">[HAPUS]</td>
+                  </tr>
+                </tbody>
+                <tfoot class="bg-slate-100 border-t-2 border-slate-800 font-bold">
+                  <tr>
+                    <td colspan="4" class="p-2.5 text-right uppercase">Total Realisasi Anggaran Web:</td>
+                    <td colspan="2" class="p-2.5 text-base text-slate-900">Rp 18.500.000</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Documentation Photos Synchronizer Wireframe -->
+          <div class="space-y-2">
+            <label class="block text-slate-800 font-bold">[FOTO DOKUMENTASI KEGIATAN: TERSINKRON OTOMATIS KE LANDING PAGE]</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="wf-cross-box h-32 flex flex-col items-center justify-center p-2 text-center">
+                <span class="bg-white px-2 py-0.5 border border-slate-400 font-bold text-[10px] z-10">[FOTO BUKTI 1]</span>
+                <span class="text-[9px] text-slate-500 mt-1 z-10">Distribusi Sembako RW 04</span>
+              </div>
+              <div class="wf-cross-box h-32 flex flex-col items-center justify-center p-2 text-center">
+                <span class="bg-white px-2 py-0.5 border border-slate-400 font-bold text-[10px] z-10">[FOTO BUKTI 2]</span>
+                <span class="text-[9px] text-slate-500 mt-1 z-10">Evakuasi Lansia Dayeuhkolot</span>
+              </div>
+              <div class="border-2 border-dashed border-slate-400 bg-slate-50 h-32 flex flex-col items-center justify-center text-center p-3 cursor-pointer hover:bg-slate-100">
+                <span class="font-bold text-slate-700">[+ Upload Foto Kegiatan]</span>
+                <span class="text-[9px] text-slate-500 mt-1">Maks. 5 MB (JPG/PNG)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center justify-end gap-3 pt-3 border-t border-slate-200">
+            <div class="px-4 py-2 bg-slate-100 text-slate-700 font-bold border border-slate-300">
+              [BTN: Simpan Draf]
+            </div>
+            <div class="px-6 py-2 bg-slate-800 text-white font-bold border-2 border-slate-800">
+              [BTN: Ajukan LPJ ke Auditor Admin]
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 3: MENU SIDEBAR 3 - SELEKSI RELAWAN                           -->
+      <!-- ===================================================================== -->
+      <section id="wf-inisiator-seleksi" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 3]</span>
+              <h3 class="text-base font-bold text-slate-900">Seleksi & Pendaftar Relawan (8 Calon Masuk)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Tinjau profil keahlian calon relawan sebelum memberikan barcode tugas.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">Kuota: 14/20 Diterima</span>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          
+          <div class="bg-white border-2 border-slate-800 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm">Fajar Nugraha</span>
+                <span class="wf-badge">MEDIS / KEPERAWATAN</span>
+              </div>
+              <p class="text-slate-600 text-[11px]">Pengalaman: 4 kali posko banjir Citarum • Golongan Darah AB • Siap bertugas shift malam.</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="px-3 py-1.5 bg-slate-800 text-white font-bold border border-slate-800">[BTN: Setujui]</div>
+              <div class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold border border-slate-300">[BTN: Tolak]</div>
+            </div>
+          </div>
+
+          <div class="bg-white border-2 border-slate-800 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm">Maya Safitri</span>
+                <span class="wf-badge">DAPUR UMUM & LOGISTIK</span>
+              </div>
+              <p class="text-slate-600 text-[11px]">Pengalaman: Koki dapur tanggap darurat PMI • Siap menyiapkan 200 porsi per hari.</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="px-3 py-1.5 bg-slate-800 text-white font-bold border border-slate-800">[BTN: Setujui]</div>
+              <div class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold border border-slate-300">[BTN: Tolak]</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 4: MENU SIDEBAR 4 - ARSIP LPJ TERBIT                          -->
+      <!-- ===================================================================== -->
+      <section id="wf-inisiator-arsip" class="space-y-4 pt-4">
+        <div class="flex items-center justify-between pb-3 border-b-2 border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="wf-badge bg-slate-800 text-white">[MENU SIDEBAR 4]</span>
+              <h3 class="text-base font-bold text-slate-900">Arsip LPJ Digital Sah & Galeri Terbit (4 Laporan)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Laporan web yang telah diverifikasi auditor admin dan tampil live di katalog publik.</p>
+          </div>
+          <span class="text-xs font-bold border border-slate-400 bg-white px-2 py-1">Status: 100% Lolos Audit</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-2">
+            <span class="wf-badge">AUDIT SAH: 18 AGUSTUS 2026</span>
+            <h4 class="font-bold text-slate-900 text-sm">Penyaluran Air Bersih Dusun Girisekar</h4>
+            <div class="p-2 border border-slate-300 bg-slate-50 text-[11px] space-y-0.5">
+              <div>• Realisasi Anggaran: Rp 22.400.000</div>
+              <div>• Penerima: 180 Kepala Keluarga</div>
+            </div>
+            <div class="w-full py-1.5 bg-slate-100 text-slate-800 text-center font-bold border border-slate-300">
+              [BTN: Lihat Tampilan LPJ Publik]
+            </div>
+          </div>
+
+          <div class="bg-white border-2 border-slate-800 p-4 space-y-2">
+            <span class="wf-badge">AUDIT SAH: 02 JULI 2026</span>
+            <h4 class="font-bold text-slate-900 text-sm">Pengadaan Buku & Komputer MI Al-Falah</h4>
+            <div class="p-2 border border-slate-300 bg-slate-50 text-[11px] space-y-0.5">
+              <div>• Realisasi Anggaran: Rp 16.800.000</div>
+              <div>• Penerima: 92 Siswa</div>
+            </div>
+            <div class="w-full py-1.5 bg-slate-100 text-slate-800 text-center font-bold border border-slate-300">
+              [BTN: Lihat Tampilan LPJ Publik]
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer Wireframe -->
+    <footer class="bg-slate-950 text-slate-400 py-6 px-6 border-t-2 border-slate-800 font-mono text-xs text-center mt-auto">
+      <p class="text-slate-300 font-bold">[FOOTER: WIREFRAME / SKETSA KASAR LO-FI - WORKSPACE INISIATOR]</p>
+      <p class="text-[10px] text-slate-500">Seluruh menu inisiator termasuk Formulir LPJ Digital Web tersaji memanjang ke bawah siap convert Figma.</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

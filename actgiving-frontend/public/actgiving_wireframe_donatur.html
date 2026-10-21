@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Wireframe / Sketsa Kasar (Donatur & Guest Landing Page)</title>
+  <meta name="description" content="Sketsa kasar / Low-Fidelity Wireframe (Blueprint UI) untuk Donatur & Guest Landing Page ActGiving, tanpa sidebar, siap import ke Figma." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Wireframe Image Placeholder with classic diagonal cross (X) */
+    .wf-cross-box {
+      position: relative;
+      background-color: #f1f5f9;
+      border: 2px dashed #94a3b8;
+      overflow: hidden;
+    }
+    .wf-cross-box::before, .wf-cross-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+      pointer-events: none;
+    }
+    .wf-cross-box::after {
+      background: linear-gradient(to bottom right, transparent calc(50% - 1px), #cbd5e1 calc(50% - 1px), #cbd5e1 calc(50% + 1px), transparent calc(50% + 1px));
+    }
+    .wf-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 1px dashed #64748b;
+      background: #f8fafc;
+      color: #334155;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased flex flex-col min-h-screen">
+
+  <!-- ==================== TOP WIREFRAME SPECIFICATION BAR ==================== -->
+  <aside class="bg-slate-900 text-slate-200 border-b border-slate-700 px-4 py-2.5 text-xs font-mono sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-bold text-[10px]">WIREFRAME / SKETSA KASAR (LO-FI)</span>
+        <span class="text-slate-300 font-bold">ActGiving • Donatur & Guest Portal</span>
+        <span class="text-slate-500">|</span>
+        <span class="text-slate-400 text-[11px]">Layout: Bersih Tanpa Sidebar • Siap Import Figma</span>
+      </div>
+      <div class="flex items-center gap-2 text-[11px]">
+        <span class="text-slate-400">Pindah Wireframe:</span>
+        <a href="/actgiving_wireframe_relawan.html" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600">Relawan WF</a>
+        <a href="/actgiving_wireframe_inisiator.html" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600">Inisiator WF</a>
+        <a href="/actgiving_wireframe_admin.html" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600">Admin WF</a>
+        <a href="/actgiving_donatur_guest.html" class="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold">Lihat Desain Hi-Fi ↗</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== HEADER WIREFRAME (NO SIDEBAR) ==================== -->
+  <header class="bg-white border-b-2 border-slate-300 sticky top-10 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      
+      <!-- Brand Wireframe -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 border-2 border-slate-800 bg-slate-100 flex items-center justify-center font-mono text-xs font-bold text-slate-700">
+          [LOGO]
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-lg tracking-tight font-mono">ActGiving</span>
+            <span class="wf-badge">WF-DONATUR</span>
+          </div>
+          <p class="text-[10px] text-slate-500 font-mono">Sistem Donasi & Kerelawanan Terpadu</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links Wireframe -->
+      <nav class="hidden md:flex items-center gap-6 font-mono text-xs text-slate-600">
+        <span class="border-b border-dashed border-slate-400 pb-0.5 cursor-pointer">[NAV: Eksplorasi Aksi]</span>
+        <span class="border-b border-dashed border-slate-400 pb-0.5 cursor-pointer">[NAV: Galeri Foto LPJ]</span>
+        <span class="border-b border-dashed border-slate-400 pb-0.5 cursor-pointer">[NAV: Transparansi Live]</span>
+      </nav>
+
+      <!-- Action Button Wireframe -->
+      <div class="flex items-center gap-2">
+        <div class="px-4 py-2 border-2 border-slate-800 bg-slate-800 text-white font-mono text-xs font-bold uppercase tracking-wider">
+          [BUTTON: Donasi Sekarang]
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== HERO SECTION WIREFRAME ==================== -->
+  <section class="bg-white border-b-2 border-slate-200 py-14 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto text-center space-y-5">
+      
+      <div>
+        <span class="wf-badge">[SECTION: HERO BANNER - VALUE PROPOSITION]</span>
+      </div>
+
+      <div class="p-3 border-2 border-dashed border-slate-300 bg-slate-50 inline-block text-xs font-mono text-slate-600">
+        Tagline: "Platform Kemanusiaan & Akuntabilitas Terbuka Indonesia"
+      </div>
+
+      <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-mono max-w-3xl mx-auto leading-tight">
+        Satu Platform, Dua Cara Berbagi: <br />
+        <span class="underline decoration-slate-400 decoration-2">[Donasi Dana] & [Terjun Relawan]</span>
+      </h1>
+
+      <p class="text-sm text-slate-600 font-mono max-w-2xl mx-auto leading-relaxed border-l-2 border-slate-300 pl-4 text-left sm:text-center sm:border-0 sm:pl-0">
+        Semua penyaluran dilaporkan melalui Formulir LPJ Digital langsung di web. Foto kegiatan dan anggaran terbuka tanpa dokumen kertas.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <div class="px-6 py-3 border-2 border-slate-800 bg-slate-900 text-white font-mono text-xs font-bold uppercase">
+          [BTN PRIMARY: Eksplorasi Aksi Terbuka]
+        </div>
+        <div class="px-6 py-3 border-2 border-slate-400 bg-white text-slate-800 font-mono text-xs font-bold uppercase">
+          [BTN SECONDARY: Dokumentasi Foto Kegiatan]
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== FILTER & SEARCH BAR WIREFRAME ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 z-10 relative">
+    <div class="bg-white border-2 border-slate-800 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between text-xs font-mono border-b border-slate-200 pb-2">
+        <span class="font-bold text-slate-700">[FILTER COMPONENT: SEARCH & FILTER BAR]</span>
+        <span class="text-slate-500">Live Search & Filter Multi-Kategori</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 font-mono text-xs">
+        <div class="sm:col-span-2 border border-slate-300 p-2.5 bg-slate-50 flex items-center justify-between text-slate-500">
+          <span>[INPUT: Cari nama program kemanusiaan...]</span>
+          <span>🔍</span>
+        </div>
+        <div class="border border-slate-300 p-2.5 bg-slate-50 flex items-center justify-between text-slate-500">
+          <span>[DROPDOWN: Semua Kategori]</span>
+          <span>▼</span>
+        </div>
+        <div class="border border-slate-300 p-2.5 bg-slate-50 flex items-center justify-between text-slate-500">
+          <span>[DROPDOWN: Semua Kota]</span>
+          <span>▼</span>
+        </div>
+      </div>
+
+      <!-- Action Mode Filter Tabs -->
+      <div class="flex flex-wrap items-center gap-2 pt-1 font-mono text-xs">
+        <span class="text-slate-500 text-[11px]">Filter Mode:</span>
+        <span class="px-3 py-1 bg-slate-800 text-white font-bold border border-slate-800">[TAB: Semua Mode]</span>
+        <span class="px-3 py-1 bg-slate-100 text-slate-700 border border-slate-300">[TAB: Donasi Dana]</span>
+        <span class="px-3 py-1 bg-slate-100 text-slate-700 border border-slate-300">[TAB: Butuh Relawan]</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== KATALOG KAMPANYE WIREFRAME ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6 w-full">
+    <div class="flex items-center justify-between border-b-2 border-slate-300 pb-3">
+      <div>
+        <span class="wf-badge">[SECTION: KATALOG PROGRAM]</span>
+        <h2 class="text-xl font-bold font-mono text-slate-900 mt-1">Daftar Program Aksi Kemanusiaan Terbuka</h2>
+        <p class="text-xs text-slate-500 font-mono">Donatur Guest dapat berdonasi instan tanpa perlu mendaftar akun.</p>
+      </div>
+      <span class="font-mono text-xs font-bold text-slate-600 border border-slate-300 px-3 py-1 bg-white">
+        Menampilkan 3 Program Pilihan
+      </span>
+    </div>
+
+    <!-- 3 Wireframe Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Card 1: Bencana Banjir -->
+      <div class="bg-white border-2 border-slate-800 flex flex-col justify-between p-4 space-y-4 shadow-sm">
+        <div class="space-y-3">
+          <!-- Wireframe Image Placeholder with X -->
+          <div class="wf-cross-box h-44 w-full flex flex-col items-center justify-center text-slate-600 font-mono text-xs p-2 text-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[IMAGE: 16:9 BANJIR DAYEUHKOLOT]</span>
+            <span class="text-[10px] text-slate-500 mt-1 z-10">400 x 225 px</span>
+          </div>
+
+          <div class="flex items-center justify-between font-mono text-[11px]">
+            <span class="wf-badge">BENCANA ALAM</span>
+            <span class="text-slate-500">Bandung, Jabar</span>
+          </div>
+
+          <h3 class="font-bold font-mono text-sm text-slate-900">
+            Tanggap Darurat Banjir Dayeuhkolot
+          </h3>
+
+          <p class="text-xs text-slate-600 font-mono">
+            Bantuan posko dapur umum dan evakuasi lansia serta anak terdampak luapan Citarum.
+          </p>
+
+          <!-- Progress Bar Placeholder -->
+          <div class="space-y-1.5 font-mono text-xs pt-1">
+            <div class="w-full bg-slate-200 h-3 border border-slate-400 overflow-hidden">
+              <div class="bg-slate-700 h-full w-[69%]"></div>
+            </div>
+            <div class="flex justify-between text-[11px]">
+              <span class="font-bold text-slate-800">Rp 34.500.000 (69%)</span>
+              <span class="text-slate-500">Target Rp 50.000.000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-dashed border-slate-300">
+          <div class="w-full py-2.5 bg-slate-800 text-white font-mono text-xs font-bold text-center border-2 border-slate-800">
+            [BTN: Donasi Sekarang (Guest)]
+          </div>
+          <div class="w-full py-2 bg-slate-100 text-slate-800 font-mono text-xs font-bold text-center border border-slate-300">
+            [BTN: Gabung Relawan (14/20)]
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Lingkungan Mangrove -->
+      <div class="bg-white border-2 border-slate-800 flex flex-col justify-between p-4 space-y-4 shadow-sm">
+        <div class="space-y-3">
+          <div class="wf-cross-box h-44 w-full flex flex-col items-center justify-center text-slate-600 font-mono text-xs p-2 text-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[IMAGE: 16:9 BERSIH PANTAI & MANGROVE]</span>
+            <span class="text-[10px] text-slate-500 mt-1 z-10">400 x 225 px</span>
+          </div>
+
+          <div class="flex items-center justify-between font-mono text-[11px]">
+            <span class="wf-badge">LINGKUNGAN HIDUP</span>
+            <span class="text-slate-500">Bekasi, Jabar</span>
+          </div>
+
+          <h3 class="font-bold font-mono text-sm text-slate-900">
+            Aksi Bersih Pantai & Tanam 1.000 Mangrove
+          </h3>
+
+          <p class="text-xs text-slate-600 font-mono">
+            Pemulihan ekosistem pesisir utara Bekasi bersama warga nelayan tradisional.
+          </p>
+
+          <div class="space-y-1.5 font-mono text-xs pt-1">
+            <div class="w-full bg-slate-200 h-3 border border-slate-400 overflow-hidden">
+              <div class="bg-slate-700 h-full w-[68%]"></div>
+            </div>
+            <div class="flex justify-between text-[11px]">
+              <span class="font-bold text-slate-800">34 Relawan (68%)</span>
+              <span class="text-slate-500">Kuota: 50 Orang</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-dashed border-slate-300">
+          <div class="w-full py-2.5 bg-slate-800 text-white font-mono text-xs font-bold text-center border-2 border-slate-800">
+            [BTN: Daftar Sebagai Relawan]
+          </div>
+          <div class="w-full py-2 bg-slate-100 text-slate-800 font-mono text-xs font-bold text-center border border-slate-300">
+            [BTN: Donasi Logistik (Rp 4.5Jt)]
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Pendidikan MI Al-Ikhlas -->
+      <div class="bg-white border-2 border-slate-800 flex flex-col justify-between p-4 space-y-4 shadow-sm">
+        <div class="space-y-3">
+          <div class="wf-cross-box h-44 w-full flex flex-col items-center justify-center text-slate-600 font-mono text-xs p-2 text-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[IMAGE: 16:9 RENOVASI KELAS MI]</span>
+            <span class="text-[10px] text-slate-500 mt-1 z-10">400 x 225 px</span>
+          </div>
+
+          <div class="flex items-center justify-between font-mono text-[11px]">
+            <span class="wf-badge">PENDIDIKAN</span>
+            <span class="text-slate-500">Sleman, DIY</span>
+          </div>
+
+          <h3 class="font-bold font-mono text-sm text-slate-900">
+            Renovasi 3 Ruang Kelas MI Al-Ikhlas
+          </h3>
+
+          <p class="text-xs text-slate-600 font-mono">
+            Perbaikan atap dan rangka kelas rapuh demi keselamatan 64 siswa di Sleman, DIY.
+          </p>
+
+          <div class="space-y-1.5 font-mono text-xs pt-1">
+            <div class="w-full bg-slate-200 h-3 border border-slate-400 overflow-hidden">
+              <div class="bg-slate-700 h-full w-[72%]"></div>
+            </div>
+            <div class="flex justify-between text-[11px]">
+              <span class="font-bold text-slate-800">Rp 18.200.000 (72%)</span>
+              <span class="text-slate-500">Target Rp 25.000.000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 pt-2 border-t border-dashed border-slate-300">
+          <div class="w-full py-2.5 bg-slate-800 text-white font-mono text-xs font-bold text-center border-2 border-slate-800">
+            [BTN: Donasi Sekarang (Guest)]
+          </div>
+          <div class="w-full py-2 bg-slate-100 text-slate-800 font-mono text-xs font-bold text-center border border-slate-300">
+            [BTN: Lihat Rincian RAB]
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== DOKUMENTASI & LPJ WEB WIREFRAME ==================== -->
+  <section class="bg-white border-y-2 border-slate-300 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+      
+      <div class="border-b-2 border-slate-300 pb-3">
+        <span class="wf-badge">[SECTION: DOKUMENTASI LPJ WEB DIGITAL]</span>
+        <h2 class="text-xl font-bold font-mono text-slate-900 mt-1">Galeri Foto Kegiatan & Rincian LPJ Web Terbuka</h2>
+        <p class="text-xs text-slate-500 font-mono">
+          Semua foto lapangan terhubung otomatis ke pos belanja formulir web tanpa berkas fisik.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 font-mono text-xs">
+        
+        <div class="border-2 border-slate-800 p-4 space-y-3 bg-slate-50">
+          <div class="wf-cross-box h-40 w-full flex items-center justify-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[FOTO LAPANGAN 1]</span>
+          </div>
+          <h4 class="font-bold text-slate-900">Penyaluran 150 Karung Beras & Obat</h4>
+          <div class="p-2 border border-slate-300 bg-white space-y-1 text-[11px]">
+            <div>• Realisasi: Rp 18.500.000</div>
+            <div>• Penerima: 420 Jiwa</div>
+            <div>• Status LPJ: <strong class="text-slate-900">Terverifikasi Web</strong></div>
+          </div>
+        </div>
+
+        <div class="border-2 border-slate-800 p-4 space-y-3 bg-slate-50">
+          <div class="wf-cross-box h-40 w-full flex items-center justify-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[FOTO LAPANGAN 2]</span>
+          </div>
+          <h4 class="font-bold text-slate-900">Aksi Tanam 350 Bibit Pesisir</h4>
+          <div class="p-2 border border-slate-300 bg-white space-y-1 text-[11px]">
+            <div>• Realisasi: Rp 3.200.000</div>
+            <div>• Relawan: 34 Orang Terlibat</div>
+            <div>• Status LPJ: <strong class="text-slate-900">Terverifikasi Web</strong></div>
+          </div>
+        </div>
+
+        <div class="border-2 border-slate-800 p-4 space-y-3 bg-slate-50">
+          <div class="wf-cross-box h-40 w-full flex items-center justify-center">
+            <span class="bg-white/90 px-2 py-1 border border-slate-400 font-bold z-10">[FOTO LAPANGAN 3]</span>
+          </div>
+          <h4 class="font-bold text-slate-900">Pemasangan Baja Ringan Kelas</h4>
+          <div class="p-2 border border-slate-300 bg-white space-y-1 text-[11px]">
+            <div>• Realisasi: Rp 14.750.000</div>
+            <div>• Penerima: 64 Siswa MI</div>
+            <div>• Status LPJ: <strong class="text-slate-900">Terverifikasi Web</strong></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== TRANSPARANSI COUNTER WIREFRAME ==================== -->
+  <section class="bg-slate-900 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-4 text-center font-mono">
+      <span class="wf-badge bg-slate-800 text-slate-300 border-slate-600">[SECTION: LIVE TRANSPARENCY METRICS]</span>
+      <h3 class="text-lg font-bold">Indikator Akuntabilitas Penyaluran Real-Time</h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs pt-3">
+        <div class="border border-slate-700 bg-slate-800/80 p-4">
+          <div class="text-slate-400 text-[10px]">TOTAL DONASI TERCATAT:</div>
+          <div class="text-lg font-bold text-white mt-1">Rp 194.500.000</div>
+        </div>
+        <div class="border border-slate-700 bg-slate-800/80 p-4">
+          <div class="text-slate-400 text-[10px]">TOTAL PENERIMA MANFAAT:</div>
+          <div class="text-lg font-bold text-white mt-1">2.840 Jiwa</div>
+        </div>
+        <div class="border border-slate-700 bg-slate-800/80 p-4">
+          <div class="text-slate-400 text-[10px]">RELAWAN TERDAFTAR:</div>
+          <div class="text-lg font-bold text-white mt-1">142 Orang</div>
+        </div>
+        <div class="border border-slate-700 bg-slate-800/80 p-4">
+          <div class="text-slate-400 text-[10px]">AUDIT LPJ DIGITAL WEB:</div>
+          <div class="text-lg font-bold text-white mt-1">100% Sah Web</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER WIREFRAME ==================== -->
+  <footer class="bg-slate-950 text-slate-400 py-8 px-4 border-t-2 border-slate-800 font-mono text-xs text-center mt-auto">
+    <div class="max-w-7xl mx-auto space-y-2">
+      <p class="text-slate-300 font-bold">[FOOTER: WIREFRAME / SKETSA KASAR LO-FI - DONATUR & GUEST PORTAL]</p>
+      <p class="text-[11px] text-slate-500">Struktur layout, blok informasi, dan hierarki navigasi siap dikonversi ke Figma Wireframe.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

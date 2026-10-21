@@ -1,0 +1,193 @@
+name: Kategori
+description: |-
+
+  Manajemen kategori program kampanye.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/categories
+    metadata:
+      custom: []
+      groupName: Kategori
+      groupDescription: |-
+
+        Manajemen kategori program kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar Kategori'
+      description: 'Tampilkan semua kategori (Publik).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":1},{"id":2,"category_name":"Pendidikan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":3,"category_name":"Kesehatan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":4,"category_name":"Lingkungan Hidup","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":5,"category_name":"Sosial Kemanusiaan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/admin/categories
+    metadata:
+      custom: []
+      groupName: Kategori
+      groupDescription: |-
+
+        Manajemen kategori program kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Tambah Kategori (Admin)'
+      description: 'Buat kategori baru (Admin).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_name:
+        custom: []
+        name: category_name
+        description: 'Must not be greater than 100 characters.'
+        required: true
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      category_name: b
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/admin/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Kategori
+      groupDescription: |-
+
+        Manajemen kategori program kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update Kategori (Admin)'
+      description: 'Perbarui kategori (Admin).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      category_name:
+        custom: []
+        name: category_name
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/admin/categories/{id}'
+    metadata:
+      custom: []
+      groupName: Kategori
+      groupDescription: |-
+
+        Manajemen kategori program kampanye.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Hapus Kategori (Admin)'
+      description: 'Hapus kategori (Admin).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

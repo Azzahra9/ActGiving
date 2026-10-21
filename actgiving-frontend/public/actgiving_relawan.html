@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActGiving - Workspace Relawan (Semua Menu Tampil Memanjang untuk Desain Figma)</title>
+  <meta name="description" content="Dashboard resmi Relawan ActGiving dengan Sidebar Navigasi dan seluruh tampilan menu ditampilkan memanjang (Jadwal Lapangan, Riwayat & Sertifikat, Cari Misi Baru, dan Keahlian Profil) siap import Figma." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            blue: {
+              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd',
+              400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8',
+              800: '#1e40af', 900: '#1e3a8a', 950: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900 flex min-h-screen">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT SIDEBAR RELAWAN (PERSIS SEPERTI DI AI STUDIO)                     -->
+  <!-- ========================================================================= -->
+  <aside id="sidebarRelawan" class="w-72 bg-slate-900 text-slate-200 border-r border-slate-800 flex flex-col shrink-0 fixed inset-y-0 left-0 z-50 transition-transform duration-300 shadow-2xl lg:shadow-none">
+    
+    <!-- Sidebar Header & Brand -->
+    <div class="h-16 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-500 flex items-center justify-center text-white shadow-md shadow-blue-600/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        </div>
+        <div>
+          <span class="text-lg font-bold tracking-tight text-white font-display">
+            Act<span class="text-blue-400">Giving</span>
+          </span>
+          <p class="text-[10px] text-slate-400">Workspace Relawan</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Scrollable Body -->
+    <div class="flex-1 overflow-y-auto py-4 px-3 space-y-5 custom-scrollbar">
+      
+      <!-- User Profile Card -->
+      <div class="rounded-xl p-3 border shadow-xs bg-blue-950/60 border-blue-800/50 text-blue-200">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Role Saat Ini</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-blue-500/20 text-blue-200 border-blue-400/40">
+            Relawan Aktif
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Rizky Pratama" class="w-9 h-9 rounded-full object-cover border border-slate-600 shrink-0">
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-white truncate">Rizky Pratama</p>
+            <p class="text-[10px] text-slate-400 truncate">Bandung, Jawa Barat</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigasi Menu Relawan (Dengan Scroll Anchor Ke Semua Section) -->
+      <div>
+        <p class="px-2 text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-2">
+          Menu Navigasi Relawan
+        </p>
+        <nav class="space-y-1 text-xs">
+          <!-- 1. Jadwal Lapangan -->
+          <a href="#section-jadwal-lapangan" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all bg-blue-600 text-white shadow-md shadow-blue-600/30">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Jadwal Lapangan</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/30 text-white font-bold">2</span>
+          </a>
+
+          <!-- 2. Riwayat & Sertifikat -->
+          <a href="#section-riwayat-sertifikat" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-slate-300 hover:bg-blue-900/40 hover:text-blue-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+              <span>Riwayat & Sertifikat</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-bold">3 Sah</span>
+          </a>
+
+          <!-- 3. Cari Misi Baru -->
+          <a href="#section-cari-misi" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-slate-300 hover:bg-blue-900/40 hover:text-blue-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <span>Cari Misi Baru</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">5</span>
+          </a>
+
+          <!-- 4. Keahlian & Profil -->
+          <a href="#section-keahlian-profil" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all text-slate-300 hover:bg-blue-900/40 hover:text-blue-200">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span>Keahlian & Profil</span>
+            </div>
+          </a>
+        </nav>
+      </div>
+
+      <!-- KPI Mini Widget Relawan -->
+      <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 text-[11px] space-y-2">
+        <div class="flex justify-between text-slate-400">
+          <span>Jam Kontribusi:</span>
+          <span class="font-bold text-sky-400">18 Jam Sah</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>E-Sertifikat Digital:</span>
+          <span class="font-bold text-blue-300">3 Dokumen</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Poin Reputasi:</span>
+          <span class="font-bold text-emerald-400">850 Poin</span>
+        </div>
+      </div>
+
+      <!-- Beralih Role Demo -->
+      <div class="pt-3 border-t border-slate-800 space-y-2 text-xs">
+        <p class="text-[10px] uppercase font-bold text-slate-400">Beralih Tampilan Role:</p>
+        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+          <a href="/actgiving_donatur_guest.html" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-center font-semibold">
+            🌐 Donatur
+          </a>
+          <a href="/actgiving_inisiator.html" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-center font-semibold">
+            🚀 Inisiator
+          </a>
+          <a href="/actgiving_admin.html" class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-center font-semibold col-span-2">
+            🛡️ Admin & Auditor
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-3 border-t border-slate-800 bg-slate-950/60">
+      <a href="/actgiving_donatur_guest.html" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-colors">
+        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>Ke Beranda Publik</span>
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN CONTENT AREA (SEMUA MENU DITAMPILKAN MEMANJANG SECARA LENGKAP)    -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 pl-72 transition-all duration-300">
+    
+    <!-- Top Header Bar -->
+    <header class="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+      <div>
+        <h2 class="text-sm sm:text-base font-bold text-slate-900">Workspace Relawan (Full Extended View - Semua Menu Tampil)</h2>
+        <p class="text-[11px] text-slate-500">Seluruh 4 menu di sidebar disusun memanjang ke bawah sehingga siap dikonversi ke Figma dengan utuh.</p>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Figma Ready View
+        </span>
+      </div>
+    </header>
+
+    <!-- Top Breadcrumb & Notification -->
+    <div class="bg-blue-950 text-blue-200 border-b border-blue-900 py-2.5 px-4 sm:px-6 lg:px-8 text-xs flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+        <span class="font-semibold text-white">Status Relawan: Siaga Aksi Tanggap Darurat</span>
+        <span class="text-blue-400">|</span>
+        <span>Wilayah Operasi: Bandung & Sekitarnya</span>
+      </div>
+      <a href="/actgiving_donatur_guest.html" class="text-sky-300 hover:text-white font-medium flex items-center gap-1">
+        <span>← Kembali ke Katalog Publik</span>
+      </a>
+    </div>
+
+    <!-- Hero Profile Banner -->
+    <div class="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-900 text-white py-8 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex items-start sm:items-center gap-4">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Rizky Pratama" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-blue-400/40 shadow-lg">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-extrabold font-display">Rizky Pratama</h1>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/30">
+                Relawan Terverifikasi
+              </span>
+            </div>
+            <p class="text-xs text-blue-200 mt-1">Spesialisasi: Logistik Lapangan, Dapur Umum & First Aid Dasar</p>
+            <div class="flex items-center gap-4 mt-2 text-[11px] text-slate-300">
+              <span>📍 Bandung, Jawa Barat</span>
+              <span>⭐ Reputasi: 850 Poin</span>
+              <span>🛡️ ID: AG-VOL-2026-094</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="#section-cari-misi" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors">
+            + Cari Peluang Misi Baru
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counter -->
+      <div class="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-4 border-t border-white/10 text-xs">
+        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+          <div class="text-[11px] text-blue-200">Jam Kontribusi:</div>
+          <div class="text-xl font-bold mt-0.5 text-white">18 Jam</div>
+        </div>
+        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+          <div class="text-[11px] text-blue-200">Aksi Diikuti:</div>
+          <div class="text-xl font-bold mt-0.5 text-sky-400">4 Misi</div>
+        </div>
+        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+          <div class="text-[11px] text-blue-200">Tugas Terjadwal:</div>
+          <div class="text-xl font-bold mt-0.5 text-amber-300">2 Penugasan</div>
+        </div>
+        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+          <div class="text-[11px] text-blue-200">E-Sertifikat Sah:</div>
+          <div class="text-xl font-bold mt-0.5 text-emerald-300">3 File</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Sticky Jumper Bar -->
+    <div class="bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-3 sticky top-16 z-20 shadow-2xs">
+      <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
+        <span class="font-bold text-slate-500 text-[11px] uppercase tracking-wider hidden sm:inline">Lompat Cepat ke Menu:</span>
+        <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+          <a href="#section-jadwal-lapangan" class="px-3.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold whitespace-nowrap">
+            1. Jadwal Lapangan
+          </a>
+          <a href="#section-riwayat-sertifikat" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold whitespace-nowrap">
+            2. Riwayat & Sertifikat
+          </a>
+          <a href="#section-cari-misi" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold whitespace-nowrap">
+            3. Cari Misi Baru
+          </a>
+          <a href="#section-keahlian-profil" class="px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold whitespace-nowrap">
+            4. Keahlian & Profil
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SEMUA TAMPILAN MENU DISUSUN MEMANJANG KE BAWAH (NO HIDDEN TABS)           -->
+    <!-- ========================================================================= -->
+    <div class="p-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto w-full space-y-12">
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 1: MENU SIDEBAR 1 - JADWAL & TUGAS LAPANGAN AKTIF             -->
+      <!-- ===================================================================== -->
+      <section id="section-jadwal-lapangan" class="space-y-4 pt-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-blue-600">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-bold text-[10px] uppercase">
+                Menu Sidebar 1
+              </span>
+              <h3 class="text-lg font-bold text-slate-900 font-display">📅 Jadwal & Tugas Lapangan Aktif (2 Penugasan)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Daftar misi yang telah disetujui inisiator dan siap dihadiri di lapangan.</p>
+          </div>
+          <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-xl">2 Tugas Menunggu Kehadiran</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Card Tugas 1 (Banjir Dayeuhkolot) -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Terkonfirmasi & Siaga</span>
+                <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-lg">Shift Pagi</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-base">Dapur Umum Darurat Banjir Dayeuhkolot</h4>
+              <p class="text-xs text-slate-600">Membantu juru masak di posko pengungsian membungkus 800 paket makanan harian bagi warga terdampak luapan Citarum.</p>
+
+              <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Titik Kumpul / Posko:</span>
+                  <strong class="text-slate-800">Balai RW 04 Dayeuhkolot</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Jadwal Tugas:</span>
+                  <strong class="text-slate-800">25-28 Sep (07:30 - 13:00)</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Peran Spesifik:</span>
+                  <strong class="text-slate-800">Packing & Distribusi Pos</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Koordinator Posko:</span>
+                  <strong class="text-slate-800">Kang Asep (0813-8822-1100)</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Barcode Presensi Lapangan Langsung Ditampilkan -->
+            <div class="p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-2xl flex items-center justify-between gap-3 mt-2">
+              <div class="space-y-0.5">
+                <span class="text-[10px] font-bold text-blue-800 uppercase">Barcode Presensi Lapangan:</span>
+                <p class="text-[11px] text-slate-600">Scan oleh koordinator saat tiba di posko.</p>
+                <div class="text-[10px] font-mono text-blue-700 font-bold">QR-VOL-DAYEUHKOLOT-094</div>
+              </div>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AG-VOLUNTEER-RIZKY-DAYEUHKOLOT" alt="QR Code Presensi" class="w-14 h-14 rounded-lg border border-white shadow-xs">
+            </div>
+          </div>
+
+          <!-- Card Tugas 2 (Tanam Mangrove) -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px]">Menunggu Briefing Online</span>
+                <span class="text-xs font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg">Sabtu Depan</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-base">Aksi Bersih Pantai & Tanam 1.000 Mangrove</h4>
+              <p class="text-xs text-slate-600">Penanaman bibit mangrove pelindung pesisir utara Bekasi serta pemilahan sampah plastik laut bersama kelompok nelayan.</p>
+
+              <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Lokasi Aksi:</span>
+                  <strong class="text-slate-800">Muara Gembong, Bekasi Utara</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Jadwal Pelaksanaan:</span>
+                  <strong class="text-slate-800">Sabtu, 27 Sep (07:30 - 13:00)</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">Peran:</span>
+                  <strong class="text-slate-800">Penanaman Bibit & Logistik</strong>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span class="text-slate-400 block text-[10px]">PIC Lapangan:</span>
+                  <strong class="text-slate-800">Bu Dewi (0812-4411-9988)</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-sky-50/70 border border-sky-200/80 rounded-2xl flex items-center justify-between gap-3 mt-2">
+              <div class="space-y-0.5">
+                <span class="text-[10px] font-bold text-sky-800 uppercase">Barcode Presensi Lapangan:</span>
+                <p class="text-[11px] text-slate-600">Aktif pada hari-H briefing di lokasi.</p>
+                <div class="text-[10px] font-mono text-sky-700 font-bold">QR-VOL-MANGROVE-094</div>
+              </div>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=AG-VOLUNTEER-RIZKY-MANGROVE" alt="QR Code Presensi" class="w-14 h-14 rounded-lg border border-white shadow-xs">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 2: MENU SIDEBAR 2 - RIWAYAT & E-SERTIFIKAT DIGITAL SAH        -->
+      <!-- ===================================================================== -->
+      <section id="section-riwayat-sertifikat" class="space-y-4 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-sky-600">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-sky-600 text-white font-bold text-[10px] uppercase">
+                Menu Sidebar 2
+              </span>
+              <h3 class="text-lg font-bold text-slate-900 font-display">🏆 Riwayat Kontribusi & E-Sertifikat Sah (3 Sertifikat)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Seluruh sertifikat diterbitkan resmi dengan kode unik QR dan akumulasi jam pengabdian nyata.</p>
+          </div>
+          <span class="text-xs font-semibold text-sky-700 bg-sky-50 px-3 py-1 rounded-xl">Total Akumulasi: 48 Jam Kontribusi</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Sertifikat 1 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-md">16 Jam Aksi</span>
+                <span class="text-[10px] font-mono text-slate-400">CERT-2026-0812</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Distribusi Logistik Pangan Longsor Sukabumi</h4>
+              <p class="text-xs text-slate-500">Membantu posko evakuasi Cisolok membawa paket bahan pokok dan tenda terpal selama 2 hari operasi tanggap darurat.</p>
+              
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[11px] space-y-1">
+                <div class="flex justify-between text-slate-500"><span>Tanggal Aksi:</span><strong>12-14 Agu 2026</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Penyelenggara:</span><strong>Yayasan Peduli Sahabat</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Status Dokumen:</span><strong class="text-emerald-600">Sah & Terverifikasi</strong></div>
+              </div>
+            </div>
+
+            <button onclick="alert('Mengunduh E-Sertifikat PDF Resmi berstempel barcode...')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Unduh E-Sertifikat (PDF)</span>
+            </button>
+          </div>
+
+          <!-- Sertifikat 2 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-md">20 Jam Aksi</span>
+                <span class="text-[10px] font-mono text-slate-400">CERT-2026-0491</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Edukasi Sanitasi & Cuci Tangan Panti Asuhan</h4>
+              <p class="text-xs text-slate-500">Mengajar praktik hidup bersih sehat serta mendistribusikan sabun antiseptik kepada 85 anak asuh di Cimahi.</p>
+              
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[11px] space-y-1">
+                <div class="flex justify-between text-slate-500"><span>Tanggal Aksi:</span><strong>20-22 Mei 2026</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Penyelenggara:</span><strong>Relawan Sehat Nusantara</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Status Dokumen:</span><strong class="text-emerald-600">Sah & Terverifikasi</strong></div>
+              </div>
+            </div>
+
+            <button onclick="alert('Mengunduh E-Sertifikat PDF Resmi berstempel barcode...')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Unduh E-Sertifikat (PDF)</span>
+            </button>
+          </div>
+
+          <!-- Sertifikat 3 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">12 Jam Aksi</span>
+                <span class="text-[10px] font-mono text-slate-400">CERT-2026-0310</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Dapur Umum Tanggap Banjir Karawang</h4>
+              <p class="text-xs text-slate-500">Membantu proses pengolahan bahan mentah dan pendistribusian nasi boks siap saji ke perahu karet evakuasi.</p>
+              
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[11px] space-y-1">
+                <div class="flex justify-between text-slate-500"><span>Tanggal Aksi:</span><strong>04-05 Mar 2026</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Penyelenggara:</span><strong>Posko Bencana Jawa Barat</strong></div>
+                <div class="flex justify-between text-slate-500"><span>Status Dokumen:</span><strong class="text-emerald-600">Sah & Terverifikasi</strong></div>
+              </div>
+            </div>
+
+            <button onclick="alert('Mengunduh E-Sertifikat PDF Resmi berstempel barcode...')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Unduh E-Sertifikat (PDF)</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 3: MENU SIDEBAR 3 - CARI PELUANG MISI RELAWAN BARU            -->
+      <!-- ===================================================================== -->
+      <section id="section-cari-misi" class="space-y-4 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-emerald-600">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-bold text-[10px] uppercase">
+                Menu Sidebar 3
+              </span>
+              <h3 class="text-lg font-bold text-slate-900 font-display">🧭 Cari Peluang Misi Baru (5 Terbuka di Sekitar Anda)</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Daftarkan diri Anda sesuai lokasi terdekat dan minat keterampilan sosial.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl">Berbasis Lokasi Terdekat</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Peluang 1 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">Bencana Alam</span>
+                <span class="text-xs text-slate-400 font-bold">Butuh 15 Relawan</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Relawan Evakuasi Logistik Banjir Dayeuhkolot</h4>
+              <p class="text-xs text-slate-600">Membantu perahu karet membawa makanan siap saji dan air galon ke rumah warga yang terisolasi genangan.</p>
+              
+              <div class="space-y-1 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <div>📍 <strong>Lokasi:</strong> Dayeuhkolot, Bandung</div>
+                <div>⏰ <strong>Jadwal:</strong> Setiap Akhir Pekan</div>
+                <div>🛡️ <strong>Kualifikasi:</strong> Sehat jasmani, bisa berenang dasar</div>
+              </div>
+            </div>
+
+            <button onclick="alert('Pendaftaran berhasil diajukan! Inisiator akan memverifikasi permohonan Anda.')" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors">
+              Daftar Jadi Relawan
+            </button>
+          </div>
+
+          <!-- Peluang 2 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">Pendidikan</span>
+                <span class="text-xs text-slate-400 font-bold">Butuh 6 Relawan</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Relawan Guru Tamu MI Al-Ikhlas Sleman</h4>
+              <p class="text-xs text-slate-600">Mengajar 64 siswa madrasah belajar sains interaktif dan bercerita motivasi sembari gedung kelas direnovasi.</p>
+              
+              <div class="space-y-1 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <div>📍 <strong>Lokasi:</strong> Kaliurang, Sleman DIY</div>
+                <div>⏰ <strong>Jadwal:</strong> Setiap Sabtu Pagi</div>
+                <div>🛡️ <strong>Kualifikasi:</strong> Komunikatif, sabar mendampingi anak</div>
+              </div>
+            </div>
+
+            <button onclick="alert('Pendaftaran berhasil diajukan! Inisiator akan memverifikasi permohonan Anda.')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors">
+              Daftar Jadi Relawan
+            </button>
+          </div>
+
+          <!-- Peluang 3 -->
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold text-[10px]">Lingkungan</span>
+                <span class="text-xs text-slate-400 font-bold">Butuh 20 Relawan</span>
+              </div>
+              <h4 class="font-bold text-slate-900 text-sm">Aksi Bersih Pantai & Tanam 1.000 Mangrove</h4>
+              <p class="text-xs text-slate-600">Menanam bibit mangrove pelindung pesisir utara dan edukasi pengolahan sampah plastik bersama nelayan.</p>
+              
+              <div class="space-y-1 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <div>📍 <strong>Lokasi:</strong> Muara Gembong, Bekasi</div>
+                <div>⏰ <strong>Jadwal:</strong> Sabtu, 27 September 2026</div>
+                <div>🛡️ <strong>Kualifikasi:</strong> Membawa pakaian ganti, siap kotor</div>
+              </div>
+            </div>
+
+            <button onclick="alert('Pendaftaran berhasil diajukan! Inisiator akan memverifikasi permohonan Anda.')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors">
+              Daftar Jadi Relawan
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- SECTION 4: MENU SIDEBAR 4 - KEAHLIAN, BIODATA & KONTAK DARURAT        -->
+      <!-- ===================================================================== -->
+      <section id="section-keahlian-profil" class="space-y-4 pt-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b-2 border-indigo-600">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white font-bold text-[10px] uppercase">
+                Menu Sidebar 4
+              </span>
+              <h3 class="text-lg font-bold text-slate-900 font-display">👤 Keahlian, Biodata & Kontak Darurat Lapangan</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Informasi keselamatan dan kontak keluarga siaga saat Anda bertugas di zona rawan bencana.</p>
+          </div>
+          <span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-xl">Profil Terverifikasi 100%</span>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-2xs space-y-6 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Nama Lengkap</label>
+              <input type="text" value="Rizky Pratama" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Nomor WhatsApp Aktif</label>
+              <input type="text" value="0812-3456-7890" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Golongan Darah</label>
+              <input type="text" value="O Rhesus (+)" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Kota Domisili</label>
+              <input type="text" value="Bandung, Jawa Barat" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Kontak Darurat (Keluarga / Kerabat)</label>
+              <input type="text" value="Ibu Sulastri (Ibu Kandung) - 0813-9988-7766" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Riwayat Alergi / Kondisi Medis</label>
+              <input type="text" value="Tidak ada riwayat alergi obat atau makanan berat" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 font-semibold text-slate-800">
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-slate-700 block mb-2">Tag Keahlian & Keterampilan Relawan</label>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 rounded-lg bg-blue-100 text-blue-800 font-bold text-xs">Logistik & Distribusi Sembako</span>
+              <span class="px-3 py-1 rounded-lg bg-sky-100 text-sky-800 font-bold text-xs">First Aid & P3K Dasar</span>
+              <span class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">Dapur Umum Darurat</span>
+              <span class="px-3 py-1 rounded-lg bg-purple-100 text-purple-800 font-bold text-xs">Pendampingan Psikososial Anak</span>
+              <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs">+ Tambah Keahlian Baru</span>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button onclick="alert('Data profil dan kontak darurat relawan berhasil diperbarui!')" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs transition-colors">
+              Simpan Pembaruan Profil
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-xs text-center mt-auto">
+      <div class="max-w-6xl mx-auto px-4 space-y-2">
+        <p class="font-semibold text-slate-300">© 2026 ActGiving - Portal Workspace Relawan Resmi. Tampilan Memanjang Terpadu untuk Figma.</p>
+        <p class="text-[11px] text-slate-500">Seluruh menu (Jadwal Lapangan, Riwayat Sertifikat, Cari Misi, Keahlian) aktif tanpa disembunyikan.</p>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
