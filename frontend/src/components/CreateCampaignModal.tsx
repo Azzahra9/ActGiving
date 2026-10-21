@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Campaign, CampaignMode, Category, UserProfile } from '../types';
 import api from '../lib/axios';
-import { mapBackendCampaignToFrontend } from '../services/campaignService';
+import campaignService, { mapBackendCampaignToFrontend } from '../services/campaignService';
 
 interface CreateCampaignModalProps {
   isOpen: boolean;
@@ -36,6 +36,45 @@ const CATEGORY_MAP: Record<string, number> = {
   'Sosial & Kemanusiaan': 5,
 };
 
+export const INDONESIAN_CITIES = [
+  // Sumatera
+  'Banda Aceh, Aceh', 'Medan, Sumatera Utara', 'Pematangsiantar, Sumatera Utara',
+  'Padang, Sumatera Barat', 'Bukittinggi, Sumatera Barat', 'Pekanbaru, Riau', 'Dumai, Riau',
+  'Batam, Kepulauan Riau', 'Tanjungpinang, Kepulauan Riau', 'Jambi, Jambi',
+  'Palembang, Sumatera Selatan', 'Prabumulih, Sumatera Selatan', 'Bengkulu, Bengkulu',
+  'Bandar Lampung, Lampung', 'Metro, Lampung', 'Pangkal Pinang, Kep. Bangka Belitung',
+  // Jawa & Banten
+  'Jakarta Pusat, DKI Jakarta', 'Jakarta Selatan, DKI Jakarta', 'Jakarta Barat, DKI Jakarta',
+  'Jakarta Timur, DKI Jakarta', 'Jakarta Utara, DKI Jakarta', 'Bandung, Jawa Barat',
+  'Bekasi, Jawa Barat', 'Bogor, Jawa Barat', 'Depok, Jawa Barat', 'Cimahi, Jawa Barat',
+  'Cirebon, Jawa Barat', 'Sukabumi, Jawa Barat', 'Tasikmalaya, Jawa Barat',
+  'Tangerang, Banten', 'Tangerang Selatan, Banten', 'Serang, Banten', 'Cilegon, Banten',
+  'Semarang, Jawa Tengah', 'Surakarta (Solo), Jawa Tengah', 'Magelang, Jawa Tengah',
+  'Pekalongan, Jawa Tengah', 'Tegal, Jawa Tengah', 'Salatiga, Jawa Tengah',
+  'Yogyakarta, D.I. Yogyakarta', 'Sleman, D.I. Yogyakarta', 'Bantul, D.I. Yogyakarta',
+  'Surabaya, Jawa Timur', 'Malang, Jawa Timur', 'Kediri, Jawa Timur', 'Blitar, Jawa Timur',
+  'Madiun, Jawa Timur', 'Probolinggo, Jawa Timur', 'Pasuruan, Jawa Timur',
+  'Batu, Jawa Timur', 'Lumajang, Jawa Timur', 'Jember, Jawa Timur', 'Banyuwangi, Jawa Timur',
+  // Bali & Nusa Tenggara
+  'Denpasar, Bali', 'Singaraja, Bali', 'Mataram, NTB', 'Bima, NTB',
+  'Kupang, NTT', 'Labuan Bajo, NTT',
+  // Kalimantan
+  'Pontianak, Kalimantan Barat', 'Singkawang, Kalimantan Barat',
+  'Palangka Raya, Kalimantan Tengah', 'Sampit, Kalimantan Tengah',
+  'Banjarmasin, Kalimantan Selatan', 'Banjarbaru, Kalimantan Selatan',
+  'Samarinda, Kalimantan Timur', 'Balikpapan, Kalimantan Timur', 'Bontang, Kalimantan Timur',
+  'Tarakan, Kalimantan Utara',
+  // Sulawesi
+  'Makassar, Sulawesi Selatan', 'Palopo, Sulawesi Selatan', 'Parepare, Sulawesi Selatan',
+  'Manado, Sulawesi Utara', 'Bitung, Sulawesi Utara', 'Tomohon, Sulawesi Utara',
+  'Palu, Sulawesi Tengah', 'Kendari, Sulawesi Tenggara', 'Baubau, Sulawesi Tenggara',
+  'Gorontalo, Gorontalo', 'Mamuju, Sulawesi Barat',
+  // Maluku & Papua
+  'Ambon, Maluku', 'Tual, Maluku', 'Ternate, Maluku Utara', 'Tidore, Maluku Utara',
+  'Jayapura, Papua', 'Sorong, Papua Barat Daya', 'Manokwari, Papua Barat',
+  'Merauke, Papua Selatan', 'Timika (Mimika), Papua Tengah', 'Nabire, Papua Tengah'
+];
+
 export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   isOpen,
   onClose,
@@ -48,6 +87,25 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [title, setTitle] = useState('');
   const [initiatorName, setInitiatorName] = useState(currentUser?.name || '');
   const [category, setCategory] = useState<Category>('Bencana Alam');
+  const [categoriesList, setCategoriesList] = useState<{ id: number; category_name: string }[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
+
+  // Fetch real categories from Laravel API on modal mount
+  useEffect(() => {
+    if (isOpen) {
+      campaignService.getCategories()
+        .then((cats) => {
+          if (Array.isArray(cats) && cats.length > 0) {
+            setCategoriesList(cats);
+            setSelectedCategoryId(cats[0].id);
+            setCategory(cats[0].category_name as Category);
+          }
+        })
+        .catch((err) => {
+          console.warn('Gagal mengambil kategori dari backend Laravel:', err);
+        });
+    }
+  }, [isOpen]);
   const [locationCity, setLocationCity] = useState(currentUser?.city || 'Bandung');
   const [description, setDescription] = useState('');
 
@@ -91,7 +149,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const categoryId = CATEGORY_MAP[category] || 1;
+      const categoryId = selectedCategoryId || (CATEGORY_MAP[category] || 1);
       const backendMode = mode === 'dana' ? 'fund_only' : mode === 'relawan' ? 'volunteer_only' : 'both';
       const targetAmount = mode === 'relawan' ? 0 : parseInt(targetFundsStr.replace(/\D/g, '') || '0', 10);
       const targetVolunteers = mode === 'dana' ? 0 : parseInt(targetVolunteersStr.replace(/\D/g, '') || '0', 10);
@@ -236,7 +294,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                 className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-md"
               >
                 <UserCheck className="w-4 h-4" />
-                <span>Beralih ke Akun Inisiator (Simulasi Cepat)</span>
+                <span>Masuk ke Akun Inisiator (REST API)</span>
               </button>
             )}
           </div>
@@ -325,16 +383,30 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">Kategori Isu</label>
                   <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value as Category)}
+                    value={selectedCategoryId}
+                    onChange={(e) => {
+                      const idNum = Number(e.target.value);
+                      setSelectedCategoryId(idNum);
+                      const matched = categoriesList.find((c) => c.id === idNum);
+                      if (matched) setCategory(matched.category_name as Category);
+                    }}
                     className="w-full px-3 py-2 bg-slate-50 focus:bg-white border border-slate-200 rounded-xl focus:border-blue-500 outline-hidden transition-colors cursor-pointer"
                   >
-                    <option value="Bencana Alam">Bencana Alam</option>
-                    <option value="Pendidikan">Pendidikan</option>
-                    <option value="Lingkungan Hidup">Lingkungan Hidup</option>
-                    <option value="Kesehatan">Kesehatan</option>
-                    <option value="Panti Asuhan">Panti Asuhan</option>
-                    <option value="Sosial & Kemanusiaan">Sosial & Kemanusiaan</option>
+                    {categoriesList.length > 0 ? (
+                      categoriesList.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.category_name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value={1}>Bencana Alam</option>
+                        <option value={2}>Pendidikan</option>
+                        <option value={3}>Kesehatan</option>
+                        <option value={4}>Lingkungan Hidup</option>
+                        <option value={5}>Sosial Kemanusiaan</option>
+                      </>
+                    )}
                   </select>
                 </div>
               </div>
@@ -347,12 +419,11 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                     onChange={(e) => setLocationCity(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-50 focus:bg-white border border-slate-200 rounded-xl focus:border-blue-500 outline-hidden transition-colors cursor-pointer"
                   >
-                    <option value="Bandung">Bandung</option>
-                    <option value="Jakarta Utara">Jakarta Utara</option>
-                    <option value="Surabaya">Surabaya</option>
-                    <option value="Yogyakarta">Yogyakarta</option>
-                    <option value="Medan">Medan</option>
-                    <option value="Lumajang, Jawa Timur">Lumajang, Jawa Timur</option>
+                    {INDONESIAN_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>

@@ -166,7 +166,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
                     <div>
                       <label className="block font-semibold text-slate-700 mb-1">Upload Kuitansi & Foto</label>
                       <div className="border border-dashed border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-500 text-[11px] flex items-center justify-between">
-                        <span>faktur_pembelanjaan.jpg (Mock)</span>
+                        <span>faktur_pembelanjaan.jpg</span>
                         <Upload className="w-3.5 h-3.5 text-blue-600" />
                       </div>
                     </div>

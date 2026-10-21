@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
@@ -6,6 +6,8 @@ import {
   Camera, Trash2, Plus, ReceiptText, Layers, FileCheck2, ZoomIn, ArrowRight
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
+import api from '../../lib/axios';
+import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 
 interface InisiatorDashboardViewProps {
@@ -58,18 +60,64 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   // Calculate total from budget items if amount not manually specified
   const calculatedBudgetTotal = budgetItems.reduce((sum, item) => sum + item.amount, 0);
 
+  const [initiatorCampaigns, setInitiatorCampaigns] = useState<Campaign[]>([]);
+  const [volunteersList, setVolunteersList] = useState<any[]>([]);
+
+  // Fetch real initiator campaigns and volunteer applicants from Laravel REST API
+  useEffect(() => {
+    const fetchInitiatorData = async () => {
+      try {
+        const response = await api.get('/my-campaigns');
+        const items = response.data?.data?.data || response.data?.data || [];
+        if (Array.isArray(items)) {
+          const mapped = items.map(mapBackendCampaignToFrontend);
+          setInitiatorCampaigns(mapped);
+
+          // Fetch volunteer registrations for my campaigns
+          if (mapped.length > 0) {
+            const regPromises = mapped.map((c: Campaign) =>
+              api.get(`/campaigns/${c.id}/registrations`).catch(() => null)
+            );
+            const regResults = await Promise.all(regPromises);
+            const allRegs: any[] = [];
+            regResults.forEach((res, idx) => {
+              if (res?.data?.data) {
+                const regItems = res.data.data.data || res.data.data;
+                if (Array.isArray(regItems)) {
+                  regItems.forEach((r: any) => {
+                    allRegs.push({
+                      ...r,
+                      campaignTitle: mapped[idx].title
+                    });
+                  });
+                }
+              }
+            });
+            setVolunteersList(allRegs);
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal memuat kampanye inisiator dari API:', err);
+      }
+    };
+
+    fetchInitiatorData();
+  }, []);
+
   // Filter campaigns belonging to this initiator
-  const myCampaigns = campaigns.filter(
-    (c) =>
-      currentUser.managedCampaignIds?.includes(c.id) ||
-      c.initiatorName.toLowerCase().includes(currentUser.name.toLowerCase()) ||
-      c.id === 'camp-01'
-  );
+  const myCampaigns = initiatorCampaigns.length > 0
+    ? initiatorCampaigns
+    : campaigns.filter(
+        (c) =>
+          currentUser.managedCampaignIds?.includes(c.id) ||
+          c.initiatorName.toLowerCase().includes(currentUser.name.toLowerCase())
+      );
 
   const totalDanaTerkumpul = myCampaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
   const totalTargetDana = myCampaigns.reduce((acc, c) => acc + (c.targetFunds || 0), 0);
   const totalRelawanTerdaftar = myCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
   const totalTargetRelawan = myCampaigns.reduce((acc, c) => acc + (c.targetVolunteers || 0), 0);
+  const totalLpjCount = myCampaigns.reduce((acc, c) => acc + (c.lpjReports?.length || 0), 0);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -221,55 +269,55 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
         {/* Initiator Metrics Grid */}
         <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-          <div className="bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl">
+          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300">Total Donasi Dikelola</span>
-              <DollarSign className="w-4 h-4 text-sky-400" />
+              <span className="text-xs text-blue-300 truncate">Total Donasi Dikelola</span>
+              <DollarSign className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-sans">
+            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(totalDanaTerkumpul)}>
               {formatRupiah(totalDanaTerkumpul)}
             </div>
-            <div className="text-[11px] text-blue-300/80 mt-1">
-              Target Total: {formatRupiah(totalTargetDana || 100000000)}
+            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
+              Target Total: {formatRupiah(totalTargetDana)}
             </div>
           </div>
 
-          <div className="bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl">
+          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300">Relawan Terhimpun</span>
-              <Users className="w-4 h-4 text-blue-400" />
+              <span className="text-xs text-blue-300 truncate">Relawan Terhimpun</span>
+              <Users className="w-4 h-4 text-blue-400 shrink-0 ml-1" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-sans">
+            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate">
               {totalRelawanTerdaftar} Orang
             </div>
-            <div className="text-[11px] text-blue-300/80 mt-1">
-              Dari Target: {totalTargetRelawan || 70} Personel
+            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
+              Dari Target: {totalTargetRelawan} Personel
             </div>
           </div>
 
-          <div className="bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl">
+          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300">Kampanye Dikelola</span>
-              <Building2 className="w-4 h-4 text-sky-400" />
+              <span className="text-xs text-blue-300 truncate">Kampanye Dikelola</span>
+              <Building2 className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-sans">
+            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate">
               {myCampaigns.length} Program
             </div>
-            <div className="text-[11px] text-blue-300/80 mt-1">
+            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
               Status: Semua Disetujui & Aktif
             </div>
           </div>
 
-          <div className="bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl">
+          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300">Akuntabilitas LPJ</span>
-              <FileText className="w-4 h-4 text-sky-400" />
+              <span className="text-xs text-blue-300 truncate">Akuntabilitas LPJ</span>
+              <FileText className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
             </div>
-            <div className="text-xl sm:text-2xl font-black text-sky-400 font-sans">
-              100% Sah
+            <div className="text-xl lg:text-2xl font-bold text-sky-400 font-sans truncate">
+              {totalLpjCount} Dokumen Sah
             </div>
-            <div className="text-[11px] text-blue-300/80 mt-1">
-              Semua Nota Lolos Audit Admin
+            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
+              {totalLpjCount > 0 ? 'Telah Terverifikasi Publik' : 'Belum Ada Laporan Terbit'}
             </div>
           </div>
         </div>
@@ -843,71 +891,49 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-semibold text-slate-900">Rian Pratama</td>
-                    <td className="p-3 text-slate-600">Dapur Umum & Evakuasi Banjir</td>
-                    <td className="p-3 text-slate-600">Jakarta Selatan • +62 812-8899-2233</td>
-                    <td className="p-3">
-                      <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        Siap Bertugas
-                      </span>
-                    </td>
-                    <td className="p-3 text-right">
-                      <a
-                        href="https://wa.me/6281288992233?text=Halo%20Rian%20Pratama,%20terima%20kasih%20sudah%20mendaftar%20aksi%20relawan%20kami."
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        Chat WA
-                      </a>
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-semibold text-slate-900">Dewi Anggraini, S.Kep</td>
-                    <td className="p-3 text-slate-600">Dapur Umum & Evakuasi Banjir</td>
-                    <td className="p-3 text-slate-600">Bandung • +62 813-7722-1100</td>
-                    <td className="p-3">
-                      <span className="bg-sky-100 text-sky-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        Siap Bertugas (Medis)
-                      </span>
-                    </td>
-                    <td className="p-3 text-right">
-                      <a
-                        href="https://wa.me/6281377221100?text=Halo%20Dewi,%20kami%20inisiator%20aksi%20sosial."
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        Chat WA
-                      </a>
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-semibold text-slate-900">Fajar Nugraha</td>
-                    <td className="p-3 text-slate-600">Renovasi Jembatan Pelajar</td>
-                    <td className="p-3 text-slate-600">Cianjur • +62 856-9911-3322</td>
-                    <td className="p-3">
-                      <span className="bg-slate-200 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                        Menunggu Briefing
-                      </span>
-                    </td>
-                    <td className="p-3 text-right">
-                      <a
-                        href="https://wa.me/6285699113322"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        Chat WA
-                      </a>
-                    </td>
-                  </tr>
+                  {volunteersList.length > 0 ? (
+                    volunteersList.map((vol: any, idx: number) => (
+                      <tr key={vol.id || idx} className="hover:bg-slate-50">
+                        <td className="p-3 font-semibold text-slate-900">
+                          {vol.user?.name || vol.name || 'Relawan Terdaftar'}
+                        </td>
+                        <td className="p-3 text-slate-600">{vol.campaignTitle || 'Kampanye Sosial'}</td>
+                        <td className="p-3 text-slate-600">
+                          {vol.user?.phone_whatsapp || vol.phone || '-'}
+                        </td>
+                        <td className="p-3">
+                          <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {vol.status === 'accepted' ? 'Siap Bertugas' : 'Menunggu Seleksi'}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          {vol.user?.phone_whatsapp ? (
+                            <a
+                              href={`https://wa.me/${vol.user.phone_whatsapp.replace(/\D/g, '')}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold"
+                            >
+                              <MessageSquare className="w-3 h-3" />
+                              Chat WA
+                            </a>
+                          ) : (
+                            <span className="text-slate-400 text-[11px]">-</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="p-8 text-center text-slate-500 font-sans">
+                        <Users className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
+                        <div className="font-bold text-slate-800 text-sm">Belum Ada Pendaftar Relawan</div>
+                        <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                          Data relawan yang mendaftar ke kampanye aksi sosial Anda akan tercatat di tabel ini beserta kontak dan verifikasi keahliannya.
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

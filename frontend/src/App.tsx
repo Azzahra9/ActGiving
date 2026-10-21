@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { INITIAL_CAMPAIGNS, INITIAL_STATS, DEMO_USERS } from './data/mockData';
 import { useAuth } from './context/AuthContext';
 import campaignService from './services/campaignService';
-import { Campaign, DigitalInvoice, UserProfile, LpjItem, ActiveView } from './types';
+import { Campaign, DigitalInvoice, UserProfile, LpjItem, ActiveView, DEFAULT_GUEST_USER } from './types';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { HowItWorks } from './components/HowItWorks';
@@ -30,7 +29,7 @@ export default function App() {
   const { user: authUser, setUser: setAuthUser } = useAuth();
   
   // Current Active Actor Session (SRS Dual-Role & Multi-Actor Architecture)
-  const [currentUser, setCurrentUser] = useState<UserProfile>(authUser || DEMO_USERS.guest);
+  const [currentUser, setCurrentUser] = useState<UserProfile>(authUser || DEFAULT_GUEST_USER);
 
   // Sync state if authUser changes
   useEffect(() => {
@@ -52,12 +51,12 @@ export default function App() {
   const [adminTab, setAdminTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem'>('moderasi');
 
   // Global Application State (REST API & Real Data)
-  const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState<boolean>(true);
   const [campaignError, setCampaignError] = useState<string | null>(null);
-  const [totalDonationRp, setTotalDonationRp] = useState<number>(INITIAL_STATS.totalDonationRp);
-  const [totalVolunteers, setTotalVolunteers] = useState<number>(INITIAL_STATS.totalVolunteers);
-  const [completedPrograms] = useState<number>(INITIAL_STATS.completedPrograms);
+  const [totalDonationRp, setTotalDonationRp] = useState<number>(0);
+  const [totalVolunteers, setTotalVolunteers] = useState<number>(0);
+  const [completedPrograms, setCompletedPrograms] = useState<number>(0);
 
   // Fetch real campaigns from Laravel REST API (GET /api/campaigns)
   const fetchCampaigns = useCallback(async () => {
@@ -65,16 +64,21 @@ export default function App() {
     setCampaignError(null);
     try {
       const data = await campaignService.getCampaigns();
-      if (data && data.length > 0) {
-        setCampaigns(data);
-        const dynamicDonations = data.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
-        const dynamicVolunteers = data.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
-        if (dynamicDonations > 0) setTotalDonationRp(dynamicDonations);
-        if (dynamicVolunteers > 0) setTotalVolunteers(dynamicVolunteers);
-      }
+      const validCampaigns = Array.isArray(data) ? data : [];
+      setCampaigns(validCampaigns);
+      const dynamicDonations = validCampaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
+      const dynamicVolunteers = validCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
+      const dynamicCompleted = validCampaigns.filter(c => c.status === 'completed' || c.status === 'closed').length;
+      setTotalDonationRp(dynamicDonations);
+      setTotalVolunteers(dynamicVolunteers);
+      setCompletedPrograms(dynamicCompleted);
     } catch (err: any) {
-      console.warn('Gagal memuat kampanye dari backend API, menggunakan data cadangan:', err);
+      console.warn('Gagal memuat kampanye dari backend API:', err);
       setCampaignError('Tidak dapat terhubung ke REST API Laravel (http://127.0.0.1:8000/api). Pastikan server backend Anda sedang aktif.');
+      setCampaigns([]);
+      setTotalDonationRp(0);
+      setTotalVolunteers(0);
+      setCompletedPrograms(0);
     } finally {
       setIsLoadingCampaigns(false);
     }
@@ -557,7 +561,7 @@ export default function App() {
         onClose={() => setIsCreateOpen(false)}
         onAddCampaign={handleAddCampaign}
         currentUser={currentUser}
-        onSwitchToInisiator={() => handleSelectUser(DEMO_USERS.inisiator)}
+        onSwitchToInisiator={() => setIsAuthOpen(true)}
       />
 
       {/* MODAL 5: Dual-Role Authentication (SRS Subbab 2.1 & FR-04) */}

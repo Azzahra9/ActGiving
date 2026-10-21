@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api, { getCsrfCookie, getAuthToken, setAuthToken, removeAuthToken } from '../lib/axios';
-import { UserProfile, UserRole } from '../types';
-import { DEMO_USERS } from '../data/mockData';
+import { UserProfile, UserRole, DEFAULT_GUEST_USER } from '../types';
 
 export interface LoginCredentials {
   email: string;
@@ -68,7 +67,7 @@ export const mapBackendUserToProfile = (
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile>(DEMO_USERS.guest);
+  const [user, setUser] = useState<UserProfile>(DEFAULT_GUEST_USER);
   const [token, setTokenState] = useState<string | null>(getAuthToken());
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -94,7 +93,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.warn('Sesi login telah kedaluwarsa atau token tidak valid.');
         removeAuthToken();
         setTokenState(null);
-        setUser(DEMO_USERS.guest);
+        setUser(DEFAULT_GUEST_USER);
       } finally {
         setIsLoading(false);
       }
@@ -205,25 +204,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       removeAuthToken();
       localStorage.removeItem('actgiving_preferred_role');
       setTokenState(null);
-      setUser(DEMO_USERS.guest);
+      setUser(DEFAULT_GUEST_USER);
       setIsLoading(false);
     }
   };
 
   // Demo Persona Switcher (Tetap mendukung fitur demo cepat UI)
   const switchDemoPersona = (roleKey: UserRole) => {
-    const targetUser = DEMO_USERS[roleKey];
-    if (targetUser) {
-      if (roleKey === 'guest') {
-        removeAuthToken();
-        setTokenState(null);
-      } else {
-        // Mock token untuk sesi demo
-        const mockToken = `demo_token_${roleKey}_${Date.now()}`;
-        setAuthToken(mockToken);
-        setTokenState(mockToken);
-      }
-      setUser(targetUser);
+    if (roleKey === 'guest') {
+      removeAuthToken();
+      setTokenState(null);
+      setUser(DEFAULT_GUEST_USER);
     }
   };
 

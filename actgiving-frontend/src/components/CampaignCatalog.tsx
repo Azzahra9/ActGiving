@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import campaignService from '../services/campaignService';
 import { Compass, RefreshCw, AlertCircle, Loader2, WifiOff } from 'lucide-react';
 import { Campaign } from '../types';
 import { CampaignCard } from './CampaignCard';
@@ -37,6 +38,19 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
   onSelectCategory
 }) => {
   const [internalCategory, setInternalCategory] = useState('Semua Kategori');
+  const [apiCategories, setApiCategories] = useState<{ id: number; category_name: string }[]>([]);
+
+  useEffect(() => {
+    campaignService.getCategories()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setApiCategories(data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Gagal memuat kategori dari backend:', err);
+      });
+  }, []);
   const currentCategory = propCategory !== undefined ? propCategory : internalCategory;
 
   const handleCategoryClick = (categoryValue: string) => {
@@ -76,21 +90,35 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
 
           {/* Category Filter Pills on Top-Right */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none self-start lg:self-auto">
-            {CATEGORY_TABS.map((tab) => {
-              const isActive = currentCategory === tab.value || 
-                (tab.value === 'Semua Kategori' && (currentCategory === 'Semua Kategori' || !currentCategory));
-
+            <button
+              onClick={() => handleCategoryClick('Semua Kategori')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                currentCategory === 'Semua Kategori' || !currentCategory
+                  ? 'bg-brand-blue text-white shadow-xs'
+                  : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
+              }`}
+            >
+              Semua
+            </button>
+            {(apiCategories.length > 0 ? apiCategories : [
+              { id: 1, category_name: 'Bencana Alam' },
+              { id: 2, category_name: 'Pendidikan' },
+              { id: 3, category_name: 'Kesehatan' },
+              { id: 4, category_name: 'Lingkungan Hidup' },
+              { id: 5, category_name: 'Sosial Kemanusiaan' }
+            ]).map((cat) => {
+              const isActive = currentCategory === cat.category_name;
               return (
                 <button
-                  key={tab.label}
-                  onClick={() => handleCategoryClick(tab.value)}
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat.category_name)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                     isActive
                       ? 'bg-brand-blue text-white shadow-xs'
                       : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
                   }`}
                 >
-                  {tab.label}
+                  {cat.category_name}
                 </button>
               );
             })}

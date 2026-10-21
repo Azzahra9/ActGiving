@@ -45,6 +45,16 @@ export interface UserProfile {
   managedCampaignIds?: string[]; // IDs of campaigns created/managed as initiator
 }
 
+export const DEFAULT_GUEST_USER: UserProfile = {
+  id: 'guest',
+  name: 'Tamu / Donatur',
+  email: '',
+  role: 'guest',
+  city: 'Indonesia',
+  joinedCampaignIds: [],
+  managedCampaignIds: [],
+};
+
 export interface Campaign {
   id: string;
   title: string;
@@ -56,7 +66,7 @@ export interface Campaign {
   distanceKm: number;
   imageUrl: string;
   description: string;
-  status?: 'active' | 'pending_approval' | 'rejected';
+  status?: 'active' | 'pending_approval' | 'rejected' | 'completed' | 'closed';
   // Mode Dana
   targetFunds?: number;
   collectedFunds?: number;

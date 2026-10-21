@@ -169,7 +169,7 @@ export const RelawanActivityModal: React.FC<RelawanActivityModalProps> = ({
                       className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-200 inline-flex items-center gap-1.5 transition-colors"
                     >
                       <Award className="w-3.5 h-3.5" />
-                      E-Sertifikat Digital (Mock)
+                      E-Sertifikat Digital
                     </button>
                   </div>
                 </div>

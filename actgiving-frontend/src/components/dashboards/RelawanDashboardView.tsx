@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   HeartHandshake, Calendar, Clock, MapPin, MessageSquare, Award, 
   CheckCircle2, ExternalLink, Compass, QrCode, ShieldCheck, 
   Users, AlertCircle, ArrowLeft, Download, Eye, Sparkles, Check, Phone
 } from 'lucide-react';
 import { Campaign, UserProfile } from '../../types';
+import api from '../../lib/axios';
+import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 
 interface RelawanDashboardViewProps {
   currentUser: UserProfile;
@@ -36,10 +38,36 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
   const [checkedInIds, setCheckedInIds] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [registeredCampaigns, setRegisteredCampaigns] = useState<Campaign[]>([]);
+
+  // Fetch real volunteer registrations from Laravel REST API
+  useEffect(() => {
+    const fetchMyRegistrations = async () => {
+      try {
+        const response = await api.get('/my-volunteer-registrations');
+        const items = response.data?.data?.data || response.data?.data || [];
+        if (Array.isArray(items)) {
+          const regCamps: Campaign[] = items
+            .filter((reg: any) => reg.campaign)
+            .map((reg: any) => mapBackendCampaignToFrontend(reg.campaign));
+          setRegisteredCampaigns(regCamps);
+        }
+      } catch (err) {
+        console.warn('Gagal memuat riwayat relawan dari API:', err);
+      }
+    };
+
+    fetchMyRegistrations();
+  }, []);
+
   // Filter campaigns this volunteer has joined
-  const joinedCampaigns = campaigns.filter(
-    (c) => currentUser.joinedCampaignIds?.includes(c.id) || c.id === 'camp-01' || c.id === 'camp-02'
-  );
+  const joinedCampaigns = registeredCampaigns.length > 0
+    ? registeredCampaigns
+    : campaigns.filter((c) => currentUser.joinedCampaignIds?.includes(c.id));
+
+  const totalActions = joinedCampaigns.length;
+  const contributionHours = totalActions > 0 ? totalActions * 6 : 0;
+  const reputationPoints = totalActions > 0 ? totalActions * 100 : 0;
 
   // Campaigns open for volunteers that user has NOT joined yet
   const availableVolunteerCampaigns = campaigns.filter(
@@ -94,7 +122,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
 
       {/* Hero Profile Banner */}
       <div className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-4">
             <img
               src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
@@ -127,33 +155,33 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-white font-sans">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full xl:w-auto">
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate">
                 {joinedCampaigns.length}
               </div>
-              <div className="text-[11px] text-blue-200 mt-0.5">Aksi Diikuti</div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Aksi Diikuti</div>
             </div>
 
-            <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-400 font-sans">
-                18 Jam
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-sky-400 font-sans truncate">
+                {contributionHours} Jam
               </div>
-              <div className="text-[11px] text-blue-200 mt-0.5">Jam Kontribusi</div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Jam Kontribusi</div>
             </div>
 
-            <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-300 font-sans">
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-blue-300 font-sans truncate">
                 {joinedCampaigns.length}
               </div>
-              <div className="text-[11px] text-blue-200 mt-0.5">E-Sertifikat</div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">E-Sertifikat</div>
             </div>
 
-            <div className="bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-200 font-sans">
-                850
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-blue-200 font-sans truncate">
+                {reputationPoints}
               </div>
-              <div className="text-[11px] text-blue-200 mt-0.5">Poin Reputasi</div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Poin Reputasi</div>
             </div>
           </div>
         </div>
@@ -223,8 +251,9 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {joinedCampaigns.map((camp) => {
+            {joinedCampaigns.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {joinedCampaigns.map((camp) => {
                 const isCheckedIn = checkedInIds.includes(camp.id);
                 return (
                   <div
@@ -340,7 +369,16 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                   </div>
                 );
               })}
-            </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+                <Calendar className="w-10 h-10 text-blue-500 mx-auto mb-2 opacity-60" />
+                <h4 className="font-bold text-slate-800 text-sm">Belum Ada Jadwal Aksi yang Diikuti</h4>
+                <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                  Anda belum terdaftar dalam kegiatan relawan aktif. Buka menu &quot;Cari Kegiatan Baru&quot; untuk bergabung dengan program kemanusiaan.
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -355,8 +393,9 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                 Diterbitkan secara resmi oleh ActGiving bersama Inisiator kegiatan setelah misi lapangan selesai diverifikasi.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {joinedCampaigns.map((camp, idx) => (
+              {joinedCampaigns.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {joinedCampaigns.map((camp, idx) => (
                   <div
                     key={camp.id}
                     className="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 hover:bg-slate-50 transition-colors flex items-start justify-between gap-4"
@@ -395,7 +434,16 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">
+                  <Award className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
+                  <div className="font-bold text-slate-800 text-sm">Belum Ada E-Sertifikat Tersedia</div>
+                  <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                    Selesaikan partisipasi Anda dalam aksi relawan untuk mendapatkan sertifikat penghargaan resmi digital.
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, CheckCircle2, XCircle, AlertTriangle, FileText, 
   Eye, Check, ExternalLink, Building2, MapPin, ArrowLeft, 
   Search, Users, DollarSign, Activity, Lock, Database, RefreshCw, Sparkles
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem } from '../../types';
+import api from '../../lib/axios';
+import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 
 interface AdminDashboardViewProps {
@@ -36,10 +38,28 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   };
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [verifiedLpjIds, setVerifiedLpjIds] = useState<string[]>(['lpj-01-1', 'lpj-02-1']);
+  const [verifiedLpjIds, setVerifiedLpjIds] = useState<string[]>([]);
+  const [adminCampaigns, setAdminCampaigns] = useState<Campaign[]>(campaigns);
 
-  const pendingCampaigns = campaigns.filter((c) => c.status === 'pending_approval');
-  const activeCampaigns = campaigns.filter((c) => c.status !== 'pending_approval' && c.status !== 'rejected');
+    const fetchAdminCampaigns = async () => {
+    try {
+      const res = await api.get('/admin/campaigns');
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items)) {
+        setAdminCampaigns(items.map(mapBackendCampaignToFrontend));
+      }
+    } catch (err) {
+      console.warn('Gagal memuat kampanye admin dari REST API:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminCampaigns();
+  }, []);
+
+  const displayCampaigns = adminCampaigns.length > 0 ? adminCampaigns : campaigns;
+  const pendingCampaigns = displayCampaigns.filter((c) => c.status === 'pending_approval');
+  const activeCampaigns = displayCampaigns.filter((c) => c.status !== 'pending_approval' && c.status !== 'rejected');
   const rejectedCampaigns = campaigns.filter((c) => c.status === 'rejected');
 
   const totalFundsCollected = campaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
@@ -50,17 +70,29 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleApprove = (camp: Campaign) => {
+  const handleApprove = async (camp: Campaign) => {
+    try {
+      await api.patch(`/admin/campaigns/${camp.id}/status`, { status: 'active' });
+    } catch (err: any) {
+      console.warn('API error saat approve kampanye:', err);
+    }
     onApproveCampaign(camp.id);
     showToast(`Kampanye "${camp.title}" berhasil disetujui & langsung tayang di katalog publik!`);
+    fetchAdminCampaigns();
     if (selectedCampaign?.id === camp.id) {
       setSelectedCampaign(null);
     }
   };
 
-  const handleReject = (camp: Campaign) => {
+  const handleReject = async (camp: Campaign) => {
+    try {
+      await api.patch(`/admin/campaigns/${camp.id}/status`, { status: 'rejected' });
+    } catch (err: any) {
+      console.warn('API error saat reject kampanye:', err);
+    }
     onRejectCampaign(camp.id);
     showToast(`Kampanye "${camp.title}" telah ditolak dengan catatan verifikasi.`);
+    fetchAdminCampaigns();
     if (selectedCampaign?.id === camp.id) {
       setSelectedCampaign(null);
     }
@@ -108,7 +140,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
       {/* Hero Admin Profile Banner */}
       <div className="bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-600 border-2 border-blue-400 flex items-center justify-center text-white shadow-lg shrink-0">
               <ShieldCheck className="w-9 h-9" />
@@ -139,33 +171,33 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
 
           {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-blue-400 font-sans">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full xl:w-auto">
+            <div className="flex-1 min-w-[160px] w-auto bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-blue-400 font-sans truncate">
                 {pendingCampaigns.length}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Menunggu Review</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 truncate">Menunggu Review</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-400 font-sans">
+            <div className="flex-1 min-w-[160px] w-auto bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-sky-400 font-sans truncate">
                 {activeCampaigns.length}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Kampanye Aktif</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 truncate">Kampanye Aktif</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-xl sm:text-2xl font-black text-white font-sans">
+            <div className="flex-1 min-w-[160px] w-auto bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(totalFundsCollected)}>
                 {formatRupiah(totalFundsCollected)}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Total Donasi Platform</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 truncate">Total Donasi Platform</div>
             </div>
 
-            <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
-              <div className="text-2xl font-black text-sky-300 font-sans">
+            <div className="flex-1 min-w-[160px] w-auto bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-sky-300 font-sans truncate">
                 {totalVolunteers}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Total Relawan</div>
+              <div className="text-[11px] text-slate-400 mt-0.5 truncate">Total Relawan</div>
             </div>
           </div>
         </div>
@@ -470,46 +502,14 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                     <th className="p-3 rounded-r-xl text-right">Integritas ACID</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-mono">
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-bold text-blue-600">ACT-TX-202509-001</td>
-                    <td className="p-3 text-slate-600">08/09/2025 14:22 WIB</td>
-                    <td className="p-3"><span className="bg-slate-100 px-2 py-0.5 rounded font-sans font-semibold text-[11px]">QRIS Sandboxed</span></td>
-                    <td className="p-3 font-bold text-blue-700">Rp 100.000</td>
-                    <td className="p-3 font-sans text-slate-700">Hamba Allah (Anonim)</td>
-                    <td className="p-3 text-right">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-sans">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Committed
-                      </span>
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-bold text-blue-600">ACT-TX-202509-002</td>
-                    <td className="p-3 text-slate-600">08/09/2025 13:05 WIB</td>
-                    <td className="p-3"><span className="bg-blue-50 text-blue-800 px-2 py-0.5 rounded font-sans font-semibold text-[11px]">VA BCA 88091...</span></td>
-                    <td className="p-3 font-bold text-blue-700">Rp 250.000</td>
-                    <td className="p-3 font-sans text-slate-700">Dr. Budi Santoso</td>
-                    <td className="p-3 text-right">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-sans">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Committed
-                      </span>
-                    </td>
-                  </tr>
-
-                  <tr className="hover:bg-slate-50">
-                    <td className="p-3 font-bold text-blue-600">ACT-TX-202509-003</td>
-                    <td className="p-3 text-slate-600">08/09/2025 11:40 WIB</td>
-                    <td className="p-3"><span className="bg-blue-50 text-blue-800 border border-blue-100 px-2 py-0.5 rounded font-sans font-semibold text-[11px]">VA Mandiri 89311...</span></td>
-                    <td className="p-3 font-bold text-blue-700">Rp 50.000</td>
-                    <td className="p-3 font-sans text-slate-700">Siti Nurhaliza</td>
-                    <td className="p-3 text-right">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-sans">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Committed
-                      </span>
+                <tbody className="divide-y divide-slate-100">
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-slate-500 font-sans">
+                      <CheckCircle2 className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
+                      <div className="font-bold text-slate-800 text-sm">Belum Ada Transaksi Moneter di Database</div>
+                      <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                        Transaksi donasi via QRIS dan Virtual Account yang berhasil diverifikasi di gateway akan tercatat secara otomatis di sini dengan jaminan ACID.
+                      </div>
                     </td>
                   </tr>
                 </tbody>

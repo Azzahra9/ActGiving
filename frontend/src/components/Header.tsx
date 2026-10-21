@@ -14,8 +14,7 @@ import {
   ShieldCheck, 
   Building2, 
   Award, } from 'lucide-react';
-import { UserProfile, ActiveView } from '../types';
-import { DEMO_USERS } from '../data/mockData';
+import { UserProfile, ActiveView, DEFAULT_GUEST_USER } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
@@ -72,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
       console.warn('Logout error:', err);
     }
     if (onSelectUser) {
-      onSelectUser(DEMO_USERS.guest);
+      onSelectUser(DEFAULT_GUEST_USER);
     }
     onNavigateView('public');
   };
