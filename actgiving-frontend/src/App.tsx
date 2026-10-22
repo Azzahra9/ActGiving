@@ -22,6 +22,7 @@ import { WireframeHtmlModal } from './components/WireframeHtmlModal';
 import { AdminModerationModal } from './components/AdminModerationModal';
 import { RelawanActivityModal } from './components/RelawanActivityModal';
 import { InisiatorDashboardModal } from './components/InisiatorDashboardModal';
+import { Footer } from './components/Footer';
 import { formatRupiah } from './utils/format';
 import { HeartHandshake, ShieldCheck, CheckCircle2, ArrowUpRight, LayoutDashboard } from 'lucide-react';
 
@@ -450,105 +451,18 @@ export default function App() {
         </main>
 
         {/* ========================================================= */}
-        {/* FOOTER: STATISTIK PENYALURAN & KETERLIBATAN PUBLIK (FIGMA) */}
+        {/* FOOTER: HANYA TAMPIL DI HOMEPAGE PUBLIC VIEW              */}
         {/* ========================================================= */}
-        <footer id="transparansi-counter" className="bg-navy-darkest text-slate-400 border-t border-navy-border mt-auto">
-          {/* Top Panel: Statistik Penyaluran & Keterlibatan Publik */}
-          <div className="bg-gradient-to-b from-navy-sidebar via-navy-darkest to-navy-darkest py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-navy-border/70">
-            <div className="max-w-7xl mx-auto text-center">
-              
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-brand-blue text-[10px] font-bold uppercase tracking-wider mb-2">
-                <span>Akuntabilitas Terpadu</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
-                Statistik Penyaluran & Keterlibatan Publik
-              </h2>
-
-              <p className="text-xs sm:text-sm text-slate-400 mt-1.5 max-w-xl mx-auto">
-                Setiap donasi dan partisipasi relawan tercatat secara otomatis dan diaudit terbuka.
-              </p>
-
-              {/* 4 Large Rounded Stat Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-10">
-                {/* Card 1: Total Donasi Terkumpul */}
-                <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
-                    {totalDonationRp ? formatRupiah(totalDonationRp) : 'Rp 194.500.000'}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    Total Donasi Terkumpul
-                  </p>
-                </div>
-
-                {/* Card 2: Penerima Manfaat */}
-                <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
-                    2.840 Jiwa
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    Penerima Manfaat Lapangan
-                  </p>
-                </div>
-
-                {/* Card 3: Relawan */}
-                <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight">
-                    {totalVolunteers > 0 ? `${totalVolunteers} Relawan` : '142 Relawan'}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    Aksi Aktif Sepanjang 2026
-                  </p>
-                </div>
-
-                {/* Card 4: LPJ Terbit & Terverifikasi */}
-                <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-xs">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-black text-brand-green font-sans tracking-tight">
-                    100%
-                  </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    LPJ Terbit & Terverifikasi
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Bottom Bar: Brand & Copyright */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-brand-blue flex items-center justify-center text-white shrink-0 shadow-xs">
-                  <HeartHandshake className="w-4 h-4" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-white font-sans text-sm tracking-tight">
-                    Act<span className="text-brand-blue">Giving</span>
-                  </span>
-                  <span className="text-slate-600 hidden sm:inline">|</span>
-                  <span className="text-slate-400 text-xs hidden sm:inline">
-                    Sistem Informasi Donasi & Kerelawanan Terpadu
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500">
-                <button onClick={() => setIsSourceOpen(true)} className="hover:text-brand-blue transition-colors cursor-pointer">
-                  Kode HTML Mandiri
-                </button>
-                <span>•</span>
-                <button onClick={() => setIsWireframeOpen(true)} className="hover:text-amber-400 transition-colors font-mono cursor-pointer">
-                  Sketsa Wireframe
-                </button>
-                <span>•</span>
-                <p>
-                  © 2026 ActGiving. Sistem Platform Donasi & Form LPJ Digital Terbuka.
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
+        {activeView === 'public' && (
+          <Footer
+            totalDonationRp={totalDonationRp}
+            totalVolunteers={totalVolunteers}
+            formatRupiah={formatRupiah}
+            onOpenCreateCampaign={() => setIsCreateOpen(true)}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onNavigateView={setActiveView}
+          />
+        )}
       </div>
 
       {/* MODAL 1: Guest Checkout (SRS Subbab 4.1 UC-01 & FR-01, FR-02, FR-03, E1, E2) */}
