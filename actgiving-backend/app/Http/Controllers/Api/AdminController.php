@@ -22,7 +22,7 @@ class AdminController extends Controller
      */
     public function indexCampaigns(Request $request): JsonResponse
     {
-        $query = Campaign::with(['category', 'user:id,name,email,is_verified']);
+        $query = Campaign::with(['category', 'user:id,name,email,is_verified', 'lpjReports']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);

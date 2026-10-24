@@ -56,6 +56,7 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
     description: lpj.description || '',
     photoUrl:
       lpj.receipt_image_url ||
+      lpj.proof_image_url ||
       lpj.photo_url ||
       'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
     activityPhotos: lpj.activity_photos || [
@@ -66,7 +67,8 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
     volunteersInvolved: lpj.volunteers_involved || undefined,
     fieldLocation: lpj.field_location || undefined,
     digitalRegNumber: lpj.digital_reg_number || undefined,
-    receiptUrl: lpj.receipt_image_url || undefined,
+    receiptUrl: lpj.receipt_image_url || lpj.proof_image_url || undefined,
+    status: (lpj.status as 'pending' | 'verified' | 'sah' | 'rejected') || 'pending',
   };
 };
 

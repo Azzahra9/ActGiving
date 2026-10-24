@@ -61,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']);
     Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']);
     Route::post('/campaigns/{id}/lpj', [LPJController::class, 'store']); // FR-12: Upload LPJ via FileUploadService
+    Route::put('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'update']);
+    Route::patch('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'update']);
+    Route::delete('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'destroy']);
 
     // FR-11: Pencairan Dana oleh Inisiator
     Route::post('/campaigns/{id}/disbursements', [DisbursementController::class, 'store']);
@@ -78,6 +81,15 @@ Route::middleware('auth:sanctum')->group(function () {
         // Moderasi Kampanye
         Route::get('/campaigns', [AdminController::class, 'indexCampaigns']);
         Route::patch('/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
+
+        // Audit & Verifikasi LPJ Digital
+        Route::get('/lpj', [LPJController::class, 'adminIndex']);
+        Route::patch('/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
+        Route::put('/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
+        Route::patch('/lpj/{id}', [LPJController::class, 'adminUpdateStatus']);
+        Route::put('/lpj/{id}', [LPJController::class, 'adminUpdateStatus']);
+        Route::patch('/lpj/{id}/verify', [LPJController::class, 'adminVerify']);
+        Route::patch('/lpj/{id}/unverify', [LPJController::class, 'adminUnverify']);
 
         // FR-11: Validasi Persetujuan Pencairan Dana
         Route::patch('/disbursements/{id}/status', [DisbursementController::class, 'updateStatus']);

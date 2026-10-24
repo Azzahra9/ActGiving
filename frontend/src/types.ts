@@ -27,6 +27,7 @@ export interface LpjItem {
   fieldLocation?: string;
   digitalRegNumber?: string;
   receiptUrl?: string;
+  status?: 'pending' | 'verified' | 'sah' | 'rejected';
 }
 
 export type UserRole = 'guest' | 'relawan' | 'inisiator' | 'admin';

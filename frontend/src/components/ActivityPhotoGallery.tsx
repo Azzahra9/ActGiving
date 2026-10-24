@@ -40,7 +40,9 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
 
   // Flatten all LPJ items across campaigns to create the connected live gallery
   const activityItems = campaigns.flatMap((campaign) => {
-    return (campaign.lpjReports || []).flatMap((lpj) => {
+    return (campaign.lpjReports || [])
+      .filter((lpj) => lpj.status === 'verified' || lpj.status === 'sah')
+      .flatMap((lpj) => {
       // Gather all photos for this LPJ item (photoUrl + any additional activityPhotos)
       const photos = Array.from(
         new Set([lpj.photoUrl, ...(lpj.activityPhotos || [])].filter(Boolean))

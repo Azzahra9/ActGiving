@@ -30,7 +30,14 @@ export const LpjModal: React.FC<LpjModalProps> = ({
 
   if (!isOpen || !campaign) return null;
 
-  const lpjReports = campaign.lpjReports || [];
+  // Publik hanya boleh melihat LPJ yang berstatus 'verified' atau 'sah'
+  const allReports = campaign.lpjReports || [];
+  const verifiedLpjReports = allReports.filter(
+    (report) => report.status === 'verified' || report.status === 'sah'
+  );
+  const hasPendingReports = allReports.some(
+    (report) => !report.status || report.status === 'pending'
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
@@ -70,14 +77,23 @@ export const LpjModal: React.FC<LpjModalProps> = ({
             </div>
           </div>
 
-          {lpjReports.length === 0 ? (
+          {verifiedLpjReports.length === 0 ? (
             <div className="text-center py-12 text-slate-500 text-xs bg-slate-50 rounded-2xl border border-dashed border-slate-200">
               <ImageIcon className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              Belum ada formulir LPJ digital yang diterbitkan untuk kampanye ini.
+              <h4 className="text-sm font-bold text-slate-800">
+                {hasPendingReports
+                  ? 'Menunggu verifikasi transparan oleh auditor platform'
+                  : 'Belum ada formulir LPJ digital yang terverifikasi sah'}
+              </h4>
+              <p className="text-slate-500 max-w-md mx-auto leading-relaxed mt-1">
+                {hasPendingReports
+                  ? 'Inisiator telah mengunggah laporan pertanggungjawaban kegiatan. Laporan saat ini berada dalam antrean audit Admin dan akan otomatis tampil di linimasa publik segera setelah dinyatakan sah.'
+                  : 'Laporan pertanggungjawaban penyaluran dana dan dokumentasi kegiatan lapangan akan dipublikasikan secara transparan setelah diaudit dan disahkan oleh auditor platform.'}
+              </p>
             </div>
           ) : (
             <div className="space-y-8">
-              {lpjReports.map((report) => {
+              {verifiedLpjReports.map((report) => {
                 const photos = Array.from(
                   new Set([report.photoUrl, ...(report.activityPhotos || [])].filter(Boolean))
                 );

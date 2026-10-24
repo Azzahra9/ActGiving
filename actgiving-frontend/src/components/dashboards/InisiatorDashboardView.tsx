@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
   ExternalLink, TrendingUp, Calendar, MapPin, Search, Check, Sparkles,
-  Camera, Trash2, Pencil, Plus, ReceiptText, Layers, FileCheck2, ZoomIn, ArrowRight
+  Camera, Trash2, Pencil, Plus, ReceiptText, Lock, Layers, FileCheck2, ZoomIn, ArrowRight
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
 import api from '../../lib/axios';
@@ -54,11 +54,13 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   ]);
   const [newItemName, setNewItemName] = useState('');
   const [newItemAmount, setNewItemAmount] = useState('');
-  const [activityPhotos, setActivityPhotos] = useState<string[]>([
-    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80'
-  ]);
-  const [newPhotoInput, setNewPhotoInput] = useState('');
+  // Foto dokumentasi: URL preview dan File asli dari galeri/perangkat pengguna
+  const [activityPhotos, setActivityPhotos] = useState<string[]>([]);
+  const [activityPhotoFiles, setActivityPhotoFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSubmittingLpj, setIsSubmittingLpj] = useState(false);
+  const [editingLpjId, setEditingLpjId] = useState<string | null>(null);
+  const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Calculate total from budget items if amount not manually specified
@@ -159,26 +161,119 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     setBudgetItems(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  const handleAddActivityPhoto = (urlToAdd?: string) => {
-    const url = urlToAdd || newPhotoInput.trim();
-    if (!url) {
-      showToast('Masukkan link URL foto kegiatan yang valid.');
-      return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const filesArray = Array.from(selectedFiles);
+    
+    // Preview gambar menggunakan URL.createObjectURL(file)
+    const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+
+    setActivityPhotoFiles(prev => [...prev, ...filesArray]);
+    setActivityPhotos(prev => [...prev, ...newPreviews]);
+    showToast(`${filesArray.length} foto kegiatan berhasil dipilih dari galeri/perangkat.`);
+
+    // Reset value input file agar file yang sama bisa dipilih ulang jika dibutuhkan
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
-    if (activityPhotos.includes(url)) {
-      showToast('Foto ini sudah ada dalam daftar dokumentasi.');
-      return;
-    }
-    setActivityPhotos(prev => [...prev, url]);
-    if (!urlToAdd) setNewPhotoInput('');
-    showToast('Foto kegiatan berhasil ditambahkan ke form LPJ.');
   };
 
   const handleRemoveActivityPhoto = (indexToRemove: number) => {
+    const previewUrl = activityPhotos[indexToRemove];
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setActivityPhotos(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    setActivityPhotoFiles(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  // Bersihkan Object URLs saat unmount
+  useEffect(() => {
+    return () => {
+      activityPhotos.forEach((url) => {
+        if (url && url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, []);
+
+  const handleStartEditLpj = (campaignId: string, lpj: LpjItem) => {
+    if (lpj.status === 'verified' || lpj.status === 'sah') {
+      showToast('LPJ sudah berstatus Sah oleh Admin dan terkunci dari perubahan.');
+      return;
+    }
+    setEditingLpjId(lpj.id);
+    setEditingCampaignId(campaignId);
+    setSelectedCampaignId(campaignId);
+    setLpjTitle(lpj.title);
+    setLpjAmount(lpj.realizedAmount.toString());
+    setLpjDesc(lpj.description);
+    setFieldLocation(lpj.fieldLocation || '');
+    setBeneficiariesCount((lpj.beneficiariesCount || '').toString());
+    setVolunteersInvolved((lpj.volunteersInvolved || '').toString());
+    setBudgetItems(lpj.budgetItems || []);
+    setActivityPhotos(lpj.activityPhotos || (lpj.photoUrl ? [lpj.photoUrl] : []));
+    setActivityPhotoFiles([]);
+    showToast(`Mode edit aktif: "${lpj.title}". Silakan sesuaikan data lalu simpan.`);
+
+    const formEl = document.getElementById('lpj-form-container');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleCancelEditLpj = () => {
+    setEditingLpjId(null);
+    setEditingCampaignId(null);
+    setLpjTitle('');
+    setLpjAmount('');
+    setLpjDesc('');
+    setFieldLocation('');
+    setBeneficiariesCount('');
+    setVolunteersInvolved('');
+    setActivityPhotos([]);
+    setActivityPhotoFiles([]);
+  };
+
+  const handleDeleteLpjReport = async (campaignId: string, lpjId: string, status?: string) => {
+    if (status === 'verified' || status === 'sah') {
+      showToast('LPJ sudah diverifikasi Sah oleh Admin dan terkunci dari penghapusan.');
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      'Apakah Anda yakin ingin menghapus Laporan Pertanggungjawaban (LPJ) ini? Data yang dihapus tidak dapat dipulihkan.'
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/campaigns/${campaignId}/lpj/${lpjId}`);
+      showToast('Laporan Pertanggungjawaban (LPJ) berhasil dihapus.');
+    } catch (err: any) {
+      console.warn('Delete LPJ error:', err);
+      showToast(err.response?.data?.message || 'Gagal menghapus LPJ dari backend.');
+      if (err.response?.status === 403) return;
+    }
+
+    setInitiatorCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === campaignId) {
+          return {
+            ...c,
+            lpjReports: (c.lpjReports || []).filter((r) => r.id !== lpjId),
+          };
+        }
+        return c;
+      })
+    );
+
+    onDeleteLpj?.(campaignId, lpjId);
+  };
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetCampId = selectedCampaignId || (myCampaigns.length > 0 ? myCampaigns[0].id : '');
     if (!targetCampId) {
@@ -187,9 +282,91 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     }
 
     const currentCampaign = myCampaigns.find(c => c.id === targetCampId);
-
     const finalAmount = lpjAmount ? parseInt(lpjAmount) : (calculatedBudgetTotal || 5000000);
-    const primaryPhoto = activityPhotos[0] || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
+    const descriptionText = lpjDesc.trim() || 'Laporan pertanggungjawaban kegiatan penyaluran dan aksi lapangan.';
+
+    setIsSubmittingLpj(true);
+
+    // Siapkan FormData untuk mengirim file asli ke backend Laravel
+    const formData = new FormData();
+    formData.append('description', descriptionText);
+    formData.append('title', lpjTitle || 'Penyaluran Bantuan Lapangan');
+    formData.append('amount_spent', finalAmount.toString());
+    formData.append('field_location', fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan');
+    formData.append('beneficiaries_count', (parseInt(beneficiariesCount) || 0).toString());
+    formData.append('volunteers_involved', (parseInt(volunteersInvolved) || 0).toString());
+    formData.append('budget_items', JSON.stringify(budgetItems));
+
+    // Masukkan berkas gambar asli ke dalam FormData
+    if (activityPhotoFiles.length > 0) {
+      // proof_image untuk endpoint standar Laravel (file utama)
+      formData.append('proof_image', activityPhotoFiles[0]);
+
+      // Masukkan seluruh file ke activity_photos[]
+      activityPhotoFiles.forEach((file) => {
+        formData.append('activity_photos[]', file);
+      });
+    }
+
+    let serverProofUrl = '';
+    let serverActivityUrls: string[] = [];
+
+    try {
+      const res = await api.post(`/campaigns/${targetCampId}/lpj`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res.data?.data) {
+        serverProofUrl = res.data.data.public_url || res.data.data.lpj_report?.proof_image_url || '';
+        if (Array.isArray(res.data.data.activity_photo_urls)) {
+          serverActivityUrls = res.data.data.activity_photo_urls;
+        }
+      }
+    } catch (err: any) {
+      console.warn('Backend API LPJ upload notice:', err);
+    } finally {
+      setIsSubmittingLpj(false);
+    }
+
+    const primaryPhoto = serverProofUrl || activityPhotos[0] || '';
+    const finalPhotos = serverActivityUrls.length > 0 ? serverActivityUrls : activityPhotos;
+
+    if (editingLpjId && editingCampaignId) {
+      const updatedLpj: LpjItem = {
+        id: editingLpjId,
+        digitalRegNumber: `LPJ-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
+        title: lpjTitle || 'Penyaluran Bantuan Lapangan',
+        date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+        realizedAmount: finalAmount,
+        description: descriptionText,
+        budgetItems: budgetItems.length > 0 ? budgetItems : [{ name: 'Distribusi Logistik Lapangan', amount: finalAmount }],
+        activityPhotos: finalPhotos.length > 0 ? finalPhotos : (primaryPhoto ? [primaryPhoto] : []),
+        photoUrl: primaryPhoto,
+        beneficiariesCount: parseInt(beneficiariesCount) || 120,
+        volunteersInvolved: parseInt(volunteersInvolved) || 8,
+        fieldLocation: fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan',
+        status: 'pending',
+      };
+
+      setInitiatorCampaigns((prev) =>
+        prev.map((c) => {
+          if (c.id === targetCampId) {
+            return {
+              ...c,
+              lpjReports: (c.lpjReports || []).map((r) => (r.id === editingLpjId ? updatedLpj : r)),
+            };
+          }
+          return c;
+        })
+      );
+
+      onUpdateLpj?.(targetCampId, updatedLpj);
+      showToast(`Laporan LPJ "${updatedLpj.title}" berhasil diperbarui!`);
+      handleCancelEditLpj();
+      return;
+    }
 
     const newLpj: LpjItem = {
       id: `lpj-custom-${Date.now()}`,
@@ -197,23 +374,38 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
       title: lpjTitle || 'Penyaluran Bantuan Lapangan',
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
       realizedAmount: finalAmount,
-      description: lpjDesc || 'Distribusi kebutuhan logistik sesuai rencana anggaran belanja kampanye.',
+      description: descriptionText,
       budgetItems: budgetItems.length > 0 ? budgetItems : [{ name: 'Distribusi Logistik Lapangan', amount: finalAmount }],
-      activityPhotos: activityPhotos.length > 0 ? activityPhotos : [primaryPhoto],
+      activityPhotos: finalPhotos.length > 0 ? finalPhotos : (primaryPhoto ? [primaryPhoto] : []),
       photoUrl: primaryPhoto,
       beneficiariesCount: parseInt(beneficiariesCount) || 120,
       volunteersInvolved: parseInt(volunteersInvolved) || 8,
-      fieldLocation: fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan'
+      fieldLocation: fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan',
+      status: 'pending',
     };
 
+    setInitiatorCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === targetCampId) {
+          return {
+            ...c,
+            lpjReports: [newLpj, ...(c.lpjReports || [])],
+          };
+        }
+        return c;
+      })
+    );
+
     onAddLpj(targetCampId, newLpj);
-    showToast(`Formulir LPJ "${newLpj.title}" berhasil diterbitkan & foto kegiatan tersinkron ke landing page!`);
+    showToast(`Formulir LPJ "${newLpj.title}" berhasil diunggah dan masuk antrean audit Admin!`);
     setLpjTitle('');
     setLpjAmount('');
     setLpjDesc('');
     setFieldLocation('');
     setBeneficiariesCount('');
     setVolunteersInvolved('');
+    setActivityPhotos([]);
+    setActivityPhotoFiles([]);
   };
 
   return (
@@ -702,7 +894,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                 </div>
 
                 {/* Foto-Foto Kegiatan Lapangan yang Berlangsung */}
-                <div className="space-y-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-slate-800 flex items-center gap-1.5">
                       <Camera className="w-4 h-4 text-sky-600" />
@@ -713,71 +905,90 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                     </span>
                   </div>
 
-                  {/* Preset quick photo additions */}
-                  <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
-                    <span className="text-slate-400">Pilih cepat foto aksi:</span>
-                    <button
-                      type="button"
-                      onClick={() => handleAddActivityPhoto('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-md text-slate-700 font-medium"
-                    >
-                      + Penanaman Pohon
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddActivityPhoto('https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&w=800&q=80')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-md text-slate-700 font-medium"
-                    >
-                      + Distribusi Medis
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddActivityPhoto('https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=800&q=80')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-md text-slate-700 font-medium"
-                    >
-                      + Belajar Mengajar
-                    </button>
-                  </div>
+                  {/* Input File Standar (Tersembunyi, dipicu tombol / dropzone) */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
 
-                  {/* Photos Preview Grid */}
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
-                    {activityPhotos.map((photo, pIdx) => (
-                      <div key={pIdx} className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 group bg-slate-100">
-                        <img
-                          src={photo}
-                          alt={`Aksi ${pIdx + 1}`}
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover"
-                        />
+                  {/* Area Upload File dari Galeri / Device */}
+                  {activityPhotos.length === 0 ? (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/50 rounded-2xl p-6 text-center cursor-pointer transition-all group"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-xs">
+                        <Upload className="w-6 h-6" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                        Pilih Foto Dokumentasi dari Perangkat / Galeri
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Format JPG, PNG, atau WEBP. Bisa pilih beberapa foto sekaligus.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          fileInputRef.current?.click();
+                        }}
+                        className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>+ Tambah Foto</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Photos Preview Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                        {activityPhotos.map((photo, pIdx) => (
+                          <div
+                            key={pIdx}
+                            className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 group bg-slate-100 shadow-2xs"
+                          >
+                            <img
+                              src={photo}
+                              alt={`Dokumentasi Aksi ${pIdx + 1}`}
+                              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveActivityPhoto(pIdx)}
+                                className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors"
+                                title="Hapus foto ini"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 bg-black/70 text-white text-[9px] rounded font-medium">
+                              Foto #{pIdx + 1}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Baris Tambah Foto Tambahan */}
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-200/80">
+                        <span className="text-[11px] text-slate-500 font-medium">
+                          {activityPhotos.length} foto kegiatan dipilih dari galeri
+                        </span>
                         <button
                           type="button"
-                          onClick={() => handleRemoveActivityPhoto(pIdx)}
-                          className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-red-600 text-white rounded-md transition-colors"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-xs"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Tambah Foto</span>
                         </button>
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Add Custom Photo Input */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <input
-                      type="url"
-                      placeholder="Masukkan URL foto dokumentasi lapangan baru..."
-                      value={newPhotoInput}
-                      onChange={(e) => setNewPhotoInput(e.target.value)}
-                      className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleAddActivityPhoto()}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center gap-1 shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Tambah Foto</span>
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -797,7 +1008,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                   className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-xs flex items-center justify-center gap-2"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Terbitkan LPJ Digital & Sinkronkan ke Landing Page</span>
+                  <span>{editingLpjId ? 'Simpan Perubahan LPJ' : 'Terbitkan LPJ & Ajukan ke Audit Admin'}</span>
                 </button>
               </form>
             </div>
@@ -831,9 +1042,17 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                               <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200">
                                 {lpj.digitalRegNumber || 'LPJ-DIGITAL'}
                               </span>
-                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                                Sah di Web
-                              </span>
+                              {isVerified ? (
+                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                  <Lock className="w-3 h-3 text-emerald-600" />
+                                  Terkunci & Sah oleh Admin
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-300 flex items-center gap-1">
+                                  <AlertCircle className="w-3 h-3 text-amber-600" />
+                                  Pending Review Admin
+                                </span>
+                              )}
                             </div>
                             <h4 className="text-xs font-bold text-slate-900">{lpj.title}</h4>
                           </div>
@@ -878,7 +1097,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                         <div className="space-y-1.5">
                           <span className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
                             <Camera className="w-3 h-3 text-sky-500" />
-                            Foto Kegiatan Terhubung ke Landing Page ({photos.length}):
+                            Foto Kegiatan ({photos.length}):
                           </span>
                           <div className="flex items-center gap-2 overflow-x-auto pb-1">
                             {photos.map((ph, idx) => (
@@ -893,16 +1112,63 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                           </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                        {/* Actions Bar */}
+                        <div className="pt-2 border-t border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <span className="text-[11px] text-slate-400">Kampanye: {c.title}</span>
-                          <button
-                            onClick={() => onOpenLpjModal(c)}
-                            className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>Buka Tampilan Publik</span>
-                          </button>
+
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {isVerified ? (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="px-2.5 py-1 bg-slate-100 text-slate-400 rounded-xl text-xs font-medium cursor-not-allowed flex items-center gap-1 border border-slate-200 opacity-60"
+                                  title="Data terkunci & sah oleh admin (tidak dapat diedit lagi)"
+                                >
+                                  <Lock className="w-3 h-3" />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="px-2.5 py-1 bg-slate-100 text-slate-400 rounded-xl text-xs font-medium cursor-not-allowed flex items-center gap-1 border border-slate-200 opacity-60"
+                                  title="Data terkunci & sah oleh admin (tidak dapat dihapus lagi)"
+                                >
+                                  <Lock className="w-3 h-3" />
+                                  <span>Hapus</span>
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditLpj(c.id, lpj)}
+                                  className="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                  title="Edit data LPJ yang masih pending"
+                                >
+                                  <Pencil className="w-3 h-3 text-blue-600" />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteLpjReport(c.id, lpj.id, lpj.status)}
+                                  className="px-2.5 py-1.5 bg-white hover:bg-red-50 border border-slate-300 hover:border-red-300 text-red-600 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors shadow-2xs cursor-pointer"
+                                  title="Hapus LPJ ini"
+                                >
+                                  <Trash2 className="w-3 h-3 text-red-600" />
+                                  <span>Hapus</span>
+                                </button>
+                              </>
+                            )}
+
+                            <button
+                              onClick={() => onOpenLpjModal(c)}
+                              className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>{isVerified ? 'Buka Tampilan Publik' : 'Pratinjau Publik'}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );

@@ -12,8 +12,26 @@ class LpjReport extends Model
 
     protected $fillable = [
         'campaign_id',
+        'status',
+        'title',
         'description',
+        'amount_spent',
+        'budget_items',
+        'beneficiaries_count',
+        'volunteers_involved',
+        'field_location',
         'proof_image_url',
+        'activity_photos',
+        'verified_at',
+    ];
+
+    protected $casts = [
+        'activity_photos' => 'array',
+        'budget_items' => 'array',
+        'amount_spent' => 'decimal:2',
+        'beneficiaries_count' => 'integer',
+        'volunteers_involved' => 'integer',
+        'verified_at' => 'datetime',
     ];
 
     /**

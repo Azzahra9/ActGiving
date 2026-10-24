@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import api from '../lib/axios';
 import { Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, FileText, X, AlertCircle } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem } from '../types';
 
@@ -38,9 +39,47 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
   const totalDanaTerkumpul = myCampaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
   const totalRelawanTerdaftar = myCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (proofPreview && proofPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(proofPreview);
+      }
+      setProofFile(file);
+      setProofPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeUploadCampaignId) return;
+
+    setIsSubmitting(true);
+    let uploadedUrl = '';
+
+    const formData = new FormData();
+    formData.append('description', lpjDesc || 'Penyaluran bantuan kegiatan kampanye');
+    formData.append('title', lpjTitle || 'Penyaluran Bantuan Lapangan');
+    formData.append('amount_spent', (parseInt(lpjAmount) || 5000000).toString());
+    if (proofFile) {
+      formData.append('proof_image', proofFile);
+      formData.append('activity_photos[]', proofFile);
+    }
+
+    try {
+      const res = await api.post(`/campaigns/${activeUploadCampaignId}/lpj`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data?.data) {
+        uploadedUrl = res.data.data.public_url || res.data.data.lpj_report?.proof_image_url || '';
+      }
+    } catch (err) {
+      console.warn('Upload LPJ modal notice:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    const finalPhoto = uploadedUrl || proofPreview || '';
 
     const newLpj: LpjItem = {
       id: `lpj-custom-${Date.now()}`,
@@ -48,8 +87,9 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
       realizedAmount: parseInt(lpjAmount) || 5000000,
       description: lpjDesc || 'Distribusi kebutuhan logistik sesuai rencana anggaran belanja kampanye.',
-      receiptUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80',
-      photoUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80'
+      receiptUrl: finalPhoto || undefined,
+      photoUrl: finalPhoto,
+      activityPhotos: finalPhoto ? [finalPhoto] : []
     };
 
     onAddLpj(activeUploadCampaignId, newLpj);
@@ -60,6 +100,11 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       setLpjTitle('');
       setLpjAmount('');
       setLpjDesc('');
+      setProofFile(null);
+      if (proofPreview && proofPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(proofPreview);
+      }
+      setProofPreview(null);
     }, 2000);
   };
 

@@ -28,6 +28,9 @@ class CampaignController extends Controller
         $query = Campaign::with([
             'category:id,category_name',
             'user:id,name,is_verified',
+            'lpjReports' => function ($q) {
+                $q->whereIn('status', ['verified', 'sah'])->latest();
+            },
         ])
         ->where('status', 'active');
 
@@ -70,7 +73,9 @@ class CampaignController extends Controller
         $campaign = Campaign::with([
             'category:id,category_name',
             'user:id,name,city_domicile,is_verified',
-            'lpjReports',
+            'lpjReports' => function ($q) {
+                $q->whereIn('status', ['verified', 'sah'])->latest();
+            },
         ])
         ->withCount([
             'donations as total_donors' => function ($q) {
@@ -144,7 +149,7 @@ class CampaignController extends Controller
      */
     public function myCampaigns(Request $request): JsonResponse
     {
-        $campaigns = Campaign::with(['category'])
+        $campaigns = Campaign::with(['category', 'lpjReports'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->paginate(10);
