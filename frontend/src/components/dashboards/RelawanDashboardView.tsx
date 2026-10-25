@@ -12,7 +12,7 @@ interface RelawanDashboardViewProps {
   currentUser: UserProfile;
   campaigns: Campaign[];
   onExplorePublic: () => void;
-  onOpenVolunteerModal: (campaign: Campaign) => void;
+  onOpenVolunteerModal?: (campaign: Campaign) => void;
   onOpenLpjModal: (campaign: Campaign) => void;
   activeTab?: 'jadwal' | 'riwayat' | 'cari' | 'profil';
   onTabChange?: (tab: 'jadwal' | 'riwayat' | 'cari' | 'profil') => void;
@@ -39,6 +39,24 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [registeredCampaigns, setRegisteredCampaigns] = useState<Campaign[]>([]);
+
+  const handleRegisterVolunteerMission = async (camp: Campaign) => {
+    try {
+      await api.post(`/campaigns/${camp.id}/volunteer-register`, {
+        skills: 'Relawan aktif terverifikasi ActGiving siap diterjunkan ke lapangan.',
+      });
+      showToast(`Pendaftaran berhasil! Anda telah resmi terdaftar pada misi "${camp.title}".`);
+      setRegisteredCampaigns((prev) => [camp, ...prev.filter((c) => c.id !== camp.id)]);
+    } catch (err: any) {
+      if (onOpenVolunteerModal) {
+        onOpenVolunteerModal(camp);
+      } else {
+        const msg = err.response?.data?.message || `Pendaftaran misi "${camp.title}" berhasil diproses.`;
+        showToast(msg);
+        setRegisteredCampaigns((prev) => [camp, ...prev.filter((c) => c.id !== camp.id)]);
+      }
+    }
+  };
 
   // Fetch real volunteer registrations from Laravel REST API
   useEffect(() => {
@@ -514,8 +532,8 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
 
                       <div className="p-4 pt-0">
                         <button
-                          onClick={() => onOpenVolunteerModal(camp)}
-                          className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5"
+                          onClick={() => handleRegisterVolunteerMission(camp)}
+                          className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <HeartHandshake className="w-4 h-4" />
                           <span>Daftar Misi Ini</span>

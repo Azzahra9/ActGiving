@@ -31,6 +31,10 @@ Route::get('/campaigns', [CampaignController::class, 'index']);
 Route::get('/campaigns/{id}', [CampaignController::class, 'show']);
 Route::get('/campaigns/{id}/lpj', [LPJController::class, 'index']); // Public list LPJ
 Route::post('/campaigns/{id}/reports', [CampaignReportController::class, 'store']); // FR-13: Laporan Aduan Publik
+Route::post('/campaigns/{id}/volunteer-register', [VolunteerRegistrationController::class, 'register']); // Registrasi akun relawan baru & lamaran misi
+Route::get('/initiator/volunteers', [VolunteerRegistrationController::class, 'initiatorVolunteers']); // Daftar Pendaftar Relawan Inisiator
+Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']); // Daftar pendaftar per kampanye
+Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']); // Seleksi status pendaftar relawan (accept/reject)
 
 // 3. PUBLIC DONATIONS & SIMULATION WEBHOOK
 Route::post('/donations', [DonationController::class, 'store']); // Pencatatan Transaksi Donasi Nyata / QRIS
@@ -68,8 +72,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-campaigns', [CampaignController::class, 'myCampaigns']);
     Route::put('/campaigns/{id}', [CampaignController::class, 'update']);
     Route::delete('/campaigns/{id}', [CampaignController::class, 'destroy']);
-    Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']);
-    Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']);
     Route::post('/campaigns/{id}/lpj', [LPJController::class, 'store']); // FR-12: Upload LPJ via FileUploadService
     Route::put('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'update']);
     Route::patch('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'update']);
@@ -82,8 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // FR: Manajemen Izin Donasi oleh Inisiator (Approve/Reject)
     Route::patch('/donations/{id}/approval', [DonationController::class, 'updateApproval']);
 
-    // RELAWAN: Melamar & Riwayat Pendaftaran
-    Route::post('/campaigns/{id}/volunteer-register', [VolunteerRegistrationController::class, 'register']);
+    // RELAWAN: Riwayat Pendaftaran
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
 
     // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports

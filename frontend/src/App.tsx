@@ -13,7 +13,7 @@ import { RelawanDashboardView } from './components/dashboards/RelawanDashboardVi
 import { InisiatorDashboardView } from './components/dashboards/InisiatorDashboardView';
 import { AdminDashboardView } from './components/dashboards/AdminDashboardView';
 import { GuestCheckoutModal } from './components/GuestCheckoutModal';
-import { VolunteerModal } from './components/VolunteerModal';
+import { RegisterModal } from './components/RegisterModal';
 import { LpjModal } from './components/LpjModal';
 import { CreateCampaignModal } from './components/CreateCampaignModal';
 import { AuthModal } from './components/AuthModal';
@@ -108,7 +108,7 @@ export default function App() {
 
   // Modal Context States
   const [checkoutCampaign, setCheckoutCampaign] = useState<Campaign | null>(null);
-  const [volunteerCampaign, setVolunteerCampaign] = useState<Campaign | null>(null);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [lpjCampaign, setLpjCampaign] = useState<Campaign | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [campaignToEdit, setCampaignToEdit] = useState<Campaign | null>(null);
@@ -395,7 +395,7 @@ export default function App() {
               currentUser={currentUser}
               campaigns={campaigns}
               onExplorePublic={() => setActiveView('public')}
-              onOpenVolunteerModal={(camp) => setVolunteerCampaign(camp)}
+              onOpenVolunteerModal={() => setIsRegisterOpen(true)}
               onOpenLpjModal={(camp) => setLpjCampaign(camp)}
               activeTab={relawanTab}
               onTabChange={setRelawanTab}
@@ -474,7 +474,7 @@ export default function App() {
                 error={campaignError}
                 onRetry={fetchCampaigns}
                 onDonateClick={(camp) => setCheckoutCampaign(camp)}
-                onVolunteerClick={(camp) => setVolunteerCampaign(camp)}
+                onVolunteerClick={() => setIsRegisterOpen(true)}
                 onViewLpjClick={(camp) => setLpjCampaign(camp)}
                 onResetFilters={handleResetFilters}
                 selectedCategory={selectedCategory}
@@ -520,13 +520,17 @@ export default function App() {
         currentUser={currentUser}
       />
 
-      {/* MODAL 2: Volunteer Registration (SRS Subbab 4.2 UC-02 & FR-09) */}
-      <VolunteerModal
-        campaign={volunteerCampaign}
-        isOpen={!!volunteerCampaign}
-        onClose={() => setVolunteerCampaign(null)}
-        onVolunteerSuccess={handleVolunteerSuccess}
+      {/* MODAL 2: Modal Registrasi Akun Umum / Dual-Role (RegisterModal) */}
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
         currentUser={currentUser}
+        initialTab="register"
+        initialRole="relawan"
+        onSelectUser={(user) => {
+          setCurrentUser(user);
+          setIsRegisterOpen(false);
+        }}
       />
 
       {/* MODAL 3: LPJ Transparency Timeline (SRS Subbab 4.3 & FR-12) */}

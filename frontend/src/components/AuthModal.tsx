@@ -20,18 +20,22 @@ interface AuthModalProps {
   onClose: () => void;
   currentUser?: UserProfile;
   onSelectUser?: (user: UserProfile) => void;
+  initialTab?: 'login' | 'register';
+  initialRole?: 'relawan' | 'inisiator';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   currentUser: propUser,
-  onSelectUser
+  onSelectUser,
+  initialTab = 'login',
+  initialRole = 'relawan'
 }) => {
   const { user: authUser, login, register } = useAuth();
   const currentUser = propUser || authUser;
 
-  const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [tab, setTab] = useState<'login' | 'register'>(initialTab);
 
   // Form States
   const [fullName, setFullName] = useState('');
@@ -40,7 +44,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [city, setCity] = useState('Bandung');
-  const [selectedRoleType, setSelectedRoleType] = useState<'relawan' | 'inisiator'>('inisiator');
+  const [selectedRoleType, setSelectedRoleType] = useState<'relawan' | 'inisiator'>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
 
   // Status & UI States
@@ -48,6 +52,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState('');
+
+  // Sinkronisasi tab & role saat modal dibuka
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialTab) setTab(initialTab);
+      if (initialRole) setSelectedRoleType(initialRole);
+      setErrorMessage(null);
+      setIsSuccess(false);
+    }
+  }, [isOpen, initialTab, initialRole]);
 
   if (!isOpen) return null;
 

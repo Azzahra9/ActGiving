@@ -10,7 +10,7 @@ import {
   CheckCircle2, 
   ArrowUpRight,
   ShieldCheck,
-  ChevronRight,
+
   Camera
 } from 'lucide-react';
 import { Campaign } from '../types';
@@ -203,10 +203,12 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
           {isRelawanMode && (
             <button
               onClick={() => onVolunteerClick(campaign)}
+              title="Daftar Akun Baru (Dual-Role) - Relawan"
               className="w-full py-2.5 px-4 bg-brand-blue hover:bg-brand-blue-hover text-white rounded-lg text-xs font-semibold transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Users className="w-3.5 h-3.5" />
-              Daftar Jadi Relawan
+              <span>Daftar Jadi Relawan</span>
+
             </button>
           )}
 
@@ -218,14 +220,16 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
                 className="py-2 px-3 bg-brand-blue hover:bg-brand-blue-hover text-white rounded-lg text-xs font-semibold transition-colors shadow-xs flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Coins className="w-3.5 h-3.5" />
-                Donasi Sekarang
+                <span>Donasi Sekarang</span>
               </button>
               <button
                 onClick={() => onVolunteerClick(campaign)}
+                title="Daftar Akun Baru (Dual-Role) - Relawan"
                 className="py-2 px-3 bg-white hover:bg-blue-50/60 text-brand-blue border border-brand-blue rounded-lg text-xs font-semibold transition-colors shadow-xs flex items-center justify-center gap-1 cursor-pointer"
               >
                 <Users className="w-3.5 h-3.5" />
-                Daftar Relawan
+                <span>Daftar Relawan</span>
+
               </button>
             </div>
           )}
