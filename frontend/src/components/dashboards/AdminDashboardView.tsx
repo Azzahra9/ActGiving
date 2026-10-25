@@ -9,6 +9,48 @@ import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 
+interface AdminDonationRecord {
+  id: number;
+  campaign_id: number;
+  amount: number | string;
+  payment_channel?: string;
+  payment_method?: string;
+  reference_code: string;
+  donor_name?: string;
+  donor_email?: string;
+  is_anonymous?: boolean;
+  status: string;
+  created_at: string;
+  campaign?: {
+    id: number;
+    title: string;
+    location?: string;
+  };
+}
+
+interface AdminLpjRecord {
+  id: number | string;
+  campaign_id: number | string;
+  title?: string;
+  description?: string;
+  amount_spent?: number | string;
+  realized_amount?: number | string;
+  status?: string;
+  proof_image_url?: string;
+  receipt_image_url?: string;
+  activity_photos?: string[];
+  report_date?: string;
+  created_at?: string;
+  campaign?: {
+    id: number | string;
+    title: string;
+    user?: {
+      name: string;
+      email: string;
+    };
+  };
+}
+
 interface AdminDashboardViewProps {
   currentUser: UserProfile;
   campaigns: Campaign[];
@@ -40,8 +82,12 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [verifiedLpjIds, setVerifiedLpjIds] = useState<string[]>([]);
   const [adminCampaigns, setAdminCampaigns] = useState<Campaign[]>(campaigns);
+  const [adminDonations, setAdminDonations] = useState<AdminDonationRecord[]>([]);
+  const [isLoadingDonations, setIsLoadingDonations] = useState<boolean>(false);
+  const [adminLpjReports, setAdminLpjReports] = useState<AdminLpjRecord[]>([]);
+  const [isLoadingLpj, setIsLoadingLpj] = useState<boolean>(false);
 
-    const fetchAdminCampaigns = async () => {
+  const fetchAdminCampaigns = async () => {
     try {
       const res = await api.get('/admin/campaigns');
       const items = res.data?.data?.data || res.data?.data;
@@ -53,17 +99,79 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
   };
 
+  const fetchAdminDonations = async () => {
+    setIsLoadingDonations(true);
+    try {
+      const res = await api.get('/admin/donations').catch(() => api.get('/donations'));
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items)) {
+        setAdminDonations(items);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat log transaksi admin dari REST API:', err);
+    } finally {
+      setIsLoadingDonations(false);
+    }
+  };
+
+  const fetchAdminLpj = async () => {
+    setIsLoadingLpj(true);
+    try {
+      const res = await api.get('/admin/lpj').catch(() => api.get('/lpj/audit'));
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items)) {
+        setAdminLpjReports(items);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat LPJ admin dari REST API:', err);
+    } finally {
+      setIsLoadingLpj(false);
+    }
+  };
+
   useEffect(() => {
     fetchAdminCampaigns();
+    fetchAdminDonations();
+    fetchAdminLpj();
   }, []);
 
   const displayCampaigns = adminCampaigns.length > 0 ? adminCampaigns : campaigns;
-  const pendingCampaigns = displayCampaigns.filter((c) => c.status === 'pending_approval');
-  const activeCampaigns = displayCampaigns.filter((c) => c.status !== 'pending_approval' && c.status !== 'rejected');
+  const pendingCampaigns = displayCampaigns.filter((c) => c.status === 'pending_approval' || c.status === 'pending');
+  const activeCampaigns = displayCampaigns.filter((c) => c.status !== 'pending_approval' && c.status !== 'pending' && c.status !== 'rejected');
   const rejectedCampaigns = campaigns.filter((c) => c.status === 'rejected');
 
+  const totalFundsFromDonations = adminDonations.reduce((acc, d) => acc + Number(d.amount || 0), 0);
   const totalFundsCollected = campaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
+  const displayTotalFunds = totalFundsFromDonations > 0 ? totalFundsFromDonations : totalFundsCollected;
   const totalVolunteers = campaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
+
+  const displayLpjList = adminLpjReports.length > 0
+    ? adminLpjReports.map((r) => ({
+        id: String(r.id),
+        title: r.title || 'Laporan Realisasi Penyaluran',
+        description: r.description || 'Tanpa catatan pengeluaran.',
+        realizedAmount: Number(r.amount_spent || r.realized_amount || 0),
+        date: r.report_date
+          ? new Date(r.report_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+          : r.created_at
+          ? new Date(r.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+          : 'Baru Diajukan',
+        campaignTitle: r.campaign?.title || 'Program Kampanye',
+        receiptUrl: r.proof_image_url || r.receipt_image_url || (Array.isArray(r.activity_photos) ? r.activity_photos[0] : undefined),
+        status: r.status || 'pending_audit',
+      }))
+    : (campaigns || []).flatMap((c) =>
+        (Array.isArray(c?.lpjReports) ? c.lpjReports : []).map((lpj) => ({
+          id: String(lpj.id),
+          title: lpj.title || 'Laporan Realisasi Penyaluran',
+          description: lpj.description || 'Tanpa catatan pengeluaran.',
+          realizedAmount: Number(lpj.realizedAmount || 0),
+          date: lpj.date || '-',
+          campaignTitle: c?.title || 'Program Kampanye',
+          receiptUrl: lpj.receiptUrl || lpj.photoUrl,
+          status: lpj.status || 'pending',
+        }))
+      );
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -78,7 +186,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
     onApproveCampaign(camp.id);
     showToast(`Kampanye "${camp.title}" berhasil disetujui & langsung tayang di katalog publik!`);
-    fetchAdminCampaigns();
+    await fetchAdminCampaigns();
     if (selectedCampaign?.id === camp.id) {
       setSelectedCampaign(null);
     }
@@ -92,19 +200,39 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
     onRejectCampaign(camp.id);
     showToast(`Kampanye "${camp.title}" telah ditolak dengan catatan verifikasi.`);
-    fetchAdminCampaigns();
+    await fetchAdminCampaigns();
     if (selectedCampaign?.id === camp.id) {
       setSelectedCampaign(null);
     }
   };
 
-  const toggleVerifyLpj = (lpjId: string) => {
-    if (verifiedLpjIds.includes(lpjId)) {
-      setVerifiedLpjIds((prev) => prev.filter((id) => id !== lpjId));
-      showToast('Status verifikasi LPJ dibatalkan untuk peninjauan ulang.');
-    } else {
-      setVerifiedLpjIds((prev) => [...prev, lpjId]);
-      showToast('LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
+  const toggleVerifyLpj = async (lpjId: string, currentStatus?: string) => {
+    const isCurrentlySah = verifiedLpjIds.includes(lpjId) || currentStatus === 'verified' || currentStatus === 'sah';
+
+    try {
+      if (isCurrentlySah) {
+        await api.patch(`/admin/lpj/${lpjId}/unverify`).catch(() =>
+          api.patch(`/admin/lpj/${lpjId}/status`, { status: 'pending_audit' })
+        );
+        setVerifiedLpjIds((prev) => prev.filter((id) => id !== lpjId));
+        showToast('Status verifikasi LPJ dibatalkan untuk peninjauan ulang.');
+      } else {
+        await api.patch(`/admin/lpj/${lpjId}/verify`).catch(() =>
+          api.patch(`/admin/lpj/${lpjId}/status`, { status: 'sah' })
+        );
+        setVerifiedLpjIds((prev) => [...prev, lpjId]);
+        showToast('LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
+      }
+      fetchAdminLpj();
+    } catch (err) {
+      console.warn('Gagal memperbarui status LPJ di server:', err);
+      if (isCurrentlySah) {
+        setVerifiedLpjIds((prev) => prev.filter((id) => id !== lpjId));
+        showToast('Status verifikasi LPJ dibatalkan untuk peninjauan ulang.');
+      } else {
+        setVerifiedLpjIds((prev) => [...prev, lpjId]);
+        showToast('LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
+      }
     }
   };
 
@@ -187,8 +315,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             </div>
 
             <div className="flex-1 min-w-[160px] w-auto bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center shadow-xs">
-              <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(totalFundsCollected)}>
-                {formatRupiah(totalFundsCollected)}
+              <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(displayTotalFunds)}>
+                {formatRupiah(displayTotalFunds)}
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5 truncate">Total Donasi Platform</div>
             </div>
@@ -404,19 +532,36 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         {/* TAB 2: AUDIT LPJ */}
         {activeTab === 'audit_lpj' && (
           <div className="mt-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Pusat Audit Transparansi LPJ & Bukti Kuitansi Penyaluran Dana
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Setiap laporan belanja wajib diperiksa kesesuaiannya dengan kuitansi fisik toko dan dokumentasi serah terima di lapangan.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Pusat Audit Transparansi LPJ & Bukti Kuitansi Penyaluran Dana
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Setiap laporan belanja wajib diperiksa kesesuaiannya dengan kuitansi fisik toko dan dokumentasi serah terima di lapangan.
+                </p>
+              </div>
+              <button
+                onClick={fetchAdminLpj}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors self-start sm:self-auto cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLpj ? 'animate-spin' : ''}`} />
+                <span>Muat Ulang LPJ</span>
+              </button>
             </div>
 
             <div className="space-y-4">
-              {campaigns.flatMap((c) =>
-                (c.lpjReports || []).map((lpj) => {
-                  const isVerified = verifiedLpjIds.includes(lpj.id);
+              {displayLpjList.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 font-sans border border-slate-200 rounded-2xl bg-slate-50/50">
+                  <FileText className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
+                  <div className="font-bold text-slate-800 text-sm">Belum Ada LPJ Menunggu Audit</div>
+                  <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                    Seluruh laporan pertanggungjawaban yang diunggah oleh inisiator akan masuk ke antrean ini untuk diverifikasi keaslian notanya.
+                  </div>
+                </div>
+              ) : (
+                displayLpjList.map((lpj) => {
+                  const isVerified = verifiedLpjIds.includes(lpj.id) || lpj.status === 'verified' || lpj.status === 'sah';
                   return (
                     <div
                       key={lpj.id}
@@ -428,11 +573,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                           {isVerified ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-300">
                               <CheckCircle2 className="w-3 h-3" />
-                              Lolos Audit Auditor
+                              Lolos Audit Auditor (Sah)
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-50 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200">
-                              <AlertTriangle className="w-3 h-3 text-blue-600" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">
+                              <AlertTriangle className="w-3 h-3 text-amber-600" />
                               Memerlukan Verifikasi Nota
                             </span>
                           )}
@@ -443,24 +588,26 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                           <span>•</span>
                           <span>Tanggal: {lpj.date}</span>
                           <span>•</span>
-                          <span>Kampanye: <strong className="text-slate-800">{c.title}</strong></span>
+                          <span>Kampanye: <strong className="text-slate-800">{lpj.campaignTitle}</strong></span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <a
-                          href={lpj.receiptUrl || lpj.photoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Lihat Kuitansi</span>
-                        </a>
+                        {lpj.receiptUrl && (
+                          <a
+                            href={lpj.receiptUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Lihat Kuitansi</span>
+                          </a>
+                        )}
 
                         <button
-                          onClick={() => toggleVerifyLpj(lpj.id)}
-                          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                          onClick={() => toggleVerifyLpj(lpj.id, lpj.status)}
+                          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                             isVerified
                               ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                               : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
@@ -481,13 +628,22 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         {/* TAB 3: AUDIT TRANSAKSI SANDBOX */}
         {activeTab === 'transaksi' && (
           <div className="mt-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-slate-900">
-                Log Transaksi Moneter Sandbox
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Pengawasan transaksi gateway QRIS dan Virtual Account tanpa peredaran uang riil, dijamin oleh prinsip ACID.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Log Transaksi Moneter Sandbox & Live PostgreSQL
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Pengawasan transaksi gateway QRIS dan Virtual Account tanpa peredaran uang riil, dijamin oleh prinsip ACID.
+                </p>
+              </div>
+              <button
+                onClick={fetchAdminDonations}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors self-start sm:self-auto cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDonations ? 'animate-spin' : ''}`} />
+                <span>Muat Ulang Transaksi</span>
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -498,20 +654,65 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                     <th className="p-3">Waktu Transaksi</th>
                     <th className="p-3">Metode Gateway</th>
                     <th className="p-3">Nominal (Rp)</th>
-                    <th className="p-3">Donatur</th>
+                    <th className="p-3">Donatur & Kampanye</th>
                     <th className="p-3 rounded-r-xl text-right">Integritas ACID</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-slate-500 font-sans">
-                      <CheckCircle2 className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
-                      <div className="font-bold text-slate-800 text-sm">Belum Ada Transaksi Moneter di Database</div>
-                      <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                        Transaksi donasi via QRIS dan Virtual Account yang berhasil diverifikasi di gateway akan tercatat secara otomatis di sini dengan jaminan ACID.
-                      </div>
-                    </td>
-                  </tr>
+                  {adminDonations.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-slate-500 font-sans">
+                        <CheckCircle2 className="w-8 h-8 text-blue-500 mx-auto mb-2 opacity-60" />
+                        <div className="font-bold text-slate-800 text-sm">Belum Ada Transaksi Moneter di Database</div>
+                        <div className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                          Transaksi donasi via QRIS dan Virtual Account yang berhasil diverifikasi di gateway akan tercatat secara otomatis di sini dengan jaminan ACID.
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    adminDonations.map((d) => (
+                      <tr key={d.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="p-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-lg border border-slate-200">
+                              {d.reference_code || `INV-${d.id}`}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-3 text-slate-600">
+                          {d.created_at ? new Date(d.created_at).toLocaleString('id-ID') : 'Baru saja'}
+                        </td>
+                        <td className="p-3">
+                          <span className="bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded-md font-bold uppercase text-[10px]">
+                            {d.payment_channel || d.payment_method || 'QRIS'}
+                          </span>
+                        </td>
+                        <td className="p-3 font-bold text-slate-900">
+                          {formatRupiah(Number(d.amount))}
+                        </td>
+                        <td className="p-3">
+                          <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                            <span>{d.donor_name || 'Hamba Allah'}</span>
+                            {d.is_anonymous && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                Anonim
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] text-slate-500 truncate max-w-xs">
+                            {d.campaign?.title || `Kampanye ID #${d.campaign_id}`}
+                          </div>
+                        </td>
+                        <td className="p-3 text-right">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 text-[10px]">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            ACID Committed ({d.status ? d.status.toUpperCase() : 'PAID'})
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, XCircle, AlertTriangle, FileText, Eye, Check, ExternalLink, Building2, MapPin } from 'lucide-react';
 import { Campaign } from '../types';
+import { formatRupiah } from '../utils/format';
 
 interface AdminModerationModalProps {
   isOpen: boolean;
@@ -229,7 +230,7 @@ export const AdminModerationModal: React.FC<AdminModerationModalProps> = ({
 
               <div className="space-y-3">
                 {activeCampaigns
-                  .filter((c) => c.lpjReports && c.lpjReports.length > 0)
+                  .filter((c) => Array.isArray(c?.lpjReports) && c.lpjReports.length > 0)
                   .map((camp) => (
                     <div key={camp.id} className="border border-slate-200 rounded-2xl p-4 bg-slate-50/50 space-y-3">
                       <div className="flex items-center justify-between">
@@ -259,7 +260,7 @@ export const AdminModerationModal: React.FC<AdminModerationModalProps> = ({
                               </div>
                               <p className="text-slate-500 text-[11px]">{report.description}</p>
                               <div className="text-slate-600 font-medium">
-                                Nominal: <strong className="text-emerald-700">Rp {report.realizedAmount.toLocaleString('id-ID')}</strong> • Tanggal: {report.date}
+                                Nominal: <strong className="text-emerald-700">{formatRupiah(report.realizedAmount || 0)}</strong> • Tanggal: {report.date}
                               </div>
                             </div>
 

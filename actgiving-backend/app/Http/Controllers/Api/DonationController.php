@@ -52,6 +52,130 @@ class DonationController extends Controller
     }
 
     /**
+     * Pencatatan Transaksi Donasi Nyata / QRIS (POST /api/donations)
+     *
+     * Menyimpan transaksi donasi langsung ke database PostgreSQL
+     * dengan pembaruan atomic saldo kampanye (ACID).
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'campaign_id' => 'required',
+            'amount' => 'required|numeric|min:10000',
+            'payment_method' => 'nullable|string',
+            'payment_channel' => 'nullable|string',
+            'donor_name' => 'nullable|string|max:255',
+            'donor_email' => 'nullable|email|max:255',
+            'is_anonymous' => 'nullable|boolean',
+            'status' => 'nullable|string',
+        ]);
+
+        // Resolve campaign_id (could be numeric or 'camp-01')
+        $campIdRaw = $validated['campaign_id'];
+        $campaign = null;
+        if (is_numeric($campIdRaw)) {
+            $campaign = Campaign::find($campIdRaw);
+        } else {
+            $numId = (int) preg_replace('/\D/', '', (string) $campIdRaw);
+            if ($numId) {
+                $campaign = Campaign::find($numId);
+            }
+        }
+        if (!$campaign) {
+            $campaign = Campaign::where('status', 'active')->first() ?? Campaign::first();
+        }
+
+        if (!$campaign) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kampanye tujuan donasi tidak ditemukan.',
+            ], 404);
+        }
+
+        $rawChannel = $validated['payment_channel'] ?? $validated['payment_method'] ?? 'qris';
+        $channel = strtolower((string) $rawChannel);
+        if (str_contains($channel, 'qris')) {
+            $channel = 'qris';
+        } elseif (str_contains($channel, 'bca')) {
+            $channel = 'bca_va';
+        } elseif (str_contains($channel, 'mandiri')) {
+            $channel = 'mandiri_va';
+        } elseif (str_contains($channel, 'bni')) {
+            $channel = 'bni_va';
+        } elseif (str_contains($channel, 'bri')) {
+            $channel = 'bri_va';
+        } else {
+            $channel = 'qris';
+        }
+
+        $user = $request->user('sanctum');
+        $donorName = $validated['donor_name'] ?? ($user?->name ?? 'Hamba Allah');
+        $donorEmail = $validated['donor_email'] ?? ($user?->email ?? 'donatur@actgiving.com');
+        $isAnonymous = (bool) ($validated['is_anonymous'] ?? false);
+        $status = strtolower($validated['status'] ?? 'paid');
+        if (!in_array($status, ['paid', 'pending', 'expired'])) {
+            $status = 'paid';
+        }
+
+        $refCode = 'INV-'.strtoupper($channel === 'qris' ? 'QRIS' : 'VA').'-'.date('Ymd').'-'.strtoupper(Str::random(6));
+
+        return DB::transaction(function () use ($campaign, $user, $validated, $donorName, $donorEmail, $isAnonymous, $channel, $status, $refCode) {
+            $donation = Donation::create([
+                'campaign_id' => $campaign->id,
+                'user_id' => $user?->id,
+                'amount' => $validated['amount'],
+                'donor_name' => $isAnonymous ? 'Hamba Allah' : $donorName,
+                'donor_email' => $donorEmail,
+                'is_anonymous' => $isAnonymous,
+                'payment_channel' => $channel,
+                'reference_code' => $refCode,
+                'status' => $status,
+                'expires_at' => Carbon::now()->addHours(24),
+            ]);
+
+            // Jika status paid, update saldo kampanye dengan lockForUpdate untuk mencegah race condition (ACID)
+            if ($status === 'paid') {
+                $lockedCamp = Campaign::where('id', $campaign->id)->lockForUpdate()->first();
+                if ($lockedCamp) {
+                    $lockedCamp->current_amount += $donation->amount;
+                    $lockedCamp->save();
+                }
+            }
+
+            $paymentPayload = $this->generatePaymentPayload($channel, $refCode, (float) $validated['amount']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi donasi berhasil dicatat dan diamankan dengan ACID.',
+                'data' => [
+                    'donation' => $donation->load('campaign:id,title'),
+                    'payment_info' => $paymentPayload,
+                    'reference_code' => $refCode,
+                ],
+            ], 201);
+        });
+    }
+
+    /**
+     * Audit Transaksi Donasi Moneter (Admin / Sandbox)
+     */
+    public function indexAdmin(Request $request): JsonResponse
+    {
+        $query = Donation::with('campaign:id,title,location');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $donations = $query->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $donations,
+        ]);
+    }
+
+    /**
      * Guest Checkout (Tanpa Login)
      *
      * 1. Guest Checkout (Donasi Tamu tanpa Login).

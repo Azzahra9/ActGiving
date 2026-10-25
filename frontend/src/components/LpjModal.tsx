@@ -31,12 +31,12 @@ export const LpjModal: React.FC<LpjModalProps> = ({
   if (!isOpen || !campaign) return null;
 
   // Publik hanya boleh melihat LPJ yang berstatus 'verified' atau 'sah'
-  const allReports = campaign.lpjReports || [];
-  const verifiedLpjReports = allReports.filter(
-    (report) => report.status === 'verified' || report.status === 'sah'
-  );
+  const allReports = Array.isArray(campaign.lpjReports) ? campaign.lpjReports : [];
+  const verifiedLpjReports = allReports
+    .filter((report) => report && (report.status === 'verified' || report.status === 'sah'))
+    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
   const hasPendingReports = allReports.some(
-    (report) => !report.status || report.status === 'pending'
+    (report) => report && (!report.status || report.status === 'pending')
   );
 
   return (
@@ -51,12 +51,13 @@ export const LpjModal: React.FC<LpjModalProps> = ({
               <span>Formulir LPJ Digital & Transparansi Publik Terverifikasi</span>
             </div>
             <h3 className="text-base font-bold text-slate-900 truncate max-w-lg mt-0.5">
-              {campaign.title}
+              {campaign.title || 'Laporan Akuntabilitas Kampanye'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition-colors"
+            aria-label="Tutup Linimasa LPJ"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -94,9 +95,14 @@ export const LpjModal: React.FC<LpjModalProps> = ({
           ) : (
             <div className="space-y-8">
               {verifiedLpjReports.map((report) => {
-                const photos = Array.from(
-                  new Set([report.photoUrl, ...(report.activityPhotos || [])].filter(Boolean))
-                );
+                if (!report) return null;
+                const rawPhotos = [
+                  report.photoUrl,
+                  ...(Array.isArray(report.activityPhotos) ? report.activityPhotos : [])
+                ];
+                const photos = Array.from(new Set(rawPhotos.filter(Boolean))) as string[];
+                const budgetItems = Array.isArray(report.budgetItems) ? report.budgetItems : [];
+                const totalCalculatedBudget = budgetItems.reduce((sum, item) => sum + (item?.amount || 0), 0);
 
                 return (
                   <div 
@@ -116,13 +122,13 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                           </span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-900">
-                          {report.title}
+                          {report.title || 'Penyaluran Aksi Lapangan'}
                         </h4>
                       </div>
 
                       <div className="flex items-center gap-1.5 text-xs text-slate-500 shrink-0">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{report.date}</span>
+                        <span>{report.date || '-'}</span>
                       </div>
                     </div>
 
@@ -131,7 +137,7 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                       <div>
                         <span className="text-[11px] text-slate-500 block">Total Realisasi:</span>
                         <span className="font-bold text-blue-700 text-sm">
-                          {formatRupiah(report.realizedAmount)}
+                          {formatRupiah(report.realizedAmount || 0)}
                         </span>
                       </div>
 
@@ -154,23 +160,25 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                         <span className="text-[11px] text-slate-500 block">Lokasi Kegiatan:</span>
                         <span className="font-semibold text-slate-800 text-xs truncate flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-red-500 shrink-0" />
-                          {report.fieldLocation || campaign.locationCity}
+                          {report.fieldLocation || campaign.locationCity || 'Posko Aksi'}
                         </span>
                       </div>
                     </div>
 
                     {/* Deskripsi & Narasi */}
-                    <div>
-                      <span className="text-xs font-semibold text-slate-700 block mb-1">
-                        Catatan & Narasi Pelaksanaan:
-                      </span>
-                      <p className="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100">
-                        {report.description}
-                      </p>
-                    </div>
+                    {report.description && (
+                      <div>
+                        <span className="text-xs font-semibold text-slate-700 block mb-1">
+                          Catatan & Narasi Pelaksanaan:
+                        </span>
+                        <p className="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100">
+                          {report.description}
+                        </p>
+                      </div>
+                    )}
 
                     {/* Rincian Pos Belanja Terstruktur (Form Digital) */}
-                    {report.budgetItems && report.budgetItems.length > 0 && (
+                    {budgetItems.length > 0 && (
                       <div className="space-y-2">
                         <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                           <ReceiptText className="w-4 h-4 text-blue-600" />
@@ -186,20 +194,20 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                              {report.budgetItems.map((item, idx) => (
+                              {budgetItems.map((item, idx) => (
                                 <tr key={idx} className="hover:bg-slate-50/50">
-                                  <td className="py-2 px-3 text-slate-800 font-medium">{item.name}</td>
+                                  <td className="py-2 px-3 text-slate-800 font-medium">
+                                    {item?.name || 'Pos Pembelanjaan'}
+                                  </td>
                                   <td className="py-2 px-3 text-right font-bold text-slate-900">
-                                    {formatRupiah(item.amount)}
+                                    {formatRupiah(item?.amount || 0)}
                                   </td>
                                 </tr>
                               ))}
                               <tr className="bg-blue-50/60 font-bold text-blue-900">
                                 <td className="py-2 px-3">Total Akumulasi Pos Belanja</td>
                                 <td className="py-2 px-3 text-right text-blue-700">
-                                  {formatRupiah(
-                                    report.budgetItems.reduce((sum, item) => sum + item.amount, 0)
-                                  )}
+                                  {formatRupiah(totalCalculatedBudget)}
                                 </td>
                               </tr>
                             </tbody>
@@ -209,40 +217,42 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                     )}
 
                     {/* Galeri Foto-Foto Dokumentasi Kegiatan Lapangan */}
-                    <div className="space-y-2 pt-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                          <ImageIcon className="w-4 h-4 text-sky-600" />
-                          Dokumentasi Foto Kegiatan Lapangan ({photos.length} Foto):
-                        </span>
-                        <span className="text-[11px] text-slate-400">Klik foto untuk perbesar</span>
-                      </div>
+                    {photos.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <ImageIcon className="w-4 h-4 text-sky-600" />
+                            Dokumentasi Foto Kegiatan Lapangan ({photos.length} Foto):
+                          </span>
+                          <span className="text-[11px] text-slate-400">Klik foto untuk perbesar</span>
+                        </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {photos.map((photo, pIdx) => (
-                          <div 
-                            key={pIdx}
-                            onClick={() => setSelectedPhotoPreview(photo)}
-                            className="group relative h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 cursor-pointer shadow-2xs"
-                          >
-                            <img
-                              src={photo}
-                              alt={`Dokumentasi Lapangan ${pIdx + 1}`}
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
-                              <ZoomIn className="w-4 h-4" />
-                              <span>Perbesar</span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {photos.map((photo, pIdx) => (
+                            <div 
+                              key={pIdx}
+                              onClick={() => setSelectedPhotoPreview(photo)}
+                              className="group relative h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 cursor-pointer shadow-2xs"
+                            >
+                              <img
+                                src={photo}
+                                alt={`Dokumentasi Lapangan ${pIdx + 1}`}
+                                referrerPolicy="no-referrer"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                              <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
+                                <ZoomIn className="w-4 h-4" />
+                                <span>Perbesar</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Footer Akuntabilitas Form */}
                     <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-[11px] text-slate-400">
-                      <span>Inisiator: <strong>{campaign.initiatorName}</strong></span>
+                      <span>Inisiator: <strong>{campaign.initiatorName || 'Inisiator Kampanye'}</strong></span>
                       <span className="text-blue-600 font-medium">Tersinkronisasi ke Landing Page & Katalog Publik</span>
                     </div>
 
@@ -257,7 +267,7 @@ export const LpjModal: React.FC<LpjModalProps> = ({
         <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-end">
           <button
             onClick={onClose}
-            className="py-2 px-5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors"
+            className="py-2 px-5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
           >
             Tutup Linimasa LPJ
           </button>
@@ -280,7 +290,8 @@ export const LpjModal: React.FC<LpjModalProps> = ({
             />
             <button
               onClick={() => setSelectedPhotoPreview(null)}
-              className="absolute top-4 right-4 p-2 bg-black/60 text-white rounded-full hover:bg-black"
+              aria-label="Tutup Pratinjau Foto"
+              className="absolute top-4 right-4 p-2 bg-black/60 text-white rounded-full hover:bg-black transition-colors cursor-pointer"
             >
               <X className="w-6 h-6" />
             </button>

@@ -22,6 +22,7 @@ import { WireframeHtmlModal } from './components/WireframeHtmlModal';
 import { AdminModerationModal } from './components/AdminModerationModal';
 import { RelawanActivityModal } from './components/RelawanActivityModal';
 import { InisiatorDashboardModal } from './components/InisiatorDashboardModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Footer } from './components/Footer';
 import { formatRupiah } from './utils/format';
 import { HeartHandshake, ShieldCheck, CheckCircle2, ArrowUpRight, LayoutDashboard } from 'lucide-react';
@@ -66,7 +67,17 @@ export default function App() {
     try {
       const data = await campaignService.getCampaigns();
       const validCampaigns = Array.isArray(data) ? data : [];
-      setCampaigns(validCampaigns);
+      setCampaigns((prev) => {
+        // Pertahankan kampanye baru yang masih berstatus pending dari sesi lokal jika belum masuk di response active
+        const pendingLocal = prev.filter(
+          (c) => c.status === 'pending_approval' || c.status === 'pending'
+        );
+        const validIds = new Set(validCampaigns.map((c) => c.id));
+        const retained = pendingLocal.filter((c) => !validIds.has(c.id));
+        const merged = [...retained, ...validCampaigns];
+        // Filter unik agar tidak ada duplikasi ID kampanye
+        return merged.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+      });
       const dynamicDonations = validCampaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
       const dynamicVolunteers = validCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
       const dynamicCompleted = validCampaigns.filter(c => c.status === 'completed' || c.status === 'closed').length;
@@ -149,11 +160,11 @@ export default function App() {
     }
   };
 
-  // Filter calculation (Catalog only displays active approved campaigns)
+  // Filter calculation (Catalog strictly displays approved 'active' campaigns only)
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {
-      // Exclude pending or rejected campaigns from public catalog
-      if (c.status === 'pending_approval' || c.status === 'rejected') {
+      // Lapis pengaman: Hanya kampanye berstatus 'active' yang boleh tampil di katalog publik
+      if (c.status !== 'active') {
         return false;
       }
 
@@ -173,7 +184,7 @@ export default function App() {
       const matchMode = selectedMode === 'all' || c.mode === selectedMode;
 
       return matchKeyword && matchCity && matchCategory && matchMode;
-    });
+    }).filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
   }, [campaigns, searchQuery, selectedCity, selectedCategory, selectedMode]);
 
   const activeFilterCount = useMemo(() => {
@@ -265,9 +276,40 @@ export default function App() {
     setCampaigns((prev) =>
       prev.map((c) => {
         if (c.id === campaignId) {
+          const filtered = (c.lpjReports || []).filter((r) => r.id !== newLpj.id);
           return {
             ...c,
-            lpjReports: [newLpj, ...(c.lpjReports || [])]
+            lpjReports: [newLpj, ...filtered]
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Inisiator Update LPJ
+  const handleUpdateLpj = (campaignId: string, updatedLpj: LpjItem) => {
+    setCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === campaignId) {
+          return {
+            ...c,
+            lpjReports: (c.lpjReports || []).map((r) => (r.id === updatedLpj.id ? updatedLpj : r))
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Inisiator Delete LPJ
+  const handleDeleteLpj = (campaignId: string, lpjId: string) => {
+    setCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === campaignId) {
+          return {
+            ...c,
+            lpjReports: (c.lpjReports || []).filter((r) => r.id !== lpjId)
           };
         }
         return c;
@@ -361,18 +403,22 @@ export default function App() {
           )}
 
           {activeView === 'inisiator_dashboard' && (
-            <InisiatorDashboardView
-              currentUser={currentUser}
-              campaigns={campaigns}
-              onExplorePublic={() => setActiveView('public')}
-              onOpenCreateCampaign={handleOpenCreateCampaign}
-              onEditCampaign={handleOpenEditCampaign}
-              onDeleteCampaign={handleDeleteCampaign}
-              onAddLpj={handleAddLpj}
-              onOpenLpjModal={(camp) => setLpjCampaign(camp)}
-              activeTab={inisiatorTab}
-              onTabChange={setInisiatorTab}
-            />
+            <ErrorBoundary fallbackTitle="Kendala pada Dashboard Inisiator">
+              <InisiatorDashboardView
+                currentUser={currentUser}
+                campaigns={campaigns}
+                onExplorePublic={() => setActiveView('public')}
+                onOpenCreateCampaign={handleOpenCreateCampaign}
+                onEditCampaign={handleOpenEditCampaign}
+                onDeleteCampaign={handleDeleteCampaign}
+                onAddLpj={handleAddLpj}
+                onUpdateLpj={handleUpdateLpj}
+                onDeleteLpj={handleDeleteLpj}
+                onOpenLpjModal={(camp) => setLpjCampaign(camp)}
+                activeTab={inisiatorTab}
+                onTabChange={setInisiatorTab}
+              />
+            </ErrorBoundary>
           )}
 
           {activeView === 'admin_dashboard' && (
@@ -437,7 +483,7 @@ export default function App() {
 
               {/* 4. Dokumentasi Foto Kegiatan Lapangan & LPJ Digital Terhubung */}
               <ActivityPhotoGallery
-                campaigns={campaigns}
+                campaigns={filteredCampaigns}
                 onViewLpj={(camp) => setLpjCampaign(camp)}
               />
 
@@ -484,11 +530,13 @@ export default function App() {
       />
 
       {/* MODAL 3: LPJ Transparency Timeline (SRS Subbab 4.3 & FR-12) */}
-      <LpjModal
-        campaign={lpjCampaign}
-        isOpen={!!lpjCampaign}
-        onClose={() => setLpjCampaign(null)}
-      />
+      <ErrorBoundary fallbackTitle="Kendala pada Linimasa LPJ">
+        <LpjModal
+          campaign={lpjCampaign}
+          isOpen={!!lpjCampaign}
+          onClose={() => setLpjCampaign(null)}
+        />
+      </ErrorBoundary>
 
       {/* MODAL 4: Create Campaign Multi-Option (SRS Subbab 2.2 & FR-06) */}
       <CreateCampaignModal
@@ -549,14 +597,16 @@ export default function App() {
       />
 
       {/* MODAL 9: Dashboard Inisiator & Upload LPJ (SRS FR-06 / FR-12) */}
-      <InisiatorDashboardModal
-        isOpen={isInisiatorOpen}
-        onClose={() => setIsInisiatorOpen(false)}
-        currentUser={currentUser}
-        campaigns={campaigns}
-        onCreateNewCampaign={() => setIsCreateOpen(true)}
-        onAddLpj={handleAddLpj}
-      />
+      <ErrorBoundary fallbackTitle="Kendala pada Dashboard Inisiator & Form Upload LPJ">
+        <InisiatorDashboardModal
+          isOpen={isInisiatorOpen}
+          onClose={() => setIsInisiatorOpen(false)}
+          currentUser={currentUser}
+          campaigns={campaigns}
+          onCreateNewCampaign={() => setIsCreateOpen(true)}
+          onAddLpj={handleAddLpj}
+        />
+      </ErrorBoundary>
 
     </div>
   );

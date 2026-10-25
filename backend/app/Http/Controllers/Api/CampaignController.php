@@ -31,8 +31,11 @@ class CampaignController extends Controller
             'lpjReports' => function ($q) {
                 $q->whereIn('status', ['verified', 'sah'])->latest();
             },
-        ])
-        ->where('status', 'active');
+        ]);
+
+        // Filter status kampanye: Ketat HANYA status 'active' (disetujui) untuk endpoint publik.
+        // Status 'pending' dan 'rejected' dilarang keras tampil pada katalog publik/donatur luar.
+        $query->where('status', 'active');
 
         // Filter berdasarkan kategori
         if ($request->filled('category_id')) {

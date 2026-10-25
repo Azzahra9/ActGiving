@@ -25,8 +25,10 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
   onViewLpj
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
+  const [modalPhotoIndex, setModalPhotoIndex] = useState<number>(0);
   const [activePhotoModal, setActivePhotoModal] = useState<{
     photoUrl: string;
+    allPhotos?: string[];
     title: string;
     campaignTitle: string;
     location?: string;
@@ -38,35 +40,48 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
     campaign: Campaign;
   } | null>(null);
 
-  // Flatten all LPJ items across campaigns to create the connected live gallery
-  const activityItems = campaigns.flatMap((campaign) => {
-    return (campaign.lpjReports || [])
-      .filter((lpj) => lpj.status === 'verified' || lpj.status === 'sah')
-      .flatMap((lpj) => {
-      // Gather all photos for this LPJ item (photoUrl + any additional activityPhotos)
-      const photos = Array.from(
-        new Set([lpj.photoUrl, ...(lpj.activityPhotos || [])].filter(Boolean))
-      );
+  // 1. Flatten all verified LPJ reports across active campaigns (1 LPJ report = 1 card)
+  // 2. Strict status check: only 'verified' or 'sah'
+  // 3. Unique filtering by LPJ id to prevent duplicate cards
+  const activityItems = (campaigns || [])
+    .filter((campaign) => campaign && campaign.status === 'active')
+    .flatMap((campaign) => {
+      const reports = Array.isArray(campaign.lpjReports) ? campaign.lpjReports : [];
+      return reports
+        .filter((lpj) => lpj && (lpj.status === 'verified' || lpj.status === 'sah'))
+        .map((lpj) => {
+          const rawPhotos = [
+            lpj.photoUrl,
+            ...(Array.isArray(lpj.activityPhotos) ? lpj.activityPhotos : []),
+            lpj.receiptUrl,
+          ];
+          const photos = Array.from(new Set(rawPhotos.filter(Boolean))) as string[];
+          const primaryPhoto =
+            photos[0] ||
+            'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
 
-      return photos.map((photo, photoIdx) => ({
-        id: `${lpj.id}-photo-${photoIdx}`,
-        photoUrl: photo,
-        lpjId: lpj.id,
-        title: lpj.title,
-        campaignId: campaign.id,
-        campaignTitle: campaign.title,
-        category: campaign.category,
-        date: lpj.date,
-        realizedAmount: lpj.realizedAmount,
-        beneficiariesCount: lpj.beneficiariesCount,
-        volunteersInvolved: lpj.volunteersInvolved,
-        fieldLocation: lpj.fieldLocation || `${campaign.locationCity}`,
-        description: lpj.description,
-        digitalRegNumber: lpj.digitalRegNumber,
-        campaign
-      }));
-    });
-  });
+          return {
+            id: String(lpj.id),
+            lpjId: String(lpj.id),
+            photoUrl: primaryPhoto,
+            allPhotos: photos,
+            title: lpj.title || 'Foto Dokumentasi Kegiatan',
+            campaignId: campaign.id,
+            campaignTitle: campaign.title || 'Program Kampanye',
+            category: campaign.category || 'Bencana Alam',
+            date: lpj.date || '-',
+            realizedAmount: lpj.realizedAmount || 0,
+            beneficiariesCount: lpj.beneficiariesCount,
+            volunteersInvolved: lpj.volunteersInvolved,
+            fieldLocation: lpj.fieldLocation || `${campaign.locationCity || 'Posko Aksi'}`,
+            description: lpj.description || '',
+            digitalRegNumber: lpj.digitalRegNumber,
+            campaign,
+          };
+        });
+    })
+    // Filter unik agar tidak ada LPJ ganda
+    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
   const categories = [
     'Semua',
@@ -104,7 +119,7 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
           <div className="flex items-center gap-2 bg-slate-50 px-3.5 py-2 rounded-2xl border border-slate-200 self-start lg:self-auto text-xs text-slate-600">
             <Layers className="w-4 h-4 text-blue-600 shrink-0" />
             <span>
-              Total <strong>{activityItems.length}</strong> Foto Kegiatan Terverifikasi
+              Total <strong>{activityItems.length}</strong> Laporan LPJ Terverifikasi
             </span>
           </div>
         </div>
@@ -142,7 +157,10 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
                 {/* Image Container with Badges */}
                 <div 
                   className="relative aspect-16/10 bg-slate-100 overflow-hidden cursor-pointer"
-                  onClick={() => setActivePhotoModal(item)}
+                  onClick={() => {
+                    setActivePhotoModal(item);
+                    setModalPhotoIndex(0);
+                  }}
                 >
                   <img
                     src={item.photoUrl}
@@ -160,10 +178,17 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
                     <span className="px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold tracking-wide">
                       {item.category}
                     </span>
-                    <span className="px-2 py-1 rounded-lg bg-blue-600/90 backdrop-blur-xs text-white text-[10px] font-semibold flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" />
-                      LPJ Digital
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {item.allPhotos && item.allPhotos.length > 1 && (
+                        <span className="px-2 py-0.5 rounded-lg bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-medium">
+                          {item.allPhotos.length} Foto
+                        </span>
+                      )}
+                      <span className="px-2 py-1 rounded-lg bg-blue-600/90 backdrop-blur-xs text-white text-[10px] font-semibold flex items-center gap-1">
+                        <ShieldCheck className="w-3 h-3" />
+                        LPJ Sah
+                      </span>
+                    </div>
                   </div>
 
                   {/* Bottom Image Info */}
@@ -254,12 +279,34 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
             {/* Modal Photo View */}
             <div className="relative bg-slate-950 flex items-center justify-center max-h-[60vh] overflow-hidden">
               <img
-                src={activePhotoModal.photoUrl}
+                src={
+                  (activePhotoModal.allPhotos && activePhotoModal.allPhotos[modalPhotoIndex]) ||
+                  activePhotoModal.photoUrl
+                }
                 alt={activePhotoModal.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full max-h-[60vh] object-contain"
+                className="w-full h-full max-h-[50vh] object-contain"
               />
             </div>
+
+            {/* Thumbnail switcher if multiple photos exist */}
+            {activePhotoModal.allPhotos && activePhotoModal.allPhotos.length > 1 && (
+              <div className="px-6 py-2 bg-slate-900/90 flex items-center gap-2 overflow-x-auto border-t border-slate-800">
+                {activePhotoModal.allPhotos.map((photo, pIdx) => (
+                  <button
+                    key={`${activePhotoModal.id}-thumb-${pIdx}`}
+                    onClick={() => setModalPhotoIndex(pIdx)}
+                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                      modalPhotoIndex === pIdx
+                        ? 'border-blue-500 scale-105'
+                        : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={photo} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Modal Details & Connection */}
             <div className="p-6 space-y-4">

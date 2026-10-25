@@ -29,6 +29,8 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
   onVolunteerClick,
   onViewLpjClick
 }) => {
+  if (!campaign) return null;
+
   // Mode-specific calculations
   const isDanaMode = campaign.mode === 'dana';
   const isRelawanMode = campaign.mode === 'relawan';

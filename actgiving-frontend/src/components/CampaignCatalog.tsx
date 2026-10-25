@@ -61,12 +61,20 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
     }
   };
 
+  // Lapis Pengaman Ketat: Pastikan HANYA kampanye yang berstatus 'active' (disetujui) yang tampil di katalog publik & tanpa duplikasi
+  const approvedCampaigns = (campaigns || [])
+    .filter((c) => {
+      if (!c) return false;
+      return c.status === 'active';
+    })
+    .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
+
   // Filter campaigns if managed internally
   const displayedCampaigns = propCategory !== undefined 
-    ? campaigns 
+    ? approvedCampaigns 
     : (currentCategory === 'Semua Kategori' 
-        ? campaigns 
-        : campaigns.filter(c => c.category === currentCategory));
+        ? approvedCampaigns 
+        : approvedCampaigns.filter(c => c.category === currentCategory));
 
   return (
     <section id="katalog-aksi" className="py-14 sm:py-16 bg-surface-bg border-t border-slate-200/80">

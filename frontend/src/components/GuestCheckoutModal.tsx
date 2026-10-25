@@ -221,37 +221,65 @@ export const GuestCheckoutModal: React.FC<GuestCheckoutModalProps> = ({
     }
   };
 
-  // Handle Simulation "Bayar Sekarang" Button (Connected to POST /api/donations/webhook-simulate)
+  // Handle Simulation "Bayar Sekarang" Button (Connected to POST /api/donations & PostgreSQL)
   const handleSimulatePaymentSuccess = async () => {
     if (isPaying) return; // Strict Anti Double-Submit
     setIsPaying(true);
 
+    const backendChannel =
+      paymentChannel === 'QRIS'
+        ? 'qris'
+        : paymentChannel === 'VA_BCA'
+        ? 'bca_va'
+        : paymentChannel === 'VA_MANDIRI'
+        ? 'mandiri_va'
+        : paymentChannel === 'VA_BRI'
+        ? 'bri_va'
+        : 'bni_va';
+
+    const resolvedDonorName = isAnonymous || !donorName.trim() ? 'Hamba Allah' : donorName.trim();
+    let finalRefCode = referenceCode;
+
     try {
+      // 1. Simpan transaksi donasi nyata / QRIS ke backend PostgreSQL (ACID)
+      const res = await api.post('/donations', {
+        campaign_id: campaign.id,
+        amount: selectedAmount,
+        payment_method: paymentChannel,
+        payment_channel: backendChannel,
+        donor_name: resolvedDonorName,
+        donor_email: donorEmail.trim() || 'donatur@actgiving.com',
+        is_anonymous: isAnonymous,
+        status: 'paid',
+      });
+      const resolvedRef = res.data?.data?.reference_code || res.data?.data?.donation?.reference_code;
+      if (resolvedRef) {
+        finalRefCode = resolvedRef;
+        setReferenceCode(finalRefCode);
+      }
+    } catch (err) {
+      console.warn('Gagal mencatat donasi via POST /api/donations, mencoba webhook simulator:', err);
       if (referenceCode) {
         await api.post('/donations/webhook-simulate', {
           reference_code: referenceCode,
           status: 'paid',
-        }).catch((err) => {
-          console.warn('Simulate webhook warning:', err);
-        });
+        }).catch((wErr) => console.warn('Simulate webhook warning:', wErr));
       }
     } finally {
-      const resolvedDonorName = isAnonymous || !donorName.trim() ? 'Hamba Allah' : donorName.trim();
-      
       const invoice: DigitalInvoice = {
-        referenceCode: referenceCode || `INV-${Date.now()}`,
+        referenceCode: finalRefCode || `INV-${Date.now()}`,
         campaignTitle: campaign.title,
         amount: selectedAmount,
         paymentChannel: paymentChannel === 'QRIS' ? 'QRIS Standar Indonesia' : paymentChannel.replace('_', ' '),
         donorName: resolvedDonorName,
-        donorEmail: donorEmail.trim(),
+        donorEmail: donorEmail.trim() || 'donatur@actgiving.com',
         isAnonymous,
         status: 'PAID',
         paidAt: new Date().toLocaleString('id-ID', {
           dateStyle: 'long',
-          timeStyle: 'medium'
+          timeStyle: 'medium',
         }),
-        vaNumber: paymentChannel !== 'QRIS' ? vaNumber : undefined
+        vaNumber: paymentChannel !== 'QRIS' ? vaNumber : undefined,
       };
 
       setDigitalInvoice(invoice);

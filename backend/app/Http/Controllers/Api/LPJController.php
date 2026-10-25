@@ -130,10 +130,10 @@ class LPJController extends Controller
             $budgetItems = json_decode($budgetItems, true);
         }
 
-        // 5. Simpan record LPJ ke database dengan status 'pending'
+        // 5. Simpan record LPJ ke database dengan status 'pending_audit'
         $lpjReport = LpjReport::create([
             'campaign_id' => $campaign->id,
-            'status' => 'pending',
+            'status' => 'pending_audit',
             'title' => $request->input('title', 'Penyaluran Bantuan Lapangan'),
             'description' => $request->description,
             'amount_spent' => $request->input('amount_spent', 0),
@@ -275,7 +275,7 @@ class LPJController extends Controller
             $query->where('status', $request->status);
         }
 
-        $reports = $query->latest()->paginate(20);
+        $reports = $query->latest()->get();
 
         return response()->json([
             'success' => true,
@@ -293,16 +293,18 @@ class LPJController extends Controller
         $lpj = LpjReport::with('campaign')->findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:verified,sah,pending,rejected',
+            'status' => 'required|in:verified,sah,pending,pending_audit,needs_review,rejected',
         ]);
 
         $status = strtolower($validated['status']);
         if ($status === 'sah') {
             $status = 'verified';
+        } elseif (in_array($status, ['pending', 'needs_review'])) {
+            $status = 'pending_audit';
         }
 
         $lpj->status = $status;
-        $lpj->verified_at = in_array($status, ['verified', 'sah']) ? now() : null;
+        $lpj->verified_at = ($status === 'verified') ? now() : null;
         $lpj->save();
 
         $message = $status === 'verified'
@@ -343,7 +345,7 @@ class LPJController extends Controller
     public function adminUnverify($id): JsonResponse
     {
         $lpj = LpjReport::with('campaign')->findOrFail($id);
-        $lpj->status = 'pending';
+        $lpj->status = 'pending_audit';
         $lpj->verified_at = null;
         $lpj->save();
 

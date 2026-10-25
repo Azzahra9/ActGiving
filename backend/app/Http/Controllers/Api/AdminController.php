@@ -28,7 +28,7 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
 
-        $campaigns = $query->latest()->paginate(15);
+        $campaigns = $query->latest()->get();
 
         return response()->json([
             'success' => true,

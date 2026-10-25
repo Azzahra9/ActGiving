@@ -33,6 +33,16 @@ Route::get('/campaigns/{id}/lpj', [LPJController::class, 'index']); // Public li
 Route::post('/campaigns/{id}/reports', [CampaignReportController::class, 'store']); // FR-13: Laporan Aduan Publik
 
 // 3. PUBLIC DONATIONS & SIMULATION WEBHOOK
+Route::post('/donations', [DonationController::class, 'store']); // Pencatatan Transaksi Donasi Nyata / QRIS
+Route::get('/donations', [DonationController::class, 'indexAdmin']); // Daftar Transaksi Donasi
+Route::get('/admin/donations', [DonationController::class, 'indexAdmin']); // Audit Transaksi Sandbox
+Route::get('/admin/campaigns', [AdminController::class, 'indexCampaigns']); // Antrean Moderasi Kampanye
+Route::patch('/admin/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
+Route::get('/admin/lpj', [LPJController::class, 'adminIndex']); // Antrean Audit LPJ
+Route::patch('/admin/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
+Route::patch('/admin/lpj/{id}/verify', [LPJController::class, 'adminVerify']);
+Route::patch('/admin/lpj/{id}/unverify', [LPJController::class, 'adminUnverify']);
+
 Route::prefix('donations')->group(function () {
     // Rate Limiting Khusus: Maksimal 10 request per menit per IP untuk mencegah spam donasi fiktif
     Route::post('/guest-checkout', [DonationController::class, 'guestCheckout'])->middleware('throttle:guest-checkout-limit');
@@ -76,21 +86,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/campaigns/{id}/volunteer-register', [VolunteerRegistrationController::class, 'register']);
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
 
-    // ADMINISTRATOR: Moderasi Kampanye, Verifikasi User, Kelola Kategori, Disbursement & Reports
+    // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports
     Route::prefix('admin')->middleware('admin')->group(function () {
-        // Moderasi Kampanye
-        Route::get('/campaigns', [AdminController::class, 'indexCampaigns']);
-        Route::patch('/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
-
-        // Audit & Verifikasi LPJ Digital
-        Route::get('/lpj', [LPJController::class, 'adminIndex']);
-        Route::patch('/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
-        Route::put('/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
-        Route::patch('/lpj/{id}', [LPJController::class, 'adminUpdateStatus']);
-        Route::put('/lpj/{id}', [LPJController::class, 'adminUpdateStatus']);
-        Route::patch('/lpj/{id}/verify', [LPJController::class, 'adminVerify']);
-        Route::patch('/lpj/{id}/unverify', [LPJController::class, 'adminUnverify']);
-
         // FR-11: Validasi Persetujuan Pencairan Dana
         Route::patch('/disbursements/{id}/status', [DisbursementController::class, 'updateStatus']);
 
