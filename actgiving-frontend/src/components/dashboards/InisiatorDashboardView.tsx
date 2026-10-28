@@ -1126,7 +1126,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                         className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>+ Tambah Foto</span>
+                        <span>Tambah Foto</span>
                       </button>
                     </div>
                   ) : (
@@ -1171,7 +1171,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                           className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-xs"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          <span>+ Tambah Foto</span>
+                          <span>Tambah Foto</span>
                         </button>
                       </div>
                     </div>
