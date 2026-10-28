@@ -70,6 +70,11 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       setProofPreview(URL.createObjectURL(file));
       setErrorMessage(null);
     }
+    // Reset nilai input agar tidak terjadi double-trigger
+    e.target.value = '';
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleRemoveProof = () => {
@@ -98,7 +103,9 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
     const formData = new FormData();
     formData.append('description', descText);
     formData.append('title', titleText);
+    formData.append('total_realisasi', finalAmount.toString());
     formData.append('amount_spent', finalAmount.toString());
+    formData.append('realized_amount', finalAmount.toString());
     formData.append('is_final', isFinalReport ? '1' : '0');
     formData.append('report_type', isFinalReport ? 'final' : 'progress');
     if (proofFile) {

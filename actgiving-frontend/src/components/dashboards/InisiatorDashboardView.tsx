@@ -214,18 +214,43 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
+    if (!selectedFiles || selectedFiles.length === 0) {
+      if (e.target) e.target.value = '';
+      return;
+    }
 
-    const filesArray = Array.from(selectedFiles);
-    
-    // Preview gambar menggunakan URL.createObjectURL(file)
-    const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+    const incomingFiles = Array.from(selectedFiles);
 
-    setActivityPhotoFiles(prev => [...prev, ...filesArray]);
-    setActivityPhotos(prev => [...prev, ...newPreviews]);
-    showToast(`${filesArray.length} foto kegiatan berhasil dipilih dari galeri/perangkat.`);
+    // 1. Filter internal di dalam incomingFiles agar tidak ada file ganda dalam 1 seleksi
+    const uniqueIncomingMap = new Map<string, File>();
+    incomingFiles.forEach((file) => {
+      const key = `${file.name}_${file.size}_${file.lastModified}`;
+      if (!uniqueIncomingMap.has(key)) {
+        uniqueIncomingMap.set(key, file);
+      }
+    });
+    const uniqueIncoming = Array.from(uniqueIncomingMap.values());
 
-    // Reset value input file agar file yang sama bisa dipilih ulang jika dibutuhkan
+    // 2. Filter terhadap state foto yang sudah ada sebelumnya
+    setActivityPhotoFiles((prevFiles) => {
+      const existingKeys = new Set(prevFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+      const nonDuplicateFiles = uniqueIncoming.filter((f) => !existingKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
+
+      if (nonDuplicateFiles.length === 0) {
+        showToast('Foto ini sudah ada dalam daftar pratinjau.');
+        return prevFiles;
+      }
+
+      // Buat Object URL preview hanya untuk file baru yang unik
+      const newPreviews = nonDuplicateFiles.map((file) => URL.createObjectURL(file));
+      setActivityPhotos((prevPhotos) => [...prevPhotos, ...newPreviews]);
+      showToast(`${nonDuplicateFiles.length} foto kegiatan berhasil ditambahkan.`);
+
+      return [...prevFiles, ...nonDuplicateFiles];
+    });
+
+    // 3. Reset value input file agar tidak terjadi double-trigger dan mengizinkan pemilihan ulang
+    e.target.value = '';
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -335,7 +360,11 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     }
 
     const currentCampaign = myCampaigns.find(c => c.id === targetCampId);
-    const finalAmount = lpjAmount ? parseInt(lpjAmount) : (calculatedBudgetTotal || 5000000);
+    // Prioritaskan total kalkulasi dari Rincian Pos Belanja, fallback ke manual lpjAmount jika ada
+    const totalRealisasi = calculatedBudgetTotal > 0 
+      ? calculatedBudgetTotal 
+      : (lpjAmount ? parseInt(lpjAmount, 10) : 0);
+    const finalAmount = totalRealisasi > 0 ? totalRealisasi : (lpjAmount ? parseInt(lpjAmount, 10) : 5000000);
     const descriptionText = lpjDesc.trim() || 'Laporan pertanggungjawaban kegiatan penyaluran dan aksi lapangan.';
 
     setIsSubmittingLpj(true);
@@ -344,7 +373,9 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     const formData = new FormData();
     formData.append('description', descriptionText);
     formData.append('title', lpjTitle || 'Penyaluran Bantuan Lapangan');
+    formData.append('total_realisasi', finalAmount.toString());
     formData.append('amount_spent', finalAmount.toString());
+    formData.append('realized_amount', finalAmount.toString());
     formData.append('field_location', fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan');
     formData.append('beneficiaries_count', (parseInt(beneficiariesCount) || 0).toString());
     formData.append('volunteers_involved', (parseInt(volunteersInvolved) || 0).toString());
@@ -354,13 +385,12 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
     // Masukkan berkas gambar asli ke dalam FormData
     if (activityPhotoFiles.length > 0) {
-      // proof_image untuk endpoint standar Laravel (file utama)
-      formData.append('proof_image', activityPhotoFiles[0]);
-
       // Masukkan seluruh file ke activity_photos[]
       activityPhotoFiles.forEach((file) => {
         formData.append('activity_photos[]', file);
       });
+      // proof_image untuk endpoint standar Laravel (file utama)
+      formData.append('proof_image', activityPhotoFiles[0]);
     }
 
     let serverProofUrl = '';

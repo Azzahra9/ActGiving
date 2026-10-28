@@ -77,6 +77,8 @@ class LPJController extends Controller
             'description' => 'required|string|min:10',
             'title' => 'nullable|string|max:255',
             'amount_spent' => 'nullable|numeric|min:0',
+            'total_realisasi' => 'nullable|numeric|min:0',
+            'realized_amount' => 'nullable|numeric|min:0',
             'field_location' => 'nullable|string|max:255',
             'beneficiaries_count' => 'nullable|integer|min:0',
             'volunteers_involved' => 'nullable|integer|min:0',
@@ -99,18 +101,7 @@ class LPJController extends Controller
         $fileStoredPath = null;
         $activityPhotoUrls = [];
 
-        // 3. Upload berkas proof_image jika ada
-        if ($request->hasFile('proof_image')) {
-            $uploadResult = $this->fileUploadService->upload(
-                $request->file('proof_image'),
-                'lpj_proofs'
-            );
-            $proofUrl = $uploadResult['url'];
-            $fileStoredPath = $uploadResult['path'];
-            $activityPhotoUrls[] = $proofUrl;
-        }
-
-        // 4. Upload berkas activity_photos jika ada
+        // 3. Upload berkas activity_photos jika ada (cegah duplikasi berkas)
         if ($request->hasFile('activity_photos')) {
             foreach ($request->file('activity_photos') as $photoFile) {
                 if ($photoFile) {
@@ -124,6 +115,17 @@ class LPJController extends Controller
             }
         }
 
+        // 4. Jika proof_image diunggah dan activity_photos belum ada, upload proof_image
+        if (!$proofUrl && $request->hasFile('proof_image')) {
+            $uploadResult = $this->fileUploadService->upload(
+                $request->file('proof_image'),
+                'lpj_proofs'
+            );
+            $proofUrl = $uploadResult['url'];
+            $fileStoredPath = $uploadResult['path'];
+            $activityPhotoUrls[] = $proofUrl;
+        }
+
         $activityPhotoUrls = array_values(array_unique($activityPhotoUrls));
 
         // Parse budget_items jika berbentuk JSON string
@@ -131,6 +133,19 @@ class LPJController extends Controller
         if (is_string($budgetItems)) {
             $budgetItems = json_decode($budgetItems, true);
         }
+
+        // Ambil nominal realisasi secara presisi: total_realisasi / amount_spent / realized_amount / kalkulasi budget_items
+        $amountSpent = $request->input('total_realisasi')
+            ?? $request->input('amount_spent')
+            ?? $request->input('realized_amount');
+
+        if ((is_null($amountSpent) || floatval($amountSpent) <= 0) && is_array($budgetItems) && count($budgetItems) > 0) {
+            $amountSpent = array_reduce($budgetItems, function ($carry, $item) {
+                return $carry + floatval($item['amount'] ?? 0);
+            }, 0);
+        }
+
+        $amountSpent = floatval($amountSpent ?? 0);
 
         $isFinal = false;
         if ($request->has('is_final')) {
@@ -149,7 +164,7 @@ class LPJController extends Controller
             'report_type' => $reportType,
             'title' => $request->input('title', 'Penyaluran Bantuan Lapangan'),
             'description' => $request->description,
-            'amount_spent' => $request->input('amount_spent', 0),
+            'amount_spent' => $amountSpent,
             'budget_items' => $budgetItems,
             'beneficiaries_count' => $request->input('beneficiaries_count', 0),
             'volunteers_involved' => $request->input('volunteers_involved', 0),
@@ -196,6 +211,8 @@ class LPJController extends Controller
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string|min:10',
             'amount_spent' => 'sometimes|numeric|min:0',
+            'total_realisasi' => 'sometimes|numeric|min:0',
+            'realized_amount' => 'sometimes|numeric|min:0',
             'field_location' => 'nullable|string|max:255',
             'beneficiaries_count' => 'nullable|integer|min:0',
             'volunteers_involved' => 'nullable|integer|min:0',
@@ -206,6 +223,22 @@ class LPJController extends Controller
             'activity_photos' => 'nullable|array',
             'activity_photos.*' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        if ($request->has('total_realisasi') || $request->has('amount_spent') || $request->has('realized_amount')) {
+            $val = $request->input('total_realisasi')
+                ?? $request->input('amount_spent')
+                ?? $request->input('realized_amount');
+            $validated['amount_spent'] = floatval($val ?? 0);
+        } elseif ($request->has('budget_items')) {
+            $bItems = is_string($request->input('budget_items')) 
+                ? json_decode($request->input('budget_items'), true) 
+                : $request->input('budget_items');
+            if (is_array($bItems) && count($bItems) > 0) {
+                $validated['amount_spent'] = array_reduce($bItems, function ($carry, $item) {
+                    return $carry + floatval($item['amount'] ?? 0);
+                }, 0);
+            }
+        }
 
         if ($request->has('is_final') || $request->has('report_type')) {
             $isFinal = false;

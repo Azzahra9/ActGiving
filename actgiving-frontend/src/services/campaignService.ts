@@ -59,7 +59,7 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
           year: 'numeric',
         }),
     createdAt: lpj.created_at || undefined,
-    realizedAmount: Number(lpj.amount_spent || lpj.realized_amount || 0),
+    realizedAmount: Number(lpj.total_realisasi || lpj.amount_spent || lpj.realized_amount || 0),
     description: lpj.description || '',
     photoUrl:
       lpj.receipt_image_url ||

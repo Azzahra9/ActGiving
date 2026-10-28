@@ -403,4 +403,53 @@ class LPJUploadTest extends TestCase
         // Kampanye TETAP 'active' karena bukan LPJ Akhir
         $this->assertEquals('active', $campaign->fresh()->status);
     }
+
+    public function test_total_realisasi_is_stored_and_photos_are_not_duplicated(): void
+    {
+        Storage::fake('public');
+
+        $initiator = User::create([
+            'name' => 'Inisiator Realisasi',
+            'email' => 'inisiator_realisasi@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+
+        $category = Category::create(['category_name' => 'Kemanusiaan']);
+
+        $campaign = Campaign::create([
+            'user_id' => $initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Kampanye Uji Realisasi',
+            'description' => 'Program bantuan logistik',
+            'target_amount' => 5000000,
+            'current_amount' => 5000000,
+            'location' => 'Bandung',
+            'status' => 'active',
+            'campaign_mode' => 'fund_only',
+        ]);
+
+        $file1 = UploadedFile::fake()->image('foto_kegiatan_1.jpg', 600, 600)->size(500);
+
+        // Kirim total_realisasi serta budget_items dan pastikan foto tidak dobel
+        $response = $this->actingAs($initiator, 'sanctum')->postJson("/api/campaigns/{$campaign->id}/lpj", [
+            'title' => 'LPJ Pengadaan Logistik',
+            'description' => 'Distribusi bantuan paket makanan dan obat.',
+            'total_realisasi' => 4500000,
+            'budget_items' => [
+                ['name' => 'Paket Sembako', 'amount' => 3000000],
+                ['name' => 'Armada Distribusi', 'amount' => 1500000],
+            ],
+            'proof_image' => $file1,
+            'activity_photos' => [$file1],
+        ]);
+
+        $response->assertStatus(201);
+        $lpjData = $response->json('data.lpj_report');
+        $this->assertEquals(4500000, (float) $lpjData['amount_spent']);
+        $this->assertEquals(4500000, (float) $lpjData['total_realisasi']);
+        // Pastikan hanya 1 foto tersimpan (tidak terduplikasi karena proof_image dan activity_photos)
+        $this->assertCount(1, $lpjData['activity_photos']);
+    }
 }

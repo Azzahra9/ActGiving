@@ -37,6 +37,27 @@ class LpjReport extends Model
         'verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'total_realisasi',
+        'realized_amount',
+    ];
+
+    /**
+     * Accessor untuk total_realisasi agar konsisten dengan payload frontend
+     */
+    public function getTotalRealisasiAttribute(): float
+    {
+        return (float) ($this->amount_spent ?? 0);
+    }
+
+    /**
+     * Accessor untuk realized_amount
+     */
+    public function getRealizedAmountAttribute(): float
+    {
+        return (float) ($this->amount_spent ?? 0);
+    }
+
     /**
      * Kampanye yang dilaporkan.
      */
