@@ -93,59 +93,59 @@ export const Footer: React.FC<FooterProps> = ({
       {/* ========================================================= */}
       {/* 1. TOP PANEL: STATISTIK PENYALURAN & KETERLIBATAN PUBLIK */}
       {/* ========================================================= */}
-      <div className="bg-gradient-to-b from-navy-sidebar via-navy-darkest to-navy-darkest py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-navy-border/70">
+      <div className="bg-white py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200">
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-brand-blue text-[11px] font-bold uppercase tracking-wider mb-2.5">
             <Sparkles className="w-3.5 h-3.5 text-blue-400" />
             <span>Akuntabilitas Terpadu</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sans">
             Statistik Penyaluran & Keterlibatan Publik
           </h2>
 
-          <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto">
             Setiap donasi dan partisipasi relawan tercatat secara otomatis dan diaudit terbuka.
           </p>
 
           {/* 4 Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-10">
             {/* Card 1: Total Donasi Terkumpul */}
-            <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight group-hover:text-blue-400 transition-colors">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 {formatRupiah(totalDonationRp || 1485250000)}
               </div>
-              <p className="text-xs text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-slate-600 mt-2 font-medium">
                 Total Donasi Terkumpul
               </p>
             </div>
 
             {/* Card 2: Penerima Manfaat */}
-            <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight group-hover:text-blue-400 transition-colors">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 2.840 Jiwa
               </div>
-              <p className="text-xs text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-slate-600 mt-2 font-medium">
                 Penerima Manfaat Lapangan
               </p>
             </div>
 
             {/* Card 3: Relawan */}
-            <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-white font-sans tracking-tight group-hover:text-blue-400 transition-colors">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 {totalVolunteers > 0 ? `${totalVolunteers} Relawan` : '3.842 Relawan'}
               </div>
-              <p className="text-xs text-slate-400 mt-2 font-medium">
+              <p className="text-xs text-slate-600 mt-2 font-medium">
                 Aksi Aktif Sepanjang 2026
               </p>
             </div>
 
             {/* Card 4: LPJ Terbit & Terverifikasi */}
-            <div className="bg-navy-card/90 rounded-2xl p-6 sm:p-7 border border-navy-border/80 text-center shadow-sm hover:border-emerald-500/50 transition-all group">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-emerald-500/50 transition-all group">
               <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-400 font-sans tracking-tight group-hover:scale-105 transition-transform">
                 100%
               </div>
-              <p className="text-xs text-slate-400 mt-2 font-medium flex items-center justify-center gap-1">
+              <p className="text-xs text-slate-600 mt-2 font-medium flex items-center justify-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 inline" />
                 <span>LPJ Terbit & Terverifikasi</span>
               </p>
@@ -157,19 +157,19 @@ export const Footer: React.FC<FooterProps> = ({
       {/* ========================================================= */}
       {/* 2. NEWSLETTER SUBSCRIPTION BANNER (FITUR UTILITAS)        */}
       {/* ========================================================= */}
-      <div className="bg-navy-sidebar/60 border-b border-navy-border/80">
+      <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="bg-gradient-to-r from-navy-card via-slate-900 to-navy-card border border-navy-border p-6 sm:p-8 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-6 shadow-md">
+          <div className="bg-white border border-slate-200 p-6 sm:p-8 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-6 shadow-sm">
 
             <div className="max-w-xl text-center lg:text-left">
               <div className="flex items-center justify-center lg:justify-start gap-2 text-brand-blue text-xs font-semibold uppercase tracking-wider mb-1.5">
                 <Sparkles className="w-4 h-4 text-blue-400" />
                 <span>Transparansi Tanpa Jeda</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
                 Langganan Buletin & Laporan LPJ Mingguan
               </h3>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
                 Dapatkan rekap bukti penyaluran donasi, foto kegiatan relawan di lapangan, dan audit terbuka langsung di email Anda.
               </p>
             </div>
@@ -183,7 +183,7 @@ export const Footer: React.FC<FooterProps> = ({
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     placeholder="Masukkan alamat email Anda..."
-                    className="w-full pl-10 pr-4 py-2.5 bg-navy-darkest/90 border border-navy-border rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-blue transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-brand-blue transition-colors"
                   />
                 </div>
                 <button
