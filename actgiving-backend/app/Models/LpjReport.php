@@ -13,6 +13,8 @@ class LpjReport extends Model
     protected $fillable = [
         'campaign_id',
         'status',
+        'is_final',
+        'report_type',
         'title',
         'description',
         'amount_spent',
@@ -26,6 +28,7 @@ class LpjReport extends Model
     ];
 
     protected $casts = [
+        'is_final' => 'boolean',
         'activity_photos' => 'array',
         'budget_items' => 'array',
         'amount_spent' => 'decimal:2',

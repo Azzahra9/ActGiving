@@ -10,7 +10,8 @@ import {
   Coins, 
   ReceiptText,
   FileCheck2,
-  ZoomIn
+  ZoomIn,
+  Layers
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
@@ -66,6 +67,24 @@ export const LpjModal: React.FC<LpjModalProps> = ({
         {/* Modal Content */}
         <div className="p-6 max-h-[78vh] overflow-y-auto space-y-6">
           
+          {/* Banner Status Kampanye Selesai Jika Ada LPJ Akhir yang Sah */}
+          {(campaign.status === 'closed' || campaign.status === 'completed' || verifiedLpjReports.some(r => r.isFinal || r.reportType === 'final')) && (
+            <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 text-xs text-emerald-950 flex items-start gap-3 shadow-2xs">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-emerald-900 text-sm">Kampanye Resmi Ditutup & Selesai 100%</span>
+                  <span className="bg-emerald-200 text-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    LPJ Akhir Disahkan
+                  </span>
+                </div>
+                <p className="text-emerald-800 mt-1 leading-relaxed">
+                  Seluruh dana dan aktivitas pada program <strong>"{campaign.title}"</strong> telah selesai disalurkan dan dipertanggungjawabkan secara transparan melalui pengesahan Laporan Akhir (Final).
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Transparency Guarantee Info Box */}
           <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 text-xs text-blue-900 flex items-start gap-3">
             <FileCheck2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
@@ -112,10 +131,24 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                     {/* Header Report */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200">
                             {report.digitalRegNumber || 'LPJ-DIGITAL'}
                           </span>
+
+                          {/* Badge Pembeda Jenis LPJ */}
+                          {report.isFinal || report.reportType === 'final' ? (
+                            <span className="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-300 flex items-center gap-1 shadow-2xs">
+                              <CheckCircle2 className="w-3 h-3 text-purple-600" />
+                              LPJ Akhir (Final)
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold text-sky-800 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-300 flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-sky-600" />
+                              LPJ Progress (Tahap {verifiedLpjReports.length - verifiedLpjReports.indexOf(report)})
+                            </span>
+                          )}
+
                           <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-semibold flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" />
                             Form Sah & Terverifikasi

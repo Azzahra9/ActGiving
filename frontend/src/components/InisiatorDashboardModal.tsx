@@ -25,6 +25,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
   const [lpjTitle, setLpjTitle] = useState('');
   const [lpjAmount, setLpjAmount] = useState('');
   const [lpjDesc, setLpjDesc] = useState('');
+  const [isFinalReport, setIsFinalReport] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -98,6 +99,8 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
     formData.append('description', descText);
     formData.append('title', titleText);
     formData.append('amount_spent', finalAmount.toString());
+    formData.append('is_final', isFinalReport ? '1' : '0');
+    formData.append('report_type', isFinalReport ? 'final' : 'progress');
     if (proofFile) {
       formData.append('proof_image', proofFile);
       formData.append('activity_photos[]', proofFile);
@@ -129,11 +132,14 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       receiptUrl: finalPhoto,
       photoUrl: finalPhoto,
       activityPhotos: [finalPhoto],
-      status: 'pending'
+      status: 'pending',
+      isFinal: isFinalReport,
+      reportType: isFinalReport ? 'final' : 'progress'
     };
 
     onAddLpj(activeUploadCampaignId, newLpj);
     setIsSuccess(true);
+    setIsFinalReport(false);
     setTimeout(() => {
       setIsSuccess(false);
       setActiveUploadCampaignId(null);
@@ -231,6 +237,52 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
 
               {!isSuccess ? (
                 <form onSubmit={handleUploadSubmit} className="space-y-3">
+                  {/* Opsi Jenis Laporan LPJ */}
+                  <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+                    <label className="block font-bold text-slate-800 text-xs">Jenis Laporan Pertanggungjawaban:</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <label
+                        className={`flex items-start gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                          !isFinalReport
+                            ? 'bg-blue-50/80 border-blue-500 ring-2 ring-blue-500/20'
+                            : 'bg-white border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="modal_lpj_type"
+                          checked={!isFinalReport}
+                          onChange={() => setIsFinalReport(false)}
+                          className="mt-0.5 text-blue-600"
+                        />
+                        <div>
+                          <span className="font-bold text-slate-900 block text-xs">Laporan Berkala / Tahapan</span>
+                          <span className="text-[11px] text-slate-500 block leading-tight">Kampanye masih berjalan</span>
+                        </div>
+                      </label>
+
+                      <label
+                        className={`flex items-start gap-2 p-2.5 rounded-xl border cursor-pointer transition-all ${
+                          isFinalReport
+                            ? 'bg-purple-50/80 border-purple-500 ring-2 ring-purple-500/20'
+                            : 'bg-white border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="modal_lpj_type"
+                          checked={isFinalReport}
+                          onChange={() => setIsFinalReport(true)}
+                          className="mt-0.5 text-purple-600"
+                        />
+                        <div>
+                          <span className="font-bold text-purple-950 block text-xs">Laporan Akhir</span>
+                          <span className="text-[11px] text-slate-500 block leading-tight">Menyatakan seluruh dana/kegiatan 100% selesai dan kampanye ditutup</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block font-semibold text-slate-700 mb-1">Judul Penyaluran / Belanja</label>
                     <input

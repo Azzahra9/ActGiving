@@ -273,4 +273,134 @@ class LPJUploadTest extends TestCase
         $this->assertEquals($lpjVerified->id, $reports[0]['id']);
         $this->assertEquals('verified', $reports[0]['status']);
     }
+
+    public function test_initiator_can_upload_final_lpj_and_admin_verification_closes_campaign(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::create([
+            'name' => 'Admin Auditor',
+            'email' => 'admin_final@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
+            'is_verified' => true,
+        ]);
+
+        $initiator = User::create([
+            'name' => 'Inisiator Final',
+            'email' => 'inisiator_final@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+
+        $category = Category::create(['category_name' => 'Lingkungan']);
+
+        $campaign = Campaign::create([
+            'user_id' => $initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Kampanye Reboisasi Mangrove',
+            'description' => 'Penanaman 1000 bibit mangrove',
+            'target_amount' => 5000000,
+            'current_amount' => 5000000,
+            'location' => 'Semarang',
+            'status' => 'active',
+            'campaign_mode' => 'fund_only',
+        ]);
+
+        $file = UploadedFile::fake()->image('bukti_akhir.jpg', 600, 600)->size(500);
+
+        // 1. Inisiator upload LPJ Akhir (is_final = true)
+        $uploadRes = $this->actingAs($initiator, 'sanctum')->postJson("/api/campaigns/{$campaign->id}/lpj", [
+            'title' => 'LPJ Akhir Reboisasi Mangrove Selesai 100%',
+            'description' => 'Seluruh dana telah dibelanjakan untuk bibit dan penanaman telah tuntas.',
+            'amount_spent' => 5000000,
+            'is_final' => true,
+            'report_type' => 'final',
+            'proof_image' => $file,
+        ]);
+
+        $uploadRes->assertStatus(201);
+        $lpjId = $uploadRes->json('data.lpj_report.id');
+        $this->assertTrue($uploadRes->json('data.lpj_report.is_final'));
+        $this->assertEquals('final', $uploadRes->json('data.lpj_report.report_type'));
+        $this->assertEquals('pending', $uploadRes->json('data.lpj_report.status'));
+
+        // Kampanye masih aktif sebelum admin verifikasi sah
+        $this->assertEquals('active', $campaign->fresh()->status);
+
+        // 2. Admin memverifikasi sah LPJ Akhir
+        $verifyRes = $this->actingAs($admin, 'sanctum')->patchJson("/api/admin/lpj/{$lpjId}/verify");
+        $verifyRes->assertStatus(200);
+        $this->assertEquals('verified', $verifyRes->json('data.status'));
+
+        // Status kampanye otomatis berubah menjadi closed
+        $this->assertEquals('closed', $campaign->fresh()->status);
+
+        // 3. Batalkan verifikasi -> kampanye kembali menjadi active
+        $unverifyRes = $this->actingAs($admin, 'sanctum')->patchJson("/api/admin/lpj/{$lpjId}/unverify");
+        $unverifyRes->assertStatus(200);
+        $this->assertEquals('active', $campaign->fresh()->status);
+    }
+
+    public function test_progress_lpj_verification_does_not_close_campaign(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::create([
+            'name' => 'Admin Auditor 2',
+            'email' => 'admin_prog@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
+            'is_verified' => true,
+        ]);
+
+        $initiator = User::create([
+            'name' => 'Inisiator Progress',
+            'email' => 'inisiator_prog@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+
+        $category = Category::create(['category_name' => 'Sosial Anak']);
+
+        $campaign = Campaign::create([
+            'user_id' => $initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Kampanye Bantuan Yatim',
+            'description' => 'Program berkelanjutan',
+            'target_amount' => 10000000,
+            'current_amount' => 5000000,
+            'location' => 'Makassar',
+            'status' => 'active',
+            'campaign_mode' => 'fund_only',
+        ]);
+
+        $file = UploadedFile::fake()->image('bukti_tahap1.jpg', 600, 600)->size(500);
+
+        // Upload LPJ Progress / Berkala (is_final = false)
+        $uploadRes = $this->actingAs($initiator, 'sanctum')->postJson("/api/campaigns/{$campaign->id}/lpj", [
+            'title' => 'LPJ Tahap 1 Penyerahan Seragam',
+            'description' => 'Penyaluran seragam sekolah tahap awal.',
+            'amount_spent' => 2500000,
+            'is_final' => false,
+            'report_type' => 'progress',
+            'proof_image' => $file,
+        ]);
+
+        $uploadRes->assertStatus(201);
+        $lpjId = $uploadRes->json('data.lpj_report.id');
+        $this->assertFalse($uploadRes->json('data.lpj_report.is_final'));
+        $this->assertEquals('progress', $uploadRes->json('data.lpj_report.report_type'));
+
+        // Admin verifikasi sah via status endpoint
+        $verifyRes = $this->actingAs($admin, 'sanctum')->patchJson("/api/admin/lpj/{$lpjId}/status", [
+            'status' => 'verified',
+        ]);
+        $verifyRes->assertStatus(200);
+
+        // Kampanye TETAP 'active' karena bukan LPJ Akhir
+        $this->assertEquals('active', $campaign->fresh()->status);
+    }
 }

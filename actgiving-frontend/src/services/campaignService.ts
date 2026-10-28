@@ -69,6 +69,8 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
     digitalRegNumber: lpj.digital_reg_number || undefined,
     receiptUrl: lpj.receipt_image_url || lpj.proof_image_url || undefined,
     status: (lpj.status as 'pending' | 'verified' | 'sah' | 'rejected') || 'pending',
+    isFinal: Boolean(lpj.is_final || lpj.report_type === 'final'),
+    reportType: (lpj.report_type as 'progress' | 'final') || (lpj.is_final ? 'final' : 'progress'),
   };
 };
 
@@ -95,7 +97,13 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
     distanceKm: item.distance_km || 3.5,
     imageUrl: item.image_url || getCategoryDefaultImage(categoryName),
     description: item.description || '',
-    status: item.status === 'active' ? 'active' : item.status === 'rejected' ? 'rejected' : 'pending_approval',
+    status: item.status === 'active' 
+      ? 'active' 
+      : item.status === 'rejected' 
+      ? 'rejected' 
+      : (item.status === 'closed' || item.status === 'completed')
+      ? 'closed'
+      : 'pending_approval',
     targetFunds: targetFunds,
     collectedFunds: collectedFunds,
     deadlineDays: item.deadline_days || 14,

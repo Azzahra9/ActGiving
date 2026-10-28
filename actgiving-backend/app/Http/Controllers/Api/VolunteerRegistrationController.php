@@ -138,6 +138,7 @@ class VolunteerRegistrationController extends Controller
                 'success' => true,
                 'message' => 'Akun relawan resmi berhasil dibuat dan lamaran misi telah dikirim!',
                 'data' => [
+                    'id' => $registration->id,
                     'registration' => $registration,
                     'user' => [
                         'id' => $currentUser->id,
@@ -373,6 +374,7 @@ class VolunteerRegistrationController extends Controller
                 'success' => true,
                 'message' => "Pendaftaran relawan berhasil diubah menjadi {$newStatus}.",
                 'data' => [
+                    'id' => $registration->id,
                     'registration' => $registration,
                     'current_volunteers' => $campaign->current_volunteers,
                     'target_volunteers' => $campaign->target_volunteers,

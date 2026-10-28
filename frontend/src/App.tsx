@@ -429,6 +429,7 @@ export default function App() {
               onApproveCampaign={handleApproveCampaign}
               onRejectCampaign={handleRejectCampaign}
               onOpenLpjModal={(camp) => setLpjCampaign(camp)}
+              onRefreshCampaigns={fetchCampaigns}
               activeTab={adminTab}
               onTabChange={setAdminTab}
             />

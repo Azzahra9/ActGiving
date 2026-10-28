@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, CheckCircle2, XCircle, AlertTriangle, FileText, 
   Eye, Check, ExternalLink, Building2, MapPin, ArrowLeft, 
-  Search, Users, DollarSign, Activity, Lock, Database, RefreshCw, Sparkles
+  Search, Users, DollarSign, Activity, Lock, Database, RefreshCw, Sparkles, Layers
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem } from '../../types';
 import api from '../../lib/axios';
@@ -41,9 +41,12 @@ interface AdminLpjRecord {
   activity_photos?: string[];
   report_date?: string;
   created_at?: string;
+  is_final?: boolean;
+  report_type?: 'progress' | 'final';
   campaign?: {
     id: number | string;
     title: string;
+    status?: string;
     user?: {
       name: string;
       email: string;
@@ -58,6 +61,7 @@ interface AdminDashboardViewProps {
   onApproveCampaign: (campaignId: string) => void;
   onRejectCampaign: (campaignId: string) => void;
   onOpenLpjModal: (campaign: Campaign) => void;
+  onRefreshCampaigns?: () => void;
   activeTab?: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem';
   onTabChange?: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem') => void;
 }
@@ -69,6 +73,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   onApproveCampaign,
   onRejectCampaign,
   onOpenLpjModal,
+  onRefreshCampaigns,
   activeTab: propActiveTab,
   onTabChange
 }) => {
@@ -159,6 +164,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         campaignTitle: r.campaign?.title || 'Program Kampanye',
         receiptUrl: r.proof_image_url || r.receipt_image_url || (Array.isArray(r.activity_photos) ? r.activity_photos[0] : undefined),
         status: r.status || 'pending_audit',
+        isFinal: Boolean(r.is_final || r.report_type === 'final'),
+        reportType: (r.report_type as 'progress' | 'final') || (r.is_final ? 'final' : 'progress'),
+        campaignStatus: r.campaign?.status,
+        campaignId: r.campaign_id,
       }))
     : (campaigns || []).flatMap((c) =>
         (Array.isArray(c?.lpjReports) ? c.lpjReports : []).map((lpj) => ({
@@ -170,6 +179,10 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           campaignTitle: c?.title || 'Program Kampanye',
           receiptUrl: lpj.receiptUrl || lpj.photoUrl,
           status: lpj.status || 'pending',
+          isFinal: Boolean(lpj.isFinal || lpj.reportType === 'final'),
+          reportType: lpj.reportType || (lpj.isFinal ? 'final' : 'progress'),
+          campaignStatus: c?.status,
+          campaignId: c?.id,
         }))
       );
 
@@ -211,20 +224,22 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
     try {
       if (isCurrentlySah) {
-        await api.patch(`/admin/lpj/${lpjId}/unverify`).catch(() =>
+        const res = await api.patch(`/admin/lpj/${lpjId}/unverify`).catch(() =>
           api.patch(`/admin/lpj/${lpjId}/status`, { status: 'pending_audit' })
         );
         setVerifiedLpjIds((prev) => prev.filter((id) => id !== lpjId));
-        showToast('Status verifikasi LPJ dibatalkan untuk peninjauan ulang.');
+        showToast(res?.data?.message || 'Status verifikasi LPJ dibatalkan untuk peninjauan ulang.');
       } else {
-        await api.patch(`/admin/lpj/${lpjId}/verify`).catch(() =>
+        const res = await api.patch(`/admin/lpj/${lpjId}/verify`).catch(() =>
           api.patch(`/admin/lpj/${lpjId}/status`, { status: 'sah' })
         );
         setVerifiedLpjIds((prev) => [...prev, lpjId]);
-        showToast('LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
+        showToast(res?.data?.message || 'LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
       }
-      fetchAdminLpj();
-    } catch (err) {
+      await fetchAdminLpj();
+      await fetchAdminCampaigns();
+      onRefreshCampaigns?.();
+    } catch (err: any) {
       console.warn('Gagal memperbarui status LPJ di server:', err);
       if (isCurrentlySah) {
         setVerifiedLpjIds((prev) => prev.filter((id) => id !== lpjId));
@@ -233,6 +248,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
         setVerifiedLpjIds((prev) => [...prev, lpjId]);
         showToast('LPJ dan nota kuitansi dinyatakan SAH dan Terverifikasi.');
       }
+      fetchAdminLpj();
+      fetchAdminCampaigns();
+      onRefreshCampaigns?.();
     }
   };
 
@@ -506,9 +524,16 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                           {camp.filledVolunteers || 0} / {camp.targetVolunteers || 0}
                         </td>
                         <td className="p-3">
-                          <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                            Aktif & Sah
-                          </span>
+                          {camp.status === 'closed' || camp.status === 'completed' ? (
+                            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 shadow-2xs">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              Selesai (Ditutup)
+                            </span>
+                          ) : (
+                            <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                              Aktif & Sah
+                            </span>
+                          )}
                         </td>
                         <td className="p-3 text-right">
                           <button
@@ -568,11 +593,25 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                       className="border border-slate-200 rounded-2xl p-5 bg-slate-50/50 hover:bg-slate-50 transition-colors flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4"
                     >
                       <div className="space-y-1.5 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-slate-900">{lpj.title}</span>
+
+                          {/* Badge Indikator Jenis LPJ: Akhir vs Progress */}
+                          {lpj.isFinal ? (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-purple-100 text-purple-900 px-2.5 py-0.5 rounded-full border border-purple-300 shadow-2xs">
+                              <CheckCircle2 className="w-3 h-3 text-purple-600" />
+                              LPJ Akhir (Final)
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full border border-sky-300">
+                              <Layers className="w-3 h-3 text-sky-600" />
+                              LPJ Progress (Tahapan)
+                            </span>
+                          )}
+
                           {isVerified ? (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-300">
-                              <CheckCircle2 className="w-3 h-3" />
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                               Lolos Audit Auditor (Sah)
                             </span>
                           ) : (
@@ -581,7 +620,24 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                               Memerlukan Verifikasi Nota
                             </span>
                           )}
+
+                          {lpj.campaignStatus === 'closed' && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full border border-slate-300">
+                              <Lock className="w-3 h-3 text-slate-600" />
+                              Kampanye Ditutup
+                            </span>
+                          )}
                         </div>
+
+                        {/* Notice Otomatisasi Penutupan Kampanye */}
+                        {lpj.isFinal && !isVerified && (
+                          <div className="bg-purple-50 border border-purple-200 text-purple-900 rounded-xl px-3 py-1.5 text-[11px] flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                            <span>
+                              <strong>LPJ Akhir:</strong> Menyetujui laporan ini akan <strong>secara otomatis menutup status kampanye</strong> menjadi Selesai (Closed).
+                            </span>
+                          </div>
+                        )}
                         <p className="text-xs text-slate-600 leading-relaxed">{lpj.description}</p>
                         <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 pt-1">
                           <span>Nominal Realisasi: <strong className="text-blue-700 font-bold">{formatRupiah(lpj.realizedAmount)}</strong></span>

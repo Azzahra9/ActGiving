@@ -28,6 +28,8 @@ export interface LpjItem {
   digitalRegNumber?: string;
   receiptUrl?: string;
   status?: 'pending' | 'pending_audit' | 'needs_review' | 'verified' | 'sah' | 'rejected';
+  isFinal?: boolean;
+  reportType?: 'progress' | 'final';
 }
 
 export type UserRole = 'guest' | 'relawan' | 'inisiator' | 'admin';

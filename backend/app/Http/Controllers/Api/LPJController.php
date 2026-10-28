@@ -81,6 +81,8 @@ class LPJController extends Controller
             'beneficiaries_count' => 'nullable|integer|min:0',
             'volunteers_involved' => 'nullable|integer|min:0',
             'budget_items' => 'nullable',
+            'is_final' => 'nullable',
+            'report_type' => 'nullable|in:progress,final',
             'proof_image' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
             'activity_photos' => 'nullable|array',
             'activity_photos.*' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -130,10 +132,21 @@ class LPJController extends Controller
             $budgetItems = json_decode($budgetItems, true);
         }
 
-        // 5. Simpan record LPJ ke database dengan status 'pending_audit'
+        $isFinal = false;
+        if ($request->has('is_final')) {
+            $isFinal = filter_var($request->input('is_final'), FILTER_VALIDATE_BOOLEAN);
+        } elseif ($request->input('report_type') === 'final') {
+            $isFinal = true;
+        }
+
+        $reportType = $isFinal ? 'final' : ($request->input('report_type') === 'final' ? 'final' : 'progress');
+
+        // 5. Simpan record LPJ ke database dengan status 'pending'
         $lpjReport = LpjReport::create([
             'campaign_id' => $campaign->id,
-            'status' => 'pending_audit',
+            'status' => 'pending',
+            'is_final' => $isFinal,
+            'report_type' => $reportType,
             'title' => $request->input('title', 'Penyaluran Bantuan Lapangan'),
             'description' => $request->description,
             'amount_spent' => $request->input('amount_spent', 0),
@@ -187,10 +200,23 @@ class LPJController extends Controller
             'beneficiaries_count' => 'nullable|integer|min:0',
             'volunteers_involved' => 'nullable|integer|min:0',
             'budget_items' => 'nullable',
+            'is_final' => 'nullable',
+            'report_type' => 'nullable|in:progress,final',
             'proof_image' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
             'activity_photos' => 'nullable|array',
             'activity_photos.*' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        if ($request->has('is_final') || $request->has('report_type')) {
+            $isFinal = false;
+            if ($request->has('is_final')) {
+                $isFinal = filter_var($request->input('is_final'), FILTER_VALIDATE_BOOLEAN);
+            } elseif ($request->input('report_type') === 'final') {
+                $isFinal = true;
+            }
+            $validated['is_final'] = $isFinal;
+            $validated['report_type'] = $isFinal ? 'final' : 'progress';
+        }
 
         if ($request->hasFile('proof_image')) {
             $uploadResult = $this->fileUploadService->upload(
@@ -307,14 +333,27 @@ class LPJController extends Controller
         $lpj->verified_at = ($status === 'verified') ? now() : null;
         $lpj->save();
 
+        // Otomatisasi Penutupan Kampanye: JIKA admin menyetujui (mengesahkan) sebuah LPJ
+        // DAN LPJ tersebut berstatus is_final = true (LPJ Akhir),
+        // MAKA update status campaign yang berelasi menjadi 'closed'.
+        if ($status === 'verified' && ($lpj->is_final || $lpj->report_type === 'final')) {
+            if ($lpj->campaign) {
+                $lpj->campaign->update(['status' => 'closed']);
+            }
+        } elseif ($status !== 'verified' && ($lpj->is_final || $lpj->report_type === 'final')) {
+            if ($lpj->campaign && $lpj->campaign->status === 'closed') {
+                $lpj->campaign->update(['status' => 'active']);
+            }
+        }
+
         $message = $status === 'verified'
-            ? 'Laporan Pertanggungjawaban (LPJ) berhasil diverifikasi SAH dan kini tampil di linimasa publik.'
+            ? 'Laporan Pertanggungjawaban (LPJ) berhasil diverifikasi SAH dan kini tampil di linimasa publik.' . (($lpj->is_final || $lpj->report_type === 'final') ? ' Kampanye terkait otomatis disahkan selesai (ditutup).' : '')
             : 'Status LPJ berhasil diubah menjadi: ' . $status;
 
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $lpj,
+            'data' => $lpj->load('campaign'),
         ]);
     }
 
@@ -330,10 +369,15 @@ class LPJController extends Controller
         $lpj->verified_at = now();
         $lpj->save();
 
+        // Otomatisasi Penutupan Kampanye jika LPJ Akhir disahkan
+        if (($lpj->is_final || $lpj->report_type === 'final') && $lpj->campaign) {
+            $lpj->campaign->update(['status' => 'closed']);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Laporan Pertanggungjawaban (LPJ) berhasil dinyatakan SAH dan Terverifikasi.',
-            'data' => $lpj,
+            'message' => 'Laporan Pertanggungjawaban (LPJ) berhasil dinyatakan SAH dan Terverifikasi.' . (($lpj->is_final || $lpj->report_type === 'final') ? ' Kampanye terkait otomatis disahkan selesai (ditutup).' : ''),
+            'data' => $lpj->load('campaign'),
         ]);
     }
 
@@ -349,10 +393,15 @@ class LPJController extends Controller
         $lpj->verified_at = null;
         $lpj->save();
 
+        // Revert status kampanye jika sebelumnya ditutup oleh LPJ ini
+        if (($lpj->is_final || $lpj->report_type === 'final') && $lpj->campaign && $lpj->campaign->status === 'closed') {
+            $lpj->campaign->update(['status' => 'active']);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Status verifikasi LPJ dibatalkan untuk peninjauan ulang.',
-            'data' => $lpj,
+            'data' => $lpj->load('campaign'),
         ]);
     }
 }

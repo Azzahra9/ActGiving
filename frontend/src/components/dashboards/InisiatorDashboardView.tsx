@@ -52,6 +52,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [fieldLocation, setFieldLocation] = useState('');
   const [beneficiariesCount, setBeneficiariesCount] = useState('');
   const [volunteersInvolved, setVolunteersInvolved] = useState('');
+  const [isFinalReport, setIsFinalReport] = useState<boolean>(false);
   const [budgetItems, setBudgetItems] = useState<LpjBudgetItem[]>([
     { name: 'Pengadaan Paket Sembako & Logistik', amount: 3500000 },
     { name: 'Sewa Armada & Distribusi Lapangan', amount: 1500000 }
@@ -264,6 +265,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     setFieldLocation(lpj.fieldLocation || '');
     setBeneficiariesCount((lpj.beneficiariesCount || '').toString());
     setVolunteersInvolved((lpj.volunteersInvolved || '').toString());
+    setIsFinalReport(Boolean(lpj.isFinal || lpj.reportType === 'final'));
     setBudgetItems(lpj.budgetItems || []);
     setActivityPhotos(lpj.activityPhotos || (lpj.photoUrl ? [lpj.photoUrl] : []));
     setActivityPhotoFiles([]);
@@ -284,6 +286,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     setFieldLocation('');
     setBeneficiariesCount('');
     setVolunteersInvolved('');
+    setIsFinalReport(false);
     setActivityPhotos([]);
     setActivityPhotoFiles([]);
   };
@@ -346,6 +349,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     formData.append('beneficiaries_count', (parseInt(beneficiariesCount) || 0).toString());
     formData.append('volunteers_involved', (parseInt(volunteersInvolved) || 0).toString());
     formData.append('budget_items', JSON.stringify(budgetItems));
+    formData.append('is_final', isFinalReport ? '1' : '0');
+    formData.append('report_type', isFinalReport ? 'final' : 'progress');
 
     // Masukkan berkas gambar asli ke dalam FormData
     if (activityPhotoFiles.length > 0) {
@@ -398,6 +403,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
         volunteersInvolved: parseInt(volunteersInvolved) || 8,
         fieldLocation: fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan',
         status: 'pending',
+        isFinal: isFinalReport,
+        reportType: isFinalReport ? 'final' : 'progress',
       };
 
       setInitiatorCampaigns((prev) =>
@@ -432,6 +439,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
       volunteersInvolved: parseInt(volunteersInvolved) || 8,
       fieldLocation: fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan',
       status: 'pending',
+      isFinal: isFinalReport,
+      reportType: isFinalReport ? 'final' : 'progress',
     };
 
     setInitiatorCampaigns((prev) =>
@@ -454,6 +463,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     setFieldLocation('');
     setBeneficiariesCount('');
     setVolunteersInvolved('');
+    setIsFinalReport(false);
     setActivityPhotos([]);
     setActivityPhotoFiles([]);
   };
@@ -684,9 +694,24 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                               Mode: {camp.mode.toUpperCase()}
                             </span>
-                            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                              Aktif Disetujui
-                            </span>
+                            {camp.status === 'closed' || camp.status === 'completed' ? (
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                Selesai (Ditutup)
+                              </span>
+                            ) : camp.status === 'rejected' ? (
+                              <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                                Ditolak
+                              </span>
+                            ) : camp.status === 'pending' || camp.status === 'pending_approval' ? (
+                              <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                Menunggu Moderasi
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                Aktif Disetujui
+                              </span>
+                            )}
                           </div>
 
                           <h3 className="text-sm font-bold text-slate-900 line-clamp-1 mb-1">
@@ -839,6 +864,88 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Opsi Jenis Laporan Pertanggungjawaban (LPJ) */}
+                <div className="bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-slate-800 block text-xs">
+                      Pilih Jenis Laporan Pertanggungjawaban:
+                    </label>
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      Status Capaian Kampanye
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {/* Option 1: Laporan Berkala / Tahapan */}
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                        !isFinalReport
+                          ? 'bg-blue-50/90 border-blue-500 ring-2 ring-blue-500/20 text-slate-900 shadow-2xs'
+                          : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="initiator_report_type"
+                        checked={!isFinalReport}
+                        onChange={() => setIsFinalReport(false)}
+                        className="mt-0.5 h-4 w-4 text-blue-600 border-slate-300 focus:ring-blue-500"
+                      />
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                          <span className="font-bold text-xs text-slate-900">
+                            Laporan Berkala / Tahapan
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 leading-relaxed block">
+                          Kampanye masih berjalan dan masih dapat menerima donasi atau pendaftaran relawan lanjutan.
+                        </span>
+                      </div>
+                    </label>
+
+                    {/* Option 2: Laporan Akhir (Final) */}
+                    <label
+                      className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                        isFinalReport
+                          ? 'bg-purple-50/90 border-purple-500 ring-2 ring-purple-500/20 text-slate-900 shadow-2xs'
+                          : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="initiator_report_type"
+                        checked={isFinalReport}
+                        onChange={() => setIsFinalReport(true)}
+                        className="mt-0.5 h-4 w-4 text-purple-600 border-slate-300 focus:ring-purple-500"
+                      />
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                          <span className="font-bold text-xs text-purple-950">
+                            Laporan Akhir
+                          </span>
+                          <span className="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-bold">
+                            100% Selesai
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 leading-relaxed block">
+                          Menyatakan seluruh dana/kegiatan telah selesai 100% dan kampanye ditutup.
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+
+                  {isFinalReport && (
+                    <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 flex items-center gap-2 mt-2">
+                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>
+                        <strong>Otomatisasi Penutupan Kampanye:</strong> Jika Admin memverifikasi Sah LPJ Akhir ini, status kampanye yang berelasi akan otomatis berubah menjadi <strong>Selesai / Ditutup</strong>.
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1101,10 +1208,21 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                         >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div>
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-200">
                                 {lpj.digitalRegNumber || 'LPJ-DIGITAL'}
                               </span>
+                              {lpj.isFinal || lpj.reportType === 'final' ? (
+                                <span className="text-[10px] font-bold text-purple-800 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200 flex items-center gap-1 shadow-2xs">
+                                  <CheckCircle2 className="w-3 h-3 text-purple-600" />
+                                  LPJ Akhir (Final)
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold text-sky-800 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200 flex items-center gap-1">
+                                  <Layers className="w-3 h-3 text-sky-600" />
+                                  LPJ Progress (Tahapan)
+                                </span>
+                              )}
                               {isVerified ? (
                                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 shadow-2xs">
                                   <Lock className="w-3 h-3 text-emerald-600" />

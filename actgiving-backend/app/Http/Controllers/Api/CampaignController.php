@@ -33,9 +33,13 @@ class CampaignController extends Controller
             },
         ]);
 
-        // Filter status kampanye: Ketat HANYA status 'active' (disetujui) untuk endpoint publik.
+        // Filter status kampanye: HANYA status 'active' dan 'closed' (disetujui) untuk endpoint publik.
         // Status 'pending' dan 'rejected' dilarang keras tampil pada katalog publik/donatur luar.
-        $query->where('status', 'active');
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        } else {
+            $query->whereIn('status', ['active', 'closed']);
+        }
 
         // Filter berdasarkan kategori
         if ($request->filled('category_id')) {

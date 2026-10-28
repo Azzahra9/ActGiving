@@ -61,11 +61,11 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
     }
   };
 
-  // Lapis Pengaman Ketat: Pastikan HANYA kampanye yang berstatus 'active' (disetujui) yang tampil di katalog publik & tanpa duplikasi
+  // Lapis Pengaman Ketat: Pastikan HANYA kampanye berstatus 'active' atau 'closed' (disetujui) yang tampil di katalog publik & tanpa duplikasi
   const approvedCampaigns = (campaigns || [])
     .filter((c) => {
       if (!c) return false;
-      return c.status === 'active';
+      return c.status === 'active' || c.status === 'closed' || c.status === 'completed';
     })
     .filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
 
