@@ -47,11 +47,18 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
           month: 'long',
           year: 'numeric',
         })
+      : lpj.created_at
+      ? new Date(lpj.created_at).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
       : new Date().toLocaleDateString('id-ID', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
         }),
+    createdAt: lpj.created_at || undefined,
     realizedAmount: Number(lpj.amount_spent || lpj.realized_amount || 0),
     description: lpj.description || '',
     photoUrl:

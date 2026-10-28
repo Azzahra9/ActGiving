@@ -30,6 +30,7 @@ export interface LpjItem {
   status?: 'pending' | 'pending_audit' | 'needs_review' | 'verified' | 'sah' | 'rejected';
   isFinal?: boolean;
   reportType?: 'progress' | 'final';
+  createdAt?: string;
 }
 
 export type UserRole = 'guest' | 'relawan' | 'inisiator' | 'admin';
