@@ -23,7 +23,7 @@ return new class extends Migration
             $table->unsignedInteger('current_volunteers')->default(0);
             $table->string('location');
             $table->date('activity_date')->nullable();
-            $table->enum('status', ['pending', 'active', 'rejected', 'closed'])->default('pending');
+            $table->enum('status', ['pending', 'active', 'rejected', 'closed', 'suspended'])->default('pending');
             $table->enum('campaign_mode', ['fund_only', 'volunteer_only', 'both']);
             $table->timestamps();
 

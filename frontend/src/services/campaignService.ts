@@ -108,6 +108,8 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
       ? 'active' 
       : item.status === 'rejected' 
       ? 'rejected' 
+      : item.status === 'suspended'
+      ? 'suspended'
       : (item.status === 'closed' || item.status === 'completed')
       ? 'closed'
       : 'pending_approval',

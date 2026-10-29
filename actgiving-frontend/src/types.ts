@@ -70,7 +70,7 @@ export interface Campaign {
   distanceKm: number;
   imageUrl: string;
   description: string;
-  status?: 'active' | 'pending_approval' | 'rejected' | 'completed' | 'closed';
+  status?: 'active' | 'pending_approval' | 'rejected' | 'completed' | 'closed' | 'suspended';
   // Mode Dana
   targetFunds?: number;
   collectedFunds?: number;
