@@ -300,7 +300,7 @@ class VolunteerRegistrationController extends Controller
     public function updateStatus(Request $request, $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|in:accepted,rejected',
+            'status' => 'required|in:accepted,rejected,pending',
         ]);
 
         return DB::transaction(function () use ($request, $id) {
@@ -352,8 +352,8 @@ class VolunteerRegistrationController extends Controller
                     $campaign->current_volunteers += 1;
                     $campaign->save();
                 }
-            } elseif ($newStatus === 'rejected') {
-                // Jika sebelumnya pernah di-approve lalu diganti ke reject, pulihkan kuota
+            } elseif ($newStatus === 'rejected' || $newStatus === 'pending') {
+                // Jika sebelumnya pernah di-approve lalu diganti ke reject atau dibatalkan ke pending, pulihkan kuota
                 if ($registration->status === 'accepted') {
                     $campaign->current_volunteers = max(0, $campaign->current_volunteers - 1);
                     $campaign->save();

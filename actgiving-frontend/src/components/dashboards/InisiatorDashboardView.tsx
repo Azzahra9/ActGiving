@@ -3,7 +3,8 @@ import {
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
   ExternalLink, TrendingUp, Calendar, MapPin, Search, Check, Sparkles,
-  Camera, Trash2, Pencil, Plus, ReceiptText, Lock, Layers, FileCheck2, ZoomIn, ArrowRight, RefreshCw
+  Camera, Trash2, Pencil, Plus, ReceiptText, Lock, Layers, FileCheck2, ZoomIn, ArrowRight, RefreshCw,
+  X, XCircle, Clock, UserX, Phone, Mail
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
 import api from '../../lib/axios';
@@ -74,6 +75,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [initiatorCampaigns, setInitiatorCampaigns] = useState<Campaign[]>([]);
   const [volunteersList, setVolunteersList] = useState<any[]>([]);
   const [isLoadingVolunteers, setIsLoadingVolunteers] = useState<boolean>(false);
+  const [selectedVolunteerModal, setSelectedVolunteerModal] = useState<any | null>(null);
+  const [updatingVolId, setUpdatingVolId] = useState<number | null>(null);
 
   // Fetch volunteer applicants directly from initiator endpoint or per-campaign
   const fetchVolunteersList = useCallback(async () => {
@@ -143,17 +146,25 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     }
   }, [activeTab, fetchVolunteersList]);
 
-  // Update status seleksi relawan (Accept / Reject)
-  const handleUpdateVolunteerStatus = async (regId: number, newStatus: 'accepted' | 'rejected') => {
+  // Update status seleksi relawan (Accept / Reject / Pending)
+  const handleUpdateVolunteerStatus = async (regId: number, newStatus: 'accepted' | 'rejected' | 'pending') => {
+    setUpdatingVolId(regId);
     try {
       await api.patch(`/volunteer-registrations/${regId}/status`, { status: newStatus });
-      setToastMessage(`Status relawan berhasil diubah menjadi: ${newStatus === 'accepted' ? 'Siap Bertugas' : 'Ditolak'}.`);
+      const statusLabel = newStatus === 'accepted' ? 'Diterima (Siap Bertugas)' : newStatus === 'rejected' ? 'Ditolak' : 'Menunggu Seleksi';
+      showToast(`Status relawan berhasil diubah menjadi: ${statusLabel}.`);
       setVolunteersList((prev) =>
         prev.map((v) => (v.id === regId ? { ...v, status: newStatus } : v))
       );
+      if (selectedVolunteerModal && selectedVolunteerModal.id === regId) {
+        setSelectedVolunteerModal((prev: any) => prev ? { ...prev, status: newStatus } : null);
+      }
+      fetchVolunteersList();
     } catch (err: any) {
       console.error('Gagal memperbarui status relawan:', err);
-      alert(err.response?.data?.message || 'Gagal memperbarui status relawan.');
+      showToast(err.response?.data?.message || 'Gagal memperbarui status relawan.');
+    } finally {
+      setUpdatingVolId(null);
     }
   };
 
@@ -1419,10 +1430,10 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 font-bold">
-                    <th className="p-3 rounded-l-xl">Nama Relawan</th>
+                    <th className="p-3 rounded-l-xl">Nama & Keahlian Relawan</th>
                     <th className="p-3">Kampanye Tujuan</th>
                     <th className="p-3">Domisili & Kontak</th>
-                    <th className="p-3">Status Verifikasi</th>
+                    <th className="p-3">Status Seleksi</th>
                     <th className="p-3 rounded-r-xl text-right">Tindakan</th>
                   </tr>
                 </thead>
@@ -1431,55 +1442,83 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                     volunteersList.map((vol: any, idx: number) => {
                       const rawPhone = (vol.user?.phone_whatsapp || vol.phone || '').replace(/\D/g, '');
                       const waPhone = rawPhone.startsWith('0') ? '62' + rawPhone.slice(1) : rawPhone;
+                      const volName = vol.user?.name || vol.name || 'Relawan Terdaftar';
+                      const volCity = vol.user?.city_domicile || vol.city || 'Indonesia';
+                      const volPhoneDisplay = vol.user?.phone_whatsapp || vol.phone || vol.user?.email || '-';
+                      const volCampaign = vol.campaignTitle || vol.campaign?.title || 'Kampanye Sosial';
+                      const volSkills = vol.skills_description || vol.skills || 'Relawan Umum';
 
                       return (
                         <tr key={vol.id || idx} className="hover:bg-slate-50 transition-colors">
+                          {/* Nama & Keahlian Relawan (Klik untuk lihat profil lengkap) */}
                           <td className="p-3">
-                            <div className="font-semibold text-slate-900">
-                              {vol.user?.name || vol.name || 'Relawan Terdaftar'}
-                            </div>
-                            <div className="text-[11px] text-slate-500 font-normal truncate max-w-xs mt-0.5">
-                              {vol.skills ? `Keahlian: ${vol.skills}` : 'Relawan Umum'}
-                            </div>
-                          </td>
-                          <td className="p-3 text-slate-600 font-medium">
-                            {vol.campaignTitle || vol.campaign?.title || 'Kampanye Sosial'}
-                          </td>
-                          <td className="p-3 text-slate-600">
-                            <div className="font-medium text-slate-800">
-                              {vol.user?.city_domicile || vol.city || 'Indonesia'}
-                            </div>
-                            <div className="text-[11px] text-slate-400">
-                              {vol.user?.phone_whatsapp || vol.phone || vol.user?.email || '-'}
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
-                                vol.status === 'accepted'
-                                  ? 'bg-emerald-100 text-emerald-800'
-                                  : vol.status === 'rejected'
-                                  ? 'bg-rose-100 text-rose-800'
-                                  : 'bg-blue-100 text-blue-800'
-                              }`}
+                            <button
+                              type="button"
+                              onClick={() => setSelectedVolunteerModal(vol)}
+                              className="font-bold text-slate-900 hover:text-blue-600 transition-colors text-left flex items-center gap-1.5 cursor-pointer group"
+                              title="Klik untuk melihat profil lengkap dan keahlian relawan"
                             >
-                              {vol.status === 'accepted'
-                                ? 'Siap Bertugas'
-                                : vol.status === 'rejected'
-                                ? 'Ditolak'
-                                : 'Menunggu Seleksi'}
+                              <span className="group-hover:underline">{volName}</span>
+                              <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors shrink-0" />
+                            </button>
+                            <div className="text-[11px] text-slate-500 font-normal truncate max-w-xs mt-0.5" title={volSkills}>
+                              {volSkills}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedVolunteerModal(vol)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline mt-0.5 inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>Lihat Detail Profil</span>
+                              <ArrowRight className="w-2.5 h-2.5" />
+                            </button>
+                          </td>
+
+                          {/* Kampanye Tujuan */}
+                          <td className="p-3 text-slate-600 font-medium">
+                            <span className="truncate block max-w-[200px]" title={volCampaign}>
+                              {volCampaign}
                             </span>
                           </td>
+
+                          {/* Domisili & Kontak */}
+                          <td className="p-3 text-slate-600">
+                            <div className="font-medium text-slate-800">{volCity}</div>
+                            <div className="text-[11px] text-slate-400">{volPhoneDisplay}</div>
+                          </td>
+
+                          {/* Status Seleksi */}
+                          <td className="p-3">
+                            {vol.status === 'accepted' ? (
+                              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>Siap Bertugas</span>
+                              </span>
+                            ) : vol.status === 'rejected' ? (
+                              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 bg-rose-100 text-rose-800 border border-rose-200">
+                                <XCircle className="w-3 h-3 text-rose-600" />
+                                <span>Ditolak</span>
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 bg-amber-100 text-amber-800 border border-amber-200">
+                                <Clock className="w-3 h-3 text-amber-600" />
+                                <span>Menunggu Seleksi</span>
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Tindakan Dinamis Berdasarkan Status */}
                           <td className="p-3 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              {/* Chat WA (Selalu tampil jika nomor WA tersedia) */}
                               {waPhone ? (
                                 <a
                                   href={`https://wa.me/${waPhone}?text=${encodeURIComponent(
-                                    `Halo ${vol.user?.name || vol.name}, terima kasih telah mendaftar sebagai relawan pada kampanye ${vol.campaignTitle || 'ActGiving'}. Kami panitia pelaksana ingin melakukan koordinasi jadwal dan briefing teknis lapangan.`
+                                    `Halo ${volName}, terima kasih telah mendaftar sebagai relawan pada kampanye "${volCampaign}". Kami panitia pelaksana ingin melakukan koordinasi jadwal dan briefing teknis lapangan.`
                                   )}`}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-[11px] transition-colors"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-colors shadow-2xs"
                                   title="Hubungi Relawan via WhatsApp"
                                 >
                                   <MessageSquare className="w-3 h-3" />
@@ -1487,25 +1526,57 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                                 </a>
                               ) : null}
 
-                              {vol.status !== 'accepted' && (
+                              {/* Kondisi 1: Status PENDING (Tampilkan Setujui Hijau & Tolak Merah) */}
+                              {(!vol.status || vol.status === 'pending') && (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={updatingVolId === vol.id}
+                                    onClick={() => handleUpdateVolunteerStatus(vol.id, 'accepted')}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                                    title="Setujui Relawan untuk Bertugas"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>Setujui</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={updatingVolId === vol.id}
+                                    onClick={() => handleUpdateVolunteerStatus(vol.id, 'rejected')}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 rounded-xl font-bold text-[11px] border border-rose-300 transition-colors cursor-pointer disabled:opacity-50"
+                                    title="Tolak Lamaran Relawan"
+                                  >
+                                    <XCircle className="w-3 h-3" />
+                                    <span>Tolak</span>
+                                  </button>
+                                </>
+                              )}
+
+                              {/* Kondisi 2: Status ACCEPTED (Tampilkan Keluarkan / Tolak) */}
+                              {vol.status === 'accepted' && (
                                 <button
                                   type="button"
-                                  onClick={() => handleUpdateVolunteerStatus(vol.id, 'accepted')}
-                                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[10px] transition-colors cursor-pointer shadow-xs"
-                                  title="Setujui Relawan untuk Bertugas"
+                                  disabled={updatingVolId === vol.id}
+                                  onClick={() => handleUpdateVolunteerStatus(vol.id, 'rejected')}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 rounded-xl font-semibold text-[11px] border border-slate-200 hover:border-rose-300 transition-colors cursor-pointer disabled:opacity-50"
+                                  title="Batalkan penerimaan relawan dan pulihkan kuota"
                                 >
-                                  Setujui
+                                  <UserX className="w-3 h-3 text-rose-500" />
+                                  <span>Keluarkan / Tolak</span>
                                 </button>
                               )}
 
-                              {vol.status !== 'rejected' && (
+                              {/* Kondisi 3: Status REJECTED (Tampilkan Pulihkan / Setujui) */}
+                              {vol.status === 'rejected' && (
                                 <button
                                   type="button"
-                                  onClick={() => handleUpdateVolunteerStatus(vol.id, 'rejected')}
-                                  className="px-2.5 py-1 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-lg font-bold text-[10px] transition-colors cursor-pointer border border-slate-200"
-                                  title="Tolak Lamaran Relawan"
+                                  disabled={updatingVolId === vol.id}
+                                  onClick={() => handleUpdateVolunteerStatus(vol.id, 'accepted')}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                                  title="Pulihkan lamaran dan setujui relawan"
                                 >
-                                  Tolak
+                                  <CheckCircle2 className="w-3 h-3" />
+                                  <span>Pulihkan / Setujui</span>
                                 </button>
                               )}
                             </div>
@@ -1553,6 +1624,193 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                 <strong>Audit Berkala Admin:</strong> Tim auditor platform berhak meminta klarifikasi rekening koran jika ditemukan anomali pembelanjaan.
               </li>
             </ul>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL POP-UP DETAIL PROFIL RELAWAN LENGKAP                              */}
+        {/* ========================================================================= */}
+        {selectedVolunteerModal && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-blue-50/50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">
+                      Profil Lengkap Personel Relawan
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Calon relawan untuk: <strong className="text-blue-700">{selectedVolunteerModal.campaignTitle || selectedVolunteerModal.campaign?.title || 'Aksi Sosial'}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedVolunteerModal(null)}
+                  aria-label="Tutup Detail Relawan"
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+                {/* Identitas Card */}
+                <div className="flex items-start justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900">
+                      {selectedVolunteerModal.user?.name || selectedVolunteerModal.name || 'Relawan Terdaftar'}
+                    </h4>
+                    <div className="space-y-1 mt-2 text-xs text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>Domisili: <strong className="text-slate-800">{selectedVolunteerModal.user?.city_domicile || selectedVolunteerModal.city || 'Indonesia'}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>No. WhatsApp: <strong className="text-slate-800">{selectedVolunteerModal.user?.phone_whatsapp || selectedVolunteerModal.phone || '-'}</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <span>Email: <strong className="text-slate-800">{selectedVolunteerModal.user?.email || selectedVolunteerModal.email || '-'}</strong></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="shrink-0 text-right">
+                    <span
+                      className={`text-[11px] font-bold px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-2xs ${
+                        selectedVolunteerModal.status === 'accepted'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : selectedVolunteerModal.status === 'rejected'
+                          ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                          : 'bg-amber-100 text-amber-800 border border-amber-300'
+                      }`}
+                    >
+                      {selectedVolunteerModal.status === 'accepted' ? (
+                        <>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Siap Bertugas</span>
+                        </>
+                      ) : selectedVolunteerModal.status === 'rejected' ? (
+                        <>
+                          <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Ditolak</span>
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Menunggu Seleksi</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Keahlian & Kualifikasi Utuh (skills_description) */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span>Keahlian & Pengalaman Lapangan (skills_description):</span>
+                  </label>
+                  <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 text-xs sm:text-sm text-slate-800 leading-relaxed sm:leading-loose whitespace-pre-line shadow-2xs">
+                    {selectedVolunteerModal.skills_description || selectedVolunteerModal.skills || selectedVolunteerModal.description || 'Tidak ada uraian keahlian khusus yang dicantumkan relawan saat mendaftar.'}
+                  </div>
+                </div>
+
+                {/* Informasi Pendaftaran */}
+                <div className="text-[11px] text-slate-500 bg-white p-3 rounded-xl border border-slate-100 flex items-center justify-between">
+                  <span>Terdaftar pada: <strong>{selectedVolunteerModal.created_at ? new Date(selectedVolunteerModal.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</strong></span>
+                  <span className="text-blue-600 font-medium">Verifikasi Relawan Lapangan</span>
+                </div>
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                {/* Chat WA shortcut */}
+                {(() => {
+                  const rawPhone = (selectedVolunteerModal.user?.phone_whatsapp || selectedVolunteerModal.phone || '').replace(/\D/g, '');
+                  const waPhone = rawPhone.startsWith('0') ? '62' + rawPhone.slice(1) : rawPhone;
+                  if (!waPhone) return <div />;
+                  return (
+                    <a
+                      href={`https://wa.me/${waPhone}?text=${encodeURIComponent(
+                        `Halo ${selectedVolunteerModal.user?.name || selectedVolunteerModal.name}, terima kasih telah mendaftar sebagai relawan pada kampanye "${selectedVolunteerModal.campaignTitle || 'ActGiving'}". Kami panitia pelaksana ingin melakukan koordinasi briefing teknis lapangan.`
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition-colors shadow-2xs"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Chat via WhatsApp</span>
+                    </a>
+                  );
+                })()}
+
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  {(!selectedVolunteerModal.status || selectedVolunteerModal.status === 'pending') && (
+                    <>
+                      <button
+                        type="button"
+                        disabled={updatingVolId === selectedVolunteerModal.id}
+                        onClick={() => handleUpdateVolunteerStatus(selectedVolunteerModal.id, 'accepted')}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Setujui</span>
+                      </button>
+                      <button
+                        type="button"
+                        disabled={updatingVolId === selectedVolunteerModal.id}
+                        onClick={() => handleUpdateVolunteerStatus(selectedVolunteerModal.id, 'rejected')}
+                        className="px-4 py-2 bg-white hover:bg-rose-50 text-rose-600 border border-rose-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Tolak</span>
+                      </button>
+                    </>
+                  )}
+
+                  {selectedVolunteerModal.status === 'accepted' && (
+                    <button
+                      type="button"
+                      disabled={updatingVolId === selectedVolunteerModal.id}
+                      onClick={() => handleUpdateVolunteerStatus(selectedVolunteerModal.id, 'rejected')}
+                      className="px-4 py-2 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 border border-slate-200 hover:border-rose-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <UserX className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Keluarkan / Tolak</span>
+                    </button>
+                  )}
+
+                  {selectedVolunteerModal.status === 'rejected' && (
+                    <button
+                      type="button"
+                      disabled={updatingVolId === selectedVolunteerModal.id}
+                      onClick={() => handleUpdateVolunteerStatus(selectedVolunteerModal.id, 'accepted')}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Pulihkan / Setujui</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVolunteerModal(null)}
+                    className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
