@@ -34,7 +34,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"success":true,"data":[{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":1},{"id":2,"category_name":"Pendidikan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":3,"category_name":"Kesehatan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":4,"category_name":"Lingkungan Hidup","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":5,"category_name":"Sosial Kemanusiaan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0}]}'
+        content: '{"success":true,"data":[{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":3},{"id":2,"category_name":"Pendidikan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":3,"category_name":"Kesehatan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":4,"category_name":"Lingkungan Hidup","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0},{"id":5,"category_name":"Sosial Kemanusiaan","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z","campaigns_count":0}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

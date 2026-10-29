@@ -1,23 +1,65 @@
-name: 'Pencairan Dana'
+name: Administrator
 description: |-
 
-  Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+  Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/campaigns/{id}/disbursements'
+      - GET
+    uri: api/admin/campaigns
     metadata:
       custom: []
-      groupName: 'Pencairan Dana'
+      groupName: Administrator
       groupDescription: |-
 
-        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Ajukan Pencairan Dana (Inisiator)'
-      description: 'Inisiator: Mengajukan Pencairan Dana (FR-11).'
+      title: 'Semua Kampanye (Moderasi Admin)'
+      description: 'Admin: Melihat daftar semua kampanye untuk moderasi.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":10,"user_id":2,"category_id":1,"title":"Uji Coba Moderasi Kampanye Baru 1792862057985","description":"Deskripsi lengkap uji coba kampanye baru agar masuk ke antrean moderasi admin.","target_amount":"10000000.00","current_amount":"0.00","target_volunteers":5,"current_volunteers":0,"location":"Bandung, Jawa Barat","activity_date":null,"status":"active","campaign_mode":"both","created_at":"2026-10-24T17:14:18.000000Z","updated_at":"2026-10-25T11:45:13.000000Z","image_url":null,"category":{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z"},"user":{"id":2,"name":"Yayasan Peduli Bersama","email":"inisiator@actgiving.com","is_verified":true},"lpj_reports":[]},{"id":2,"user_id":4,"category_id":1,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","description":"Kebakaran hutan dan lahan (Karhutla) di Kalimantan semakin meluas, menyebabkan kabut asap pekat yang menyelimuti pemukiman. Jarak pandang menurun drastis dan ribuan warga, terutama balita dan lansia, mulai berjatuhan sakit akibat ISPA (Infeksi Saluran Pernapasan Akut). Kami sangat membutuhkan dana darurat untuk pengadaan masker N95, tabung oksigen portabel, obat-obatan pernapasan, dan vitamin. Kami juga memanggil relawan untuk turun langsung membantu evakuasi warga rentan dan mendistribusikan bantuan medis dari rumah ke rumah. Mari bergerak cepat selamatkan napas saudara kita!","target_amount":"10000000.00","current_amount":"10010000.00","target_volunteers":20,"current_volunteers":1,"location":"Lumajang, Jawa Timur","activity_date":"2026-10-29T00:00:00.000000Z","status":"active","campaign_mode":"both","created_at":"2026-10-21T16:43:14.000000Z","updated_at":"2026-10-28T13:50:11.000000Z","image_url":"http:\/\/127.0.0.1:8000\/storage\/campaigns\/ff131484-5b78-4db8-a1f9-beb8cac09a76_1792647116.jpeg","category":{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z"},"user":{"id":4,"name":"fadhilah azzahra","email":"azzahra@actgiving.com","is_verified":false},"lpj_reports":[{"id":3,"campaign_id":2,"description":"Puji syukur, distribusi bantuan tahap pertama berjalan lancar meski jarak pandang sangat terbatas akibat kabut asap pekat. Tim relawan berhasil mendistribusikan 500 masker N95 secara door-to-door kepada warga rentan (lansia dan balita) di Kecamatan Jekan Raya. Kami juga mengaktifkan posko oksigen darurat yang langsung menangani puluhan warga dengan gejala sesak napas akut pada hari pertama. Respons warga sangat haru dan berterima kasih. Bantuan dari para donatur sangat menyelamatkan nyawa mereka hari ini. Selanjutnya, kami akan memperluas area distribusi logistik medis ke kecamatan tetangga.","proof_image_url":"http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg","created_at":"2026-10-28T14:53:38.000000Z","updated_at":"2026-10-28T14:53:38.000000Z","activity_photos":["http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg","http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/71d19770-0b75-4aed-bb64-91bbbef8a305_1793199218.jpeg"],"status":"pending","title":"Laporan Penggunaan Dana","amount_spent":"1000000.00","budget_items":[{"name":"Masker","amount":1000000}],"beneficiaries_count":100,"volunteers_involved":20,"field_location":"Kalimantan","verified_at":null,"is_final":false,"report_type":"progress","total_realisasi":1000000,"realized_amount":1000000}]},{"id":1,"user_id":2,"category_id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","description":"Penyaluran logistik darurat, masker, makanan siap saji, dan posko medis untuk warga terdampak erupsi Semeru.","target_amount":"50000000.00","current_amount":"15575000.00","target_volunteers":10,"current_volunteers":4,"location":"Lumajang, Jawa Timur","activity_date":"2026-10-28T00:00:00.000000Z","status":"active","campaign_mode":"both","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-24T17:15:28.000000Z","image_url":null,"category":{"id":1,"category_name":"Bencana Alam","created_at":"2026-10-14T02:54:38.000000Z","updated_at":"2026-10-14T02:54:38.000000Z"},"user":{"id":2,"name":"Yayasan Peduli Bersama","email":"inisiator@actgiving.com","is_verified":true},"lpj_reports":[{"id":2,"campaign_id":1,"description":"Distribusi sembako dan obat-obatan tahap dua kepada 150 KK warga terdampak bencana.","proof_image_url":"http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png","created_at":"2026-10-24T17:17:46.000000Z","updated_at":"2026-10-28T13:51:07.000000Z","activity_photos":["http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png"],"status":"pending_audit","title":"LPJ Pengadaan Logistik Tahap 2","amount_spent":"12500000.00","budget_items":null,"beneficiaries_count":0,"volunteers_involved":0,"field_location":"Posko Tanggap Darurat Bencana","verified_at":null,"is_final":false,"report_type":"progress","total_realisasi":12500000,"realized_amount":12500000}]}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/campaigns/{id}/status'
+    metadata:
+      custom: []
+      groupName: Administrator
+      groupDescription: |-
+
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Ubah Status Kampanye (Admin)'
+      description: 'Admin: Moderasi status kampanye (active / rejected / closed).'
       authenticated: false
       deprecated: false
     headers:
@@ -40,43 +82,22 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      amount:
+      status:
         custom: []
-        name: amount
-        description: 'Must be at least 10000.'
+        name: status
+        description: ''
         required: true
-        example: 6420
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      bank_name:
-        custom: []
-        name: bank_name
-        description: 'Must not be greater than 100 characters.'
-        required: true
-        example: 'n'
+        example: rejected
         type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      bank_account:
-        custom: []
-        name: bank_account
-        description: 'Must not be greater than 50 characters.'
-        required: true
-        example: g
-        type: string
-        enumValues: []
+        enumValues:
+          - active
+          - rejected
+          - closed
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      amount: 6420
-      bank_name: 'n'
-      bank_account: g
+      status: rejected
     fileParameters: []
     responses: []
     responseFields: []
@@ -88,36 +109,24 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/campaigns/{id}/disbursements'
+    uri: api/admin/users
     metadata:
       custom: []
-      groupName: 'Pencairan Dana'
+      groupName: Administrator
       groupDescription: |-
 
-        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Riwayat Pencairan Kampanye (Inisiator)'
-      description: 'Inisiator: Melihat Riwayat Pencairan Dana Kampanye Miliknya.'
+      title: 'Daftar Pengguna (Admin)'
+      description: 'Admin: Melihat daftar pengguna sistem.'
       authenticated: false
       deprecated: false
     headers:
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the campaign.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -142,19 +151,17 @@ endpoints:
     custom: []
     httpMethods:
       - PATCH
-    uri: 'api/admin/disbursements/{id}/status'
+    uri: 'api/admin/users/{id}/verify'
     metadata:
       custom: []
-      groupName: 'Pencairan Dana'
+      groupName: Administrator
       groupDescription: |-
 
-        Pengajuan dan persetujuan pencairan dana kampanye (FR-11).
+        Endpoint moderasi kampanye dan verifikasi pengguna khusus Admin.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Setujui / Tolak Pencairan Dana (Admin, ACID)'
-      description: |-
-        Admin: Menyetujui atau Menolak Pencairan Dana (FR-11).
-        WAJIB ACID Transaction & lockForUpdate() untuk mencegah double-withdraw.
+      title: 'Verifikasi Pengguna / Inisiator (Admin)'
+      description: 'Admin: Verifikasi dokumen identitas pengguna/inisiator.'
       authenticated: false
       deprecated: false
     headers:
@@ -164,46 +171,32 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the disbursement.'
+        description: 'The ID of the user.'
         required: true
-        example: architecto
-        type: string
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: architecto
+      id: 1
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      status:
+      is_verified:
         custom: []
-        name: status
+        name: is_verified
         description: ''
         required: true
-        example: approved
-        type: string
-        enumValues:
-          - approved
-          - rejected
+        example: false
+        type: boolean
+        enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      admin_notes:
-        custom: []
-        name: admin_notes
-        description: ''
-        required: false
-        example: architecto
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
     cleanBodyParameters:
-      status: approved
-      admin_notes: architecto
+      is_verified: false
     fileParameters: []
     responses: []
     responseFields: []

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
@@ -121,23 +121,24 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   }, [initiatorCampaigns, campaigns]);
 
   // Fetch real initiator campaigns from Laravel REST API
-  useEffect(() => {
-    const fetchInitiatorData = async () => {
-      try {
-        const response = await api.get('/my-campaigns').catch(() => null);
-        const items = response?.data?.data?.data || response?.data?.data || [];
-        if (Array.isArray(items) && items.length > 0) {
-          const mapped = items.map(mapBackendCampaignToFrontend);
-          setInitiatorCampaigns(mapped);
-        }
-      } catch (err) {
-        console.warn('Gagal memuat kampanye inisiator dari API:', err);
+  // Fetch real initiator campaigns from Laravel REST API
+  const fetchInitiatorData = useCallback(async () => {
+    try {
+      const response = await api.get('/my-campaigns').catch(() => null);
+      const items = response?.data?.data?.data || response?.data?.data || [];
+      if (Array.isArray(items) && items.length > 0) {
+        const mapped = items.map(mapBackendCampaignToFrontend);
+        setInitiatorCampaigns(mapped);
       }
-    };
+    } catch (err) {
+      console.warn('Gagal memuat kampanye inisiator dari API:', err);
+    }
+  }, []);
 
+  useEffect(() => {
     fetchInitiatorData();
     fetchVolunteersList();
-  }, [fetchVolunteersList]);
+  }, [fetchInitiatorData, fetchVolunteersList, campaigns]);
 
   // Refetch saat tab relawan dibuka
   useEffect(() => {
@@ -171,15 +172,29 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const currentUserName = currentUser?.name?.toLowerCase() || '';
 
   // Filter campaigns belonging to this initiator
-  const myCampaigns = initiatorCampaigns.length > 0
-    ? initiatorCampaigns
-    : (campaigns || []).filter(
-        (c) =>
-          Boolean(c) &&
-          (Boolean(currentUser?.managedCampaignIds?.includes(c.id)) ||
-          Boolean(c.initiatorName && currentUserName && c.initiatorName.toLowerCase().includes(currentUserName)) ||
+  // Filter campaigns belonging to this initiator (termasuk yang baru dibuat dari modal)
+  const myCampaigns = React.useMemo(() => {
+    const currentUserName = currentUser?.name?.toLowerCase() || '';
+    const managedIds = new Set(currentUser?.managedCampaignIds || []);
+
+    const fromProps = (campaigns || []).filter(
+      (c) =>
+        Boolean(c) &&
+        (managedIds.has(c.id) ||
+          (Boolean(c.initiatorName && currentUserName && c.initiatorName.toLowerCase().includes(currentUserName))) ||
+          c.status === 'pending_approval' ||
+          c.status === 'pending' ||
           c.id === 'camp-01')
-      );
+    );
+
+    const combined = [...initiatorCampaigns, ...fromProps];
+    const seen = new Set<string | number>();
+    return combined.filter((c) => {
+      if (!c || seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
+  }, [initiatorCampaigns, campaigns, currentUser]);
 
   const totalDanaTerkumpul = myCampaigns.reduce((acc, c) => acc + (c?.collectedFunds || 0), 0);
   const totalTargetDana = myCampaigns.reduce((acc, c) => acc + (c?.targetFunds || 0), 0);
@@ -242,31 +257,41 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     });
     const uniqueIncoming = Array.from(uniqueIncomingMap.values());
 
-    // 2. Filter terhadap state foto yang sudah ada sebelumnya
+    // 2. Filter terhadap file yang sudah ada di activityPhotoFiles
+    const existingKeys = new Set(activityPhotoFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+    const nonDuplicateFiles = uniqueIncoming.filter((f) => !existingKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
+
+    if (nonDuplicateFiles.length === 0) {
+      showToast('Foto ini sudah ada dalam daftar pratinjau.');
+      if (e.target) e.target.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // 3. Buat Object URL preview hanya untuk file baru
+    const newPreviews = nonDuplicateFiles.map((file) => URL.createObjectURL(file));
+
+    // 4. Update kedua state secara terpisah dan murni (pure) tanpa memanggil setState di dalam updater lain
     setActivityPhotoFiles((prevFiles) => {
-      const existingKeys = new Set(prevFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
-      const nonDuplicateFiles = uniqueIncoming.filter((f) => !existingKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
-
-      if (nonDuplicateFiles.length === 0) {
-        showToast('Foto ini sudah ada dalam daftar pratinjau.');
-        return prevFiles;
-      }
-
-      // Buat Object URL preview hanya untuk file baru yang unik
-      const newPreviews = nonDuplicateFiles.map((file) => URL.createObjectURL(file));
-      setActivityPhotos((prevPhotos) => [...prevPhotos, ...newPreviews]);
-      showToast(`${nonDuplicateFiles.length} foto kegiatan berhasil ditambahkan.`);
-
-      return [...prevFiles, ...nonDuplicateFiles];
+      const prevKeys = new Set(prevFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+      const trulyNew = nonDuplicateFiles.filter((f) => !prevKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
+      return [...prevFiles, ...trulyNew];
     });
 
-    // 3. Reset value input file agar tidak terjadi double-trigger dan mengizinkan pemilihan ulang
+    setActivityPhotos((prevPhotos) => {
+      const existingUrls = new Set(prevPhotos);
+      const trulyNewUrls = newPreviews.filter((url) => !existingUrls.has(url));
+      return [...prevPhotos, ...trulyNewUrls];
+    });
+
+    showToast(`${nonDuplicateFiles.length} foto kegiatan berhasil ditambahkan.`);
+
+    // 5. Reset input file
     e.target.value = '';
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
   const handleRemoveActivityPhoto = (indexToRemove: number) => {
     const previewUrl = activityPhotos[indexToRemove];
     if (previewUrl && previewUrl.startsWith('blob:')) {

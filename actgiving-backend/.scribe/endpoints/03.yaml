@@ -1,7 +1,7 @@
 name: 'Laporan Pertanggungjawaban (LPJ)'
 description: |-
 
-  Upload bukti laporan kegiatan kampanye (FR-12).
+  Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
 endpoints:
   -
     custom: []
@@ -13,11 +13,13 @@ endpoints:
       groupName: 'Laporan Pertanggungjawaban (LPJ)'
       groupDescription: |-
 
-        Upload bukti laporan kegiatan kampanye (FR-12).
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Daftar LPJ Kampanye'
-      description: 'Menampilkan riwayat LPJ suatu kampanye.'
+      title: 'Daftar LPJ Publik Suatu Kampanye'
+      description: |-
+        HANYA menampilkan LPJ yang berstatus 'verified' atau 'sah' untuk konsumsi publik.
+        Inisiator pemilik kampanye atau Admin dapat melihat seluruh status bila diminta.
       authenticated: false
       deprecated: false
     headers:
@@ -60,6 +62,201 @@ endpoints:
   -
     custom: []
     httpMethods:
+      - GET
+    uri: api/admin/lpj
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Daftar Seluruh LPJ untuk Audit Admin'
+      description: 'Admin: Melihat seluruh antrean LPJ beserta statusnya.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":3,"campaign_id":2,"description":"Puji syukur, distribusi bantuan tahap pertama berjalan lancar meski jarak pandang sangat terbatas akibat kabut asap pekat. Tim relawan berhasil mendistribusikan 500 masker N95 secara door-to-door kepada warga rentan (lansia dan balita) di Kecamatan Jekan Raya. Kami juga mengaktifkan posko oksigen darurat yang langsung menangani puluhan warga dengan gejala sesak napas akut pada hari pertama. Respons warga sangat haru dan berterima kasih. Bantuan dari para donatur sangat menyelamatkan nyawa mereka hari ini. Selanjutnya, kami akan memperluas area distribusi logistik medis ke kecamatan tetangga.","proof_image_url":"http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg","created_at":"2026-10-28T14:53:38.000000Z","updated_at":"2026-10-28T14:53:38.000000Z","activity_photos":["http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg","http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/71d19770-0b75-4aed-bb64-91bbbef8a305_1793199218.jpeg"],"status":"pending","title":"Laporan Penggunaan Dana","amount_spent":"1000000.00","budget_items":[{"name":"Masker","amount":1000000}],"beneficiaries_count":100,"volunteers_involved":20,"field_location":"Kalimantan","verified_at":null,"is_final":false,"report_type":"progress","total_realisasi":1000000,"realized_amount":1000000,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","user_id":4,"status":"active","location":"Lumajang, Jawa Timur","user":{"id":4,"name":"fadhilah azzahra","email":"azzahra@actgiving.com"}}},{"id":2,"campaign_id":1,"description":"Distribusi sembako dan obat-obatan tahap dua kepada 150 KK warga terdampak bencana.","proof_image_url":"http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png","created_at":"2026-10-24T17:17:46.000000Z","updated_at":"2026-10-28T13:51:07.000000Z","activity_photos":["http:\/\/127.0.0.1:8000\/storage\/lpj_proofs\/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png"],"status":"pending_audit","title":"LPJ Pengadaan Logistik Tahap 2","amount_spent":"12500000.00","budget_items":null,"beneficiaries_count":0,"volunteers_involved":0,"field_location":"Posko Tanggap Darurat Bencana","verified_at":null,"is_final":false,"report_type":"progress","total_realisasi":12500000,"realized_amount":12500000,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","user_id":2,"status":"active","location":"Lumajang, Jawa Timur","user":{"id":2,"name":"Yayasan Peduli Bersama","email":"inisiator@actgiving.com"}}}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/lpj/{id}/status'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Ubah Status LPJ oleh Admin (Verifikasi Sah / Batal)'
+      description: 'Endpoint: PATCH/PUT /api/admin/lpj/{id}/status atau /api/admin/lpj/{id}'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: pending_audit
+        type: string
+        enumValues:
+          - verified
+          - sah
+          - pending
+          - pending_audit
+          - needs_review
+          - rejected
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      status: pending_audit
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/lpj/{id}/verify'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Verifikasi Sah LPJ (Admin Shortcut)'
+      description: 'Endpoint: PATCH /api/admin/lpj/{id}/verify'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/admin/lpj/{id}/unverify'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Batalkan Verifikasi LPJ (Admin Shortcut)'
+      description: 'Endpoint: PATCH /api/admin/lpj/{id}/unverify'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
       - POST
     uri: 'api/campaigns/{id}/lpj'
     metadata:
@@ -67,13 +264,11 @@ endpoints:
       groupName: 'Laporan Pertanggungjawaban (LPJ)'
       groupDescription: |-
 
-        Upload bukti laporan kegiatan kampanye (FR-12).
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Upload LPJ & Bukti Gambar (Inisiator, FR-12)'
-      description: |-
-        Inisiator: Mengunggah Laporan Pertanggungjawaban (LPJ) beserta bukti gambar fisik.
-        Menggunakan FileUploadService untuk menyimpan ke public storage disk.
+      title: 'Upload LPJ Baru (Inisiator, FR-12)'
+      description: "Status awal: 'pending' (Menunggu Review & Verifikasi Sah oleh Admin)."
       authenticated: false
       deprecated: false
     headers:
@@ -107,21 +302,648 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      title:
+        custom: []
+        name: title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: v
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      amount_spent:
+        custom: []
+        name: amount_spent
+        description: 'Must be at least 0.'
+        required: false
+        example: 42
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      total_realisasi:
+        custom: []
+        name: total_realisasi
+        description: 'Must be at least 0.'
+        required: false
+        example: 37
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      realized_amount:
+        custom: []
+        name: realized_amount
+        description: 'Must be at least 0.'
+        required: false
+        example: 9
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      field_location:
+        custom: []
+        name: field_location
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      beneficiaries_count:
+        custom: []
+        name: beneficiaries_count
+        description: 'Must be at least 0.'
+        required: false
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      volunteers_involved:
+        custom: []
+        name: volunteers_involved
+        description: 'Must be at least 0.'
+        required: false
+        example: 75
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      budget_items:
+        custom: []
+        name: budget_items
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_final:
+        custom: []
+        name: is_final
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      report_type:
+        custom: []
+        name: report_type
+        description: ''
+        required: false
+        example: progress
+        type: string
+        enumValues:
+          - progress
+          - final
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
       proof_image:
         custom: []
         name: proof_image
         description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
-        required: true
+        required: false
         example: null
         type: file
         enumValues: []
         exampleWasSpecified: false
-        nullable: false
+        nullable: true
+        deprecated: false
+      activity_photos:
+        custom: []
+        name: activity_photos
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: false
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
         deprecated: false
     cleanBodyParameters:
       description: 'Eius et animi quos velit et.'
+      title: v
+      amount_spent: 42
+      total_realisasi: 37
+      realized_amount: 9
+      field_location: 'n'
+      beneficiaries_count: 8
+      volunteers_involved: 75
+      report_type: progress
     fileParameters:
       proof_image: null
+      activity_photos:
+        - null
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/campaigns/{campaign_id}/lpj/{id}'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update LPJ (Inisiator)'
+      description: |-
+        ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+        Inisiator DILARANG mengubah data (Read-Only / 403 Forbidden).
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      campaign_id: 1
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      title:
+        custom: []
+        name: title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'Must be at least 10 characters.'
+        required: false
+        example: 'Et animi quos velit et fugiat.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount_spent:
+        custom: []
+        name: amount_spent
+        description: 'Must be at least 0.'
+        required: false
+        example: 42
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      total_realisasi:
+        custom: []
+        name: total_realisasi
+        description: 'Must be at least 0.'
+        required: false
+        example: 37
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      realized_amount:
+        custom: []
+        name: realized_amount
+        description: 'Must be at least 0.'
+        required: false
+        example: 9
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      field_location:
+        custom: []
+        name: field_location
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      beneficiaries_count:
+        custom: []
+        name: beneficiaries_count
+        description: 'Must be at least 0.'
+        required: false
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      volunteers_involved:
+        custom: []
+        name: volunteers_involved
+        description: 'Must be at least 0.'
+        required: false
+        example: 75
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      budget_items:
+        custom: []
+        name: budget_items
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_final:
+        custom: []
+        name: is_final
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      report_type:
+        custom: []
+        name: report_type
+        description: ''
+        required: false
+        example: final
+        type: string
+        enumValues:
+          - progress
+          - final
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      proof_image:
+        custom: []
+        name: proof_image
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      activity_photos:
+        custom: []
+        name: activity_photos
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: false
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      title: b
+      description: 'Et animi quos velit et fugiat.'
+      amount_spent: 42
+      total_realisasi: 37
+      realized_amount: 9
+      field_location: 'n'
+      beneficiaries_count: 8
+      volunteers_involved: 75
+      report_type: final
+    fileParameters:
+      proof_image: null
+      activity_photos:
+        - null
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/campaigns/{campaign_id}/lpj/{id}'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update LPJ (Inisiator)'
+      description: |-
+        ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+        Inisiator DILARANG mengubah data (Read-Only / 403 Forbidden).
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: multipart/form-data
+      Accept: application/json
+    urlParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      campaign_id: 1
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      title:
+        custom: []
+        name: title
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      description:
+        custom: []
+        name: description
+        description: 'Must be at least 10 characters.'
+        required: false
+        example: 'Et animi quos velit et fugiat.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount_spent:
+        custom: []
+        name: amount_spent
+        description: 'Must be at least 0.'
+        required: false
+        example: 42
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      total_realisasi:
+        custom: []
+        name: total_realisasi
+        description: 'Must be at least 0.'
+        required: false
+        example: 37
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      realized_amount:
+        custom: []
+        name: realized_amount
+        description: 'Must be at least 0.'
+        required: false
+        example: 9
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      field_location:
+        custom: []
+        name: field_location
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      beneficiaries_count:
+        custom: []
+        name: beneficiaries_count
+        description: 'Must be at least 0.'
+        required: false
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      volunteers_involved:
+        custom: []
+        name: volunteers_involved
+        description: 'Must be at least 0.'
+        required: false
+        example: 75
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      budget_items:
+        custom: []
+        name: budget_items
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_final:
+        custom: []
+        name: is_final
+        description: ''
+        required: false
+        example: null
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      report_type:
+        custom: []
+        name: report_type
+        description: ''
+        required: false
+        example: final
+        type: string
+        enumValues:
+          - progress
+          - final
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      proof_image:
+        custom: []
+        name: proof_image
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      activity_photos:
+        custom: []
+        name: activity_photos
+        description: 'Must be a file. Must be an image. Must not be greater than 5120 kilobytes.'
+        required: false
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      title: b
+      description: 'Et animi quos velit et fugiat.'
+      amount_spent: 42
+      total_realisasi: 37
+      realized_amount: 9
+      field_location: 'n'
+      beneficiaries_count: 8
+      volunteers_involved: 75
+      report_type: final
+    fileParameters:
+      proof_image: null
+      activity_photos:
+        - null
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/campaigns/{campaign_id}/lpj/{id}'
+    metadata:
+      custom: []
+      groupName: 'Laporan Pertanggungjawaban (LPJ)'
+      groupDescription: |-
+
+        Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Hapus LPJ (Inisiator)'
+      description: |-
+        ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+        Inisiator DILARANG menghapus data (403 Forbidden).
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'The ID of the campaign.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The ID of the lpj.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      campaign_id: 1
+      id: architecto
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
     responses: []
     responseFields: []
     auth: []

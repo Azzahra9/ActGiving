@@ -1,33 +1,360 @@
-name: 'Pendaftaran Relawan'
+name: Donasi
 description: |-
 
-  Pendaftaran dan seleksi relawan kegiatan kampanye.
+  Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
 endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: 'api/campaigns/{id}/registrations'
+      - POST
+    uri: api/donations
     metadata:
       custom: []
-      groupName: 'Pendaftaran Relawan'
+      groupName: Donasi
       groupDescription: |-
 
-        Pendaftaran dan seleksi relawan kegiatan kampanye.
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Daftar Pelamar Relawan (Inisiator)'
-      description: 'Inisiator: Melihat daftar pelamar relawan pada kampanyenya.'
+      title: 'Pencatatan Transaksi Donasi Nyata / QRIS (POST /api/donations)'
+      description: |-
+        Menyimpan transaksi donasi langsung ke database PostgreSQL
+        dengan pembaruan atomic saldo kampanye (ACID).
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 3357
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_method:
+        custom: []
+        name: payment_method
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      payment_channel:
+        custom: []
+        name: payment_channel
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      donor_name:
+        custom: []
+        name: donor_name
+        description: 'Must not be greater than 255 characters.'
+        required: false
+        example: 'n'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      donor_email:
+        custom: []
+        name: donor_email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: false
+        example: ashly64@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      is_anonymous:
+        custom: []
+        name: is_anonymous
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: false
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      campaign_id: architecto
+      amount: 3357
+      payment_method: architecto
+      payment_channel: architecto
+      donor_name: 'n'
+      donor_email: ashly64@example.com
+      is_anonymous: false
+      status: architecto
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/donations
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Audit Transaksi Donasi Moneter (Admin / Sandbox)'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":7,"campaign_id":2,"user_id":4,"amount":"10000000.00","donor_name":"fadhilah azzahra","donor_email":"azzahra@actgiving.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261028-CSGKCQ","status":"paid","expires_at":"2026-10-29T13:50:11.000000Z","created_at":"2026-10-28T13:50:11.000000Z","updated_at":"2026-10-28T13:50:11.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}},{"id":6,"campaign_id":2,"user_id":null,"amount":"10000000.00","donor_name":"fadhilah azzahra","donor_email":"azzahra@actgiving.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-GST-20261028-DIHA5G","status":"pending","expires_at":"2026-10-29T13:50:09.000000Z","created_at":"2026-10-28T13:50:09.000000Z","updated_at":"2026-10-28T13:50:09.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}},{"id":5,"campaign_id":1,"user_id":null,"amount":"250000.00","donor_name":"Donatur QRIS Live","donor_email":"donatur.live@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-3MF5PX","status":"paid","expires_at":"2026-10-25T17:15:28.000000Z","created_at":"2026-10-24T17:15:28.000000Z","updated_at":"2026-10-24T17:15:28.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":4,"campaign_id":1,"user_id":null,"amount":"150000.00","donor_name":"Budi Santoso QRIS","donor_email":"budi.santoso@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-OK9F6L","status":"paid","expires_at":"2026-10-25T17:14:34.000000Z","created_at":"2026-10-24T17:14:34.000000Z","updated_at":"2026-10-24T17:14:34.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":3,"campaign_id":1,"user_id":null,"amount":"150000.00","donor_name":"Budi Santoso QRIS","donor_email":"budi.santoso@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-YOSHOF","status":"paid","expires_at":"2026-10-25T17:14:27.000000Z","created_at":"2026-10-24T17:14:27.000000Z","updated_at":"2026-10-24T17:14:27.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":2,"campaign_id":1,"user_id":null,"amount":"25000.00","donor_name":"Donatur Test","donor_email":"test@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-IIRYY7","status":"paid","expires_at":"2026-10-25T17:02:56.000000Z","created_at":"2026-10-24T17:02:56.000000Z","updated_at":"2026-10-24T17:02:56.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":1,"campaign_id":2,"user_id":null,"amount":"10000.00","donor_name":"Hamba Allah","donor_email":"azzahra@actgiving.com","is_anonymous":true,"payment_channel":"qris","reference_code":"INV-GST-20261022-T91VFA","status":"paid","expires_at":"2026-10-23T05:32:31.000000Z","created_at":"2026-10-22T05:32:31.000000Z","updated_at":"2026-10-22T05:32:37.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/admin/donations
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Audit Transaksi Donasi Moneter (Admin / Sandbox)'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"success":true,"data":[{"id":7,"campaign_id":2,"user_id":4,"amount":"10000000.00","donor_name":"fadhilah azzahra","donor_email":"azzahra@actgiving.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261028-CSGKCQ","status":"paid","expires_at":"2026-10-29T13:50:11.000000Z","created_at":"2026-10-28T13:50:11.000000Z","updated_at":"2026-10-28T13:50:11.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}},{"id":6,"campaign_id":2,"user_id":null,"amount":"10000000.00","donor_name":"fadhilah azzahra","donor_email":"azzahra@actgiving.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-GST-20261028-DIHA5G","status":"pending","expires_at":"2026-10-29T13:50:09.000000Z","created_at":"2026-10-28T13:50:09.000000Z","updated_at":"2026-10-28T13:50:09.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}},{"id":5,"campaign_id":1,"user_id":null,"amount":"250000.00","donor_name":"Donatur QRIS Live","donor_email":"donatur.live@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-3MF5PX","status":"paid","expires_at":"2026-10-25T17:15:28.000000Z","created_at":"2026-10-24T17:15:28.000000Z","updated_at":"2026-10-24T17:15:28.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":4,"campaign_id":1,"user_id":null,"amount":"150000.00","donor_name":"Budi Santoso QRIS","donor_email":"budi.santoso@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-OK9F6L","status":"paid","expires_at":"2026-10-25T17:14:34.000000Z","created_at":"2026-10-24T17:14:34.000000Z","updated_at":"2026-10-24T17:14:34.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":3,"campaign_id":1,"user_id":null,"amount":"150000.00","donor_name":"Budi Santoso QRIS","donor_email":"budi.santoso@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-YOSHOF","status":"paid","expires_at":"2026-10-25T17:14:27.000000Z","created_at":"2026-10-24T17:14:27.000000Z","updated_at":"2026-10-24T17:14:27.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":2,"campaign_id":1,"user_id":null,"amount":"25000.00","donor_name":"Donatur Test","donor_email":"test@example.com","is_anonymous":false,"payment_channel":"qris","reference_code":"INV-QRIS-20261024-IIRYY7","status":"paid","expires_at":"2026-10-25T17:02:56.000000Z","created_at":"2026-10-24T17:02:56.000000Z","updated_at":"2026-10-24T17:02:56.000000Z","is_approved_by_initiator":null,"campaign":{"id":1,"title":"Tanggap Darurat Erupsi Gunung Semeru","location":"Lumajang, Jawa Timur"}},{"id":1,"campaign_id":2,"user_id":null,"amount":"10000.00","donor_name":"Hamba Allah","donor_email":"azzahra@actgiving.com","is_anonymous":true,"payment_channel":"qris","reference_code":"INV-GST-20261022-T91VFA","status":"paid","expires_at":"2026-10-23T05:32:31.000000Z","created_at":"2026-10-22T05:32:31.000000Z","updated_at":"2026-10-22T05:32:37.000000Z","is_approved_by_initiator":null,"campaign":{"id":2,"title":"Bantuan Darurat Medis & Masker untuk Korban Kabut Asap Karhutla Kalimantan","location":"Lumajang, Jawa Timur"}}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/guest-checkout
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Guest Checkout (Tanpa Login)'
+      description: |-
+        1. Guest Checkout (Donasi Tamu tanpa Login).
+        Return dummy QRIS / Virtual Account info.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'Must match an existing stored value.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 3357
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      donor_name:
+        custom: []
+        name: donor_name
+        description: 'Must not be greater than 255 characters.'
+        required: true
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      donor_email:
+        custom: []
+        name: donor_email
+        description: 'Must be a valid email address. Must not be greater than 255 characters.'
+        required: true
+        example: rowan.gulgowski@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_anonymous:
+        custom: []
+        name: is_anonymous
+        description: ''
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_channel:
+        custom: []
+        name: payment_channel
+        description: ''
+        required: true
+        example: qris
+        type: string
+        enumValues:
+          - qris
+          - bca_va
+          - mandiri_va
+          - bni_va
+          - bri_va
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      campaign_id: architecto
+      amount: 3357
+      donor_name: g
+      donor_email: rowan.gulgowski@example.com
+      is_anonymous: true
+      payment_channel: qris
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/donations/{reference_code}/status'
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Cek Status Pembayaran'
+      description: 'Cek Status Donasi Berdasarkan Reference Code (Publik).'
       authenticated: false
       deprecated: false
     headers:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      id:
+      reference_code:
         custom: []
-        name: id
-        description: 'The ID of the campaign.'
+        name: reference_code
+        description: ''
         required: true
         example: 1
         type: integer
@@ -36,7 +363,199 @@ endpoints:
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      reference_code: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "No query results for model [App\\Models\\Donation]."
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/webhook-simulate
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Simulasi Webhook Pembayaran (ACID)'
+      description: |-
+        Webhook Simulasi Bayar Payment Gateway.
+        WAJIB ACID Transaction & lockForUpdate() untuk Update current_amount secara aman.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      reference_code:
+        custom: []
+        name: reference_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      status:
+        custom: []
+        name: status
+        description: ''
+        required: true
+        example: expired
+        type: string
+        enumValues:
+          - paid
+          - expired
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      reference_code: architecto
+      status: expired
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/donations/user-checkout
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Donasi User Terdaftar'
+      description: 'Checkout Donasi oleh Pengguna Terdaftar (Dual-Role User).'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      campaign_id:
+        custom: []
+        name: campaign_id
+        description: 'Must match an existing stored value.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      amount:
+        custom: []
+        name: amount
+        description: 'Must be at least 10000.'
+        required: true
+        example: 3357
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      is_anonymous:
+        custom: []
+        name: is_anonymous
+        description: ''
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      payment_channel:
+        custom: []
+        name: payment_channel
+        description: ''
+        required: true
+        example: bni_va
+        type: string
+        enumValues:
+          - qris
+          - bca_va
+          - mandiri_va
+          - bni_va
+          - bri_va
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      campaign_id: architecto
+      amount: 3357
+      is_anonymous: false
+      payment_channel: bni_va
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/my-donations
+    metadata:
+      custom: []
+      groupName: Donasi
+      groupDescription: |-
+
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Riwayat Donasi Saya'
+      description: 'Riwayat Donasi Pengguna Terdaftar.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -61,19 +580,19 @@ endpoints:
     custom: []
     httpMethods:
       - PATCH
-    uri: 'api/volunteer-registrations/{id}/status'
+    uri: 'api/donations/{id}/approval'
     metadata:
       custom: []
-      groupName: 'Pendaftaran Relawan'
+      groupName: Donasi
       groupDescription: |-
 
-        Pendaftaran dan seleksi relawan kegiatan kampanye.
+        Endpoint checkout donasi, status pembayaran, dan simulasi webhook.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Seleksi Relawan - Accept/Reject (Inisiator, ACID)'
+      title: 'Approval Donasi oleh Inisiator (ACID)'
       description: |-
-        Inisiator: Seleksi Status Relawan (accepted / rejected).
-        WAJIB ACID Transaction & lockForUpdate() untuk mencegah over-capacity.
+        Manajemen Izin Donasi oleh Inisiator (Approve / Reject).
+        WAJIB ACID Transaction & lockForUpdate().
       authenticated: false
       deprecated: false
     headers:
@@ -83,66 +602,7 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'The ID of the volunteer registration.'
-        required: true
-        example: 16
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 16
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      status:
-        custom: []
-        name: status
-        description: ''
-        required: true
-        example: rejected
-        type: string
-        enumValues:
-          - accepted
-          - rejected
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      status: rejected
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: 'api/campaigns/{id}/volunteer-register'
-    metadata:
-      custom: []
-      groupName: 'Pendaftaran Relawan'
-      groupDescription: |-
-
-        Pendaftaran dan seleksi relawan kegiatan kampanye.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Daftar sebagai Relawan'
-      description: 'Relawan: Mendaftar ke suatu kampanye.'
-      authenticated: false
-      deprecated: false
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the campaign.'
+        description: 'The ID of the donation.'
         required: true
         example: 1
         type: integer
@@ -155,63 +615,21 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      skills:
+      approval:
         custom: []
-        name: skills
-        description: 'Must not be greater than 1000 characters.'
+        name: approval
+        description: ''
         required: true
-        example: b
-        type: string
+        example: true
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      skills: b
+      approval: true
     fileParameters: []
     responses: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: api/my-volunteer-registrations
-    metadata:
-      custom: []
-      groupName: 'Pendaftaran Relawan'
-      groupDescription: |-
-
-        Pendaftaran dan seleksi relawan kegiatan kampanye.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Riwayat Pendaftaran Relawan Saya'
-      description: 'Relawan: Melihat daftar kegiatan kerelawanan yang pernah didaftar.'
-      authenticated: false
-      deprecated: false
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Unauthenticated."}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          vary: Origin
-        description: null
     responseFields: []
     auth: []
     controller: null

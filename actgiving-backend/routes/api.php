@@ -42,6 +42,7 @@ Route::get('/donations', [DonationController::class, 'indexAdmin']); // Daftar T
 Route::get('/admin/donations', [DonationController::class, 'indexAdmin']); // Audit Transaksi Sandbox
 Route::get('/admin/campaigns', [AdminController::class, 'indexCampaigns']); // Antrean Moderasi Kampanye
 Route::patch('/admin/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
+Route::patch('/admin/campaigns/{id}/suspend', [AdminController::class, 'suspendCampaign']);
 Route::get('/admin/lpj', [LPJController::class, 'adminIndex']); // Antrean Audit LPJ
 Route::patch('/admin/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
 Route::patch('/admin/lpj/{id}/verify', [LPJController::class, 'adminVerify']);

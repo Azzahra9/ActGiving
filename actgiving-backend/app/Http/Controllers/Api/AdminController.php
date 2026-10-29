@@ -39,14 +39,14 @@ class AdminController extends Controller
     /**
      * Ubah Status Kampanye (Admin)
      *
-     * Admin: Moderasi status kampanye (active / rejected / closed).
+     * Admin: Moderasi status kampanye (active / rejected / closed / suspended).
      */
     public function updateCampaignStatus(Request $request, $id): JsonResponse
     {
         $campaign = Campaign::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:active,rejected,closed',
+            'status' => 'required|in:active,rejected,closed,suspended',
         ]);
 
         $campaign->status = $validated['status'];
@@ -56,6 +56,30 @@ class AdminController extends Controller
             'success' => true,
             'message' => "Status kampanye berhasil diubah menjadi: {$campaign->status}.",
             'data' => $campaign,
+        ]);
+    }
+
+    /**
+     * Hentikan / Suspend Kampanye (Admin)
+     *
+     * Admin: Menghentikan/menangguhkan kampanye secara paksa jika ada pelanggaran.
+     */
+    public function suspendCampaign(Request $request, $id): JsonResponse
+    {
+        $campaign = Campaign::findOrFail($id);
+
+        $validated = $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $campaign->status = 'suspended';
+        $campaign->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Kampanye '{$campaign->title}' berhasil dihentikan/ditangguhkan oleh Admin.",
+            'data' => $campaign,
+            'reason' => $validated['reason'] ?? null,
         ]);
     }
 

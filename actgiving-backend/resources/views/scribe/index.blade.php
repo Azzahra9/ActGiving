@@ -113,6 +113,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="kampanye-publik-PUTapi-campaigns--id-">
                                 <a href="#kampanye-publik-PUTapi-campaigns--id-">Update Data Kampanye (Inisiator)</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="kampanye-publik-DELETEapi-campaigns--id-">
+                                <a href="#kampanye-publik-DELETEapi-campaigns--id-">Hapus Kampanye (Inisiator)</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-kategori" class="tocify-header">
@@ -139,7 +142,16 @@
                     <a href="#donasi">Donasi</a>
                 </li>
                                     <ul id="tocify-subheader-donasi" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="donasi-POSTapi-donations-guest-checkout">
+                                                    <li class="tocify-item level-2" data-unique="donasi-POSTapi-donations">
+                                <a href="#donasi-POSTapi-donations">Pencatatan Transaksi Donasi Nyata / QRIS (POST /api/donations)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="donasi-GETapi-donations">
+                                <a href="#donasi-GETapi-donations">Audit Transaksi Donasi Moneter (Admin / Sandbox)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="donasi-GETapi-admin-donations">
+                                <a href="#donasi-GETapi-admin-donations">Audit Transaksi Donasi Moneter (Admin / Sandbox)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="donasi-POSTapi-donations-guest-checkout">
                                 <a href="#donasi-POSTapi-donations-guest-checkout">Guest Checkout (Tanpa Login)</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="donasi-GETapi-donations--reference_code--status">
@@ -164,14 +176,17 @@
                     <a href="#pendaftaran-relawan">Pendaftaran Relawan</a>
                 </li>
                                     <ul id="tocify-subheader-pendaftaran-relawan" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="pendaftaran-relawan-GETapi-campaigns--id--registrations">
-                                <a href="#pendaftaran-relawan-GETapi-campaigns--id--registrations">Daftar Pelamar Relawan (Inisiator)</a>
+                                                    <li class="tocify-item level-2" data-unique="pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">
+                                <a href="#pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">Daftar sebagai Relawan & Pembuatan Akun Relawan Otomatis</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="pendaftaran-relawan-GETapi-initiator-volunteers">
+                                <a href="#pendaftaran-relawan-GETapi-initiator-volunteers">Daftar Semua Pendaftar Relawan untuk Inisiator (FR Inisiator)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="pendaftaran-relawan-GETapi-campaigns--id--registrations">
+                                <a href="#pendaftaran-relawan-GETapi-campaigns--id--registrations">Daftar Pelamar Relawan per Kampanye (Inisiator)</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="pendaftaran-relawan-PATCHapi-volunteer-registrations--id--status">
                                 <a href="#pendaftaran-relawan-PATCHapi-volunteer-registrations--id--status">Seleksi Relawan - Accept/Reject (Inisiator, ACID)</a>
-                            </li>
-                                                                                <li class="tocify-item level-2" data-unique="pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">
-                                <a href="#pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">Daftar sebagai Relawan</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="pendaftaran-relawan-GETapi-my-volunteer-registrations">
                                 <a href="#pendaftaran-relawan-GETapi-my-volunteer-registrations">Riwayat Pendaftaran Relawan Saya</a>
@@ -232,10 +247,31 @@
                 </li>
                                     <ul id="tocify-subheader-laporan-pertanggungjawaban-lpj" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-GETapi-campaigns--id--lpj">
-                                <a href="#laporan-pertanggungjawaban-lpj-GETapi-campaigns--id--lpj">Daftar LPJ Kampanye</a>
+                                <a href="#laporan-pertanggungjawaban-lpj-GETapi-campaigns--id--lpj">Daftar LPJ Publik Suatu Kampanye</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-GETapi-admin-lpj">
+                                <a href="#laporan-pertanggungjawaban-lpj-GETapi-admin-lpj">Daftar Seluruh LPJ untuk Audit Admin</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--status">
+                                <a href="#laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--status">Ubah Status LPJ oleh Admin (Verifikasi Sah / Batal)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--verify">
+                                <a href="#laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--verify">Verifikasi Sah LPJ (Admin Shortcut)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--unverify">
+                                <a href="#laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--unverify">Batalkan Verifikasi LPJ (Admin Shortcut)</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-POSTapi-campaigns--id--lpj">
-                                <a href="#laporan-pertanggungjawaban-lpj-POSTapi-campaigns--id--lpj">Upload LPJ & Bukti Gambar (Inisiator, FR-12)</a>
+                                <a href="#laporan-pertanggungjawaban-lpj-POSTapi-campaigns--id--lpj">Upload LPJ Baru (Inisiator, FR-12)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-PUTapi-campaigns--campaign_id--lpj--id-">
+                                <a href="#laporan-pertanggungjawaban-lpj-PUTapi-campaigns--campaign_id--lpj--id-">Update LPJ (Inisiator)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-PATCHapi-campaigns--campaign_id--lpj--id-">
+                                <a href="#laporan-pertanggungjawaban-lpj-PATCHapi-campaigns--campaign_id--lpj--id-">Update LPJ (Inisiator)</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="laporan-pertanggungjawaban-lpj-DELETEapi-campaigns--campaign_id--lpj--id-">
+                                <a href="#laporan-pertanggungjawaban-lpj-DELETEapi-campaigns--campaign_id--lpj--id-">Hapus LPJ (Inisiator)</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -248,7 +284,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: 14 October 2026</li>
+        <li>Last updated: 29 October 2026</li>
     </ul>
 </div>
 
@@ -1347,21 +1383,22 @@ vary: Origin
         &quot;current_page&quot;: 1,
         &quot;data&quot;: [
             {
-                &quot;id&quot;: 1,
+                &quot;id&quot;: 10,
                 &quot;user_id&quot;: 2,
                 &quot;category_id&quot;: 1,
-                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
-                &quot;description&quot;: &quot;Penyaluran logistik darurat, masker, makanan siap saji, dan posko medis untuk warga terdampak erupsi Semeru.&quot;,
-                &quot;target_amount&quot;: &quot;50000000.00&quot;,
-                &quot;current_amount&quot;: &quot;15000000.00&quot;,
-                &quot;target_volunteers&quot;: 10,
-                &quot;current_volunteers&quot;: 4,
-                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
-                &quot;activity_date&quot;: &quot;2026-10-28T00:00:00.000000Z&quot;,
+                &quot;title&quot;: &quot;Uji Coba Moderasi Kampanye Baru 1792862057985&quot;,
+                &quot;description&quot;: &quot;Deskripsi lengkap uji coba kampanye baru agar masuk ke antrean moderasi admin.&quot;,
+                &quot;target_amount&quot;: &quot;10000000.00&quot;,
+                &quot;current_amount&quot;: &quot;0.00&quot;,
+                &quot;target_volunteers&quot;: 5,
+                &quot;current_volunteers&quot;: 0,
+                &quot;location&quot;: &quot;Bandung, Jawa Barat&quot;,
+                &quot;activity_date&quot;: null,
                 &quot;status&quot;: &quot;active&quot;,
                 &quot;campaign_mode&quot;: &quot;both&quot;,
-                &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
-                &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+                &quot;created_at&quot;: &quot;2026-10-24T17:14:18.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-25T11:45:13.000000Z&quot;,
+                &quot;image_url&quot;: null,
                 &quot;category&quot;: {
                     &quot;id&quot;: 1,
                     &quot;category_name&quot;: &quot;Bencana Alam&quot;
@@ -1370,7 +1407,64 @@ vary: Origin
                     &quot;id&quot;: 2,
                     &quot;name&quot;: &quot;Yayasan Peduli Bersama&quot;,
                     &quot;is_verified&quot;: true
-                }
+                },
+                &quot;lpj_reports&quot;: []
+            },
+            {
+                &quot;id&quot;: 2,
+                &quot;user_id&quot;: 4,
+                &quot;category_id&quot;: 1,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;description&quot;: &quot;Kebakaran hutan dan lahan (Karhutla) di Kalimantan semakin meluas, menyebabkan kabut asap pekat yang menyelimuti pemukiman. Jarak pandang menurun drastis dan ribuan warga, terutama balita dan lansia, mulai berjatuhan sakit akibat ISPA (Infeksi Saluran Pernapasan Akut). Kami sangat membutuhkan dana darurat untuk pengadaan masker N95, tabung oksigen portabel, obat-obatan pernapasan, dan vitamin. Kami juga memanggil relawan untuk turun langsung membantu evakuasi warga rentan dan mendistribusikan bantuan medis dari rumah ke rumah. Mari bergerak cepat selamatkan napas saudara kita!&quot;,
+                &quot;target_amount&quot;: &quot;10000000.00&quot;,
+                &quot;current_amount&quot;: &quot;10010000.00&quot;,
+                &quot;target_volunteers&quot;: 20,
+                &quot;current_volunteers&quot;: 1,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;activity_date&quot;: &quot;2026-10-29T00:00:00.000000Z&quot;,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;campaign_mode&quot;: &quot;both&quot;,
+                &quot;created_at&quot;: &quot;2026-10-21T16:43:14.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+                &quot;image_url&quot;: &quot;http://127.0.0.1:8000/storage/campaigns/ff131484-5b78-4db8-a1f9-beb8cac09a76_1792647116.jpeg&quot;,
+                &quot;category&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;category_name&quot;: &quot;Bencana Alam&quot;
+                },
+                &quot;user&quot;: {
+                    &quot;id&quot;: 4,
+                    &quot;name&quot;: &quot;fadhilah azzahra&quot;,
+                    &quot;is_verified&quot;: false
+                },
+                &quot;lpj_reports&quot;: []
+            },
+            {
+                &quot;id&quot;: 1,
+                &quot;user_id&quot;: 2,
+                &quot;category_id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;description&quot;: &quot;Penyaluran logistik darurat, masker, makanan siap saji, dan posko medis untuk warga terdampak erupsi Semeru.&quot;,
+                &quot;target_amount&quot;: &quot;50000000.00&quot;,
+                &quot;current_amount&quot;: &quot;15575000.00&quot;,
+                &quot;target_volunteers&quot;: 10,
+                &quot;current_volunteers&quot;: 4,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;activity_date&quot;: &quot;2026-10-28T00:00:00.000000Z&quot;,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;campaign_mode&quot;: &quot;both&quot;,
+                &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+                &quot;image_url&quot;: null,
+                &quot;category&quot;: {
+                    &quot;id&quot;: 1,
+                    &quot;category_name&quot;: &quot;Bencana Alam&quot;
+                },
+                &quot;user&quot;: {
+                    &quot;id&quot;: 2,
+                    &quot;name&quot;: &quot;Yayasan Peduli Bersama&quot;,
+                    &quot;is_verified&quot;: true
+                },
+                &quot;lpj_reports&quot;: []
             }
         ],
         &quot;first_page_url&quot;: &quot;http://localhost:8000/api/campaigns?page=1&quot;,
@@ -1401,8 +1495,8 @@ vary: Origin
         &quot;path&quot;: &quot;http://localhost:8000/api/campaigns&quot;,
         &quot;per_page&quot;: 10,
         &quot;prev_page_url&quot;: null,
-        &quot;to&quot;: 1,
-        &quot;total&quot;: 1
+        &quot;to&quot;: 3,
+        &quot;total&quot;: 3
     }
 }</code>
  </pre>
@@ -1554,7 +1648,7 @@ vary: Origin
         &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
         &quot;description&quot;: &quot;Penyaluran logistik darurat, masker, makanan siap saji, dan posko medis untuk warga terdampak erupsi Semeru.&quot;,
         &quot;target_amount&quot;: &quot;50000000.00&quot;,
-        &quot;current_amount&quot;: &quot;15000000.00&quot;,
+        &quot;current_amount&quot;: &quot;15575000.00&quot;,
         &quot;target_volunteers&quot;: 10,
         &quot;current_volunteers&quot;: 4,
         &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
@@ -1562,8 +1656,9 @@ vary: Origin
         &quot;status&quot;: &quot;active&quot;,
         &quot;campaign_mode&quot;: &quot;both&quot;,
         &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
-        &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
-        &quot;total_donors&quot;: 0,
+        &quot;updated_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+        &quot;image_url&quot;: null,
+        &quot;total_donors&quot;: 4,
         &quot;approved_volunteers_count&quot;: 0,
         &quot;category&quot;: {
             &quot;id&quot;: 1,
@@ -1680,19 +1775,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
     "http://localhost:8000/api/campaigns" \
-    --header "Content-Type: application/json" \
+    --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --data "{
-    \"category_id\": \"architecto\",
-    \"title\": \"n\",
-    \"description\": \"Eius et animi quos velit et.\",
-    \"campaign_mode\": \"fund_only\",
-    \"target_amount\": 60,
-    \"target_volunteers\": 42,
-    \"location\": \"l\",
-    \"activity_date\": \"2052-11-06\"
-}"
-</code></pre></div>
+    --form "category_id=architecto"\
+    --form "title=n"\
+    --form "description=Eius et animi quos velit et."\
+    --form "campaign_mode=both"\
+    --form "target_amount=60"\
+    --form "target_volunteers=42"\
+    --form "location=l"\
+    --form "activity_date=2026-10-29T00:19:24"\
+    --form "image=@C:\Users\ASUS\AppData\Local\Temp\php5135.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1701,25 +1794,25 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
 
-let body = {
-    "category_id": "architecto",
-    "title": "n",
-    "description": "Eius et animi quos velit et.",
-    "campaign_mode": "fund_only",
-    "target_amount": 60,
-    "target_volunteers": 42,
-    "location": "l",
-    "activity_date": "2052-11-06"
-};
+const body = new FormData();
+body.append('category_id', 'architecto');
+body.append('title', 'n');
+body.append('description', 'Eius et animi quos velit et.');
+body.append('campaign_mode', 'both');
+body.append('target_amount', '60');
+body.append('target_volunteers', '42');
+body.append('location', 'l');
+body.append('activity_date', '2026-10-29T00:19:24');
+body.append('image', document.querySelector('input[name="image"]').files[0]);
 
 fetch(url, {
     method: "POST",
     headers,
-    body: JSON.stringify(body),
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 
@@ -1730,18 +1823,46 @@ $response = $client-&gt;post(
     $url,
     [
         'headers' =&gt; [
-            'Content-Type' =&gt; 'application/json',
+            'Content-Type' =&gt; 'multipart/form-data',
             'Accept' =&gt; 'application/json',
         ],
-        'json' =&gt; [
-            'category_id' =&gt; 'architecto',
-            'title' =&gt; 'n',
-            'description' =&gt; 'Eius et animi quos velit et.',
-            'campaign_mode' =&gt; 'fund_only',
-            'target_amount' =&gt; 60,
-            'target_volunteers' =&gt; 42,
-            'location' =&gt; 'l',
-            'activity_date' =&gt; '2052-11-06',
+        'multipart' =&gt; [
+            [
+                'name' =&gt; 'category_id',
+                'contents' =&gt; 'architecto'
+            ],
+            [
+                'name' =&gt; 'title',
+                'contents' =&gt; 'n'
+            ],
+            [
+                'name' =&gt; 'description',
+                'contents' =&gt; 'Eius et animi quos velit et.'
+            ],
+            [
+                'name' =&gt; 'campaign_mode',
+                'contents' =&gt; 'both'
+            ],
+            [
+                'name' =&gt; 'target_amount',
+                'contents' =&gt; '60'
+            ],
+            [
+                'name' =&gt; 'target_volunteers',
+                'contents' =&gt; '42'
+            ],
+            [
+                'name' =&gt; 'location',
+                'contents' =&gt; 'l'
+            ],
+            [
+                'name' =&gt; 'activity_date',
+                'contents' =&gt; '2026-10-29T00:19:24'
+            ],
+            [
+                'name' =&gt; 'image',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php5135.tmp', 'r')
+            ],
         ],
     ]
 );
@@ -1770,7 +1891,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-POSTapi-campaigns" data-method="POST"
       data-path="api/campaigns"
       data-authed="0"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('POSTapi-campaigns', this);">
@@ -1806,10 +1927,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="POSTapi-campaigns"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -1867,10 +1988,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="campaign_mode"                data-endpoint="POSTapi-campaigns"
-               value="fund_only"
+               value="both"
                data-component="body">
     <br>
-<p>Example: <code>fund_only</code></p>
+<p>Example: <code>both</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>fund_only</code></li> <li><code>volunteer_only</code></li> <li><code>both</code></li></ul>
         </div>
@@ -1917,10 +2038,22 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="activity_date"                data-endpoint="POSTapi-campaigns"
-               value="2052-11-06"
+               value="2026-10-29T00:19:24"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after or equal to <code>today</code>. Example: <code>2052-11-06</code></p>
+<p>Must be a valid date. Example: <code>2026-10-29T00:19:24</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>image</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="image"                data-endpoint="POSTapi-campaigns"
+               value=""
+               data-component="body">
+    <br>
+<p>Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\php5135.tmp</code></p>
         </div>
         </form>
 
@@ -2081,17 +2214,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
     "http://localhost:8000/api/campaigns/1" \
-    --header "Content-Type: application/json" \
+    --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --data "{
-    \"title\": \"b\",
-    \"description\": \"Eius et animi quos velit et.\",
-    \"location\": \"v\",
-    \"activity_date\": \"2026-10-14T13:28:02\",
-    \"target_amount\": 42,
-    \"target_volunteers\": 37
-}"
-</code></pre></div>
+    --form "title=b"\
+    --form "description=Eius et animi quos velit et."\
+    --form "campaign_mode=volunteer_only"\
+    --form "location=v"\
+    --form "activity_date=2026-10-29T00:19:24"\
+    --form "target_amount=42"\
+    --form "target_volunteers=37"\
+    --form "image=@C:\Users\ASUS\AppData\Local\Temp\php5155.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2100,23 +2232,24 @@ You can check the Dev Tools console for debugging information.</code></pre>
 );
 
 const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     "Accept": "application/json",
 };
 
-let body = {
-    "title": "b",
-    "description": "Eius et animi quos velit et.",
-    "location": "v",
-    "activity_date": "2026-10-14T13:28:02",
-    "target_amount": 42,
-    "target_volunteers": 37
-};
+const body = new FormData();
+body.append('title', 'b');
+body.append('description', 'Eius et animi quos velit et.');
+body.append('campaign_mode', 'volunteer_only');
+body.append('location', 'v');
+body.append('activity_date', '2026-10-29T00:19:24');
+body.append('target_amount', '42');
+body.append('target_volunteers', '37');
+body.append('image', document.querySelector('input[name="image"]').files[0]);
 
 fetch(url, {
     method: "PUT",
     headers,
-    body: JSON.stringify(body),
+    body,
 }).then(response =&gt; response.json());</code></pre></div>
 
 
@@ -2127,16 +2260,42 @@ $response = $client-&gt;put(
     $url,
     [
         'headers' =&gt; [
-            'Content-Type' =&gt; 'application/json',
+            'Content-Type' =&gt; 'multipart/form-data',
             'Accept' =&gt; 'application/json',
         ],
-        'json' =&gt; [
-            'title' =&gt; 'b',
-            'description' =&gt; 'Eius et animi quos velit et.',
-            'location' =&gt; 'v',
-            'activity_date' =&gt; '2026-10-14T13:28:02',
-            'target_amount' =&gt; 42,
-            'target_volunteers' =&gt; 37,
+        'multipart' =&gt; [
+            [
+                'name' =&gt; 'title',
+                'contents' =&gt; 'b'
+            ],
+            [
+                'name' =&gt; 'description',
+                'contents' =&gt; 'Eius et animi quos velit et.'
+            ],
+            [
+                'name' =&gt; 'campaign_mode',
+                'contents' =&gt; 'volunteer_only'
+            ],
+            [
+                'name' =&gt; 'location',
+                'contents' =&gt; 'v'
+            ],
+            [
+                'name' =&gt; 'activity_date',
+                'contents' =&gt; '2026-10-29T00:19:24'
+            ],
+            [
+                'name' =&gt; 'target_amount',
+                'contents' =&gt; '42'
+            ],
+            [
+                'name' =&gt; 'target_volunteers',
+                'contents' =&gt; '37'
+            ],
+            [
+                'name' =&gt; 'image',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php5155.tmp', 'r')
+            ],
         ],
     ]
 );
@@ -2165,7 +2324,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <form id="form-PUTapi-campaigns--id-" data-method="PUT"
       data-path="api/campaigns/{id}"
       data-authed="0"
-      data-hasfiles="0"
+      data-hasfiles="1"
       data-isarraybody="0"
       autocomplete="off"
       onsubmit="event.preventDefault(); executeTryOut('PUTapi-campaigns--id-', this);">
@@ -2201,10 +2360,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Content-Type"                data-endpoint="PUTapi-campaigns--id-"
-               value="application/json"
+               value="multipart/form-data"
                data-component="header">
     <br>
-<p>Example: <code>application/json</code></p>
+<p>Example: <code>multipart/form-data</code></p>
             </div>
                                 <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
@@ -2269,6 +2428,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>Eius et animi quos velit et.</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>campaign_mode</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="campaign_mode"                data-endpoint="PUTapi-campaigns--id-"
+               value="volunteer_only"
+               data-component="body">
+    <br>
+<p>Example: <code>volunteer_only</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>fund_only</code></li> <li><code>volunteer_only</code></li> <li><code>both</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>location</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
@@ -2287,10 +2460,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="activity_date"                data-endpoint="PUTapi-campaigns--id-"
-               value="2026-10-14T13:28:02"
+               value="2026-10-29T00:19:24"
                data-component="body">
     <br>
-<p>Must be a valid date. Example: <code>2026-10-14T13:28:02</code></p>
+<p>Must be a valid date. Example: <code>2026-10-29T00:19:24</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>target_amount</code></b>&nbsp;&nbsp;
@@ -2316,7 +2489,159 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Must be at least 0. Example: <code>37</code></p>
         </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>image</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="image"                data-endpoint="PUTapi-campaigns--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\php5155.tmp</code></p>
+        </div>
         </form>
+
+                    <h2 id="kampanye-publik-DELETEapi-campaigns--id-">Hapus Kampanye (Inisiator)</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-DELETEapi-campaigns--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/campaigns/1" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/campaigns/1"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/campaigns/1';
+$response = $client-&gt;delete(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-campaigns--id-">
+</span>
+<span id="execution-results-DELETEapi-campaigns--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-campaigns--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-campaigns--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-campaigns--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-campaigns--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-campaigns--id-" data-method="DELETE"
+      data-path="api/campaigns/{id}"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-campaigns--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-campaigns--id-"
+                    onclick="tryItOut('DELETEapi-campaigns--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-campaigns--id-"
+                    onclick="cancelTryOut('DELETEapi-campaigns--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-campaigns--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/campaigns/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-campaigns--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-campaigns--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="DELETEapi-campaigns--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the campaign. Example: <code>1</code></p>
+            </div>
+                    </form>
 
                 <h1 id="kategori">Kategori</h1>
 
@@ -2395,7 +2720,7 @@ vary: Origin
             &quot;category_name&quot;: &quot;Bencana Alam&quot;,
             &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
             &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
-            &quot;campaigns_count&quot;: 1
+            &quot;campaigns_count&quot;: 3
         },
         {
             &quot;id&quot;: 2,
@@ -2951,7 +3276,858 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     <p>Endpoint checkout donasi, status pembayaran, dan simulasi webhook.</p>
 
-                                <h2 id="donasi-POSTapi-donations-guest-checkout">Guest Checkout (Tanpa Login)</h2>
+                                <h2 id="donasi-POSTapi-donations">Pencatatan Transaksi Donasi Nyata / QRIS (POST /api/donations)</h2>
+
+<p>
+</p>
+
+<p>Menyimpan transaksi donasi langsung ke database PostgreSQL
+dengan pembaruan atomic saldo kampanye (ACID).</p>
+
+<span id="example-requests-POSTapi-donations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/donations" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"campaign_id\": \"architecto\",
+    \"amount\": 3357,
+    \"payment_method\": \"architecto\",
+    \"payment_channel\": \"architecto\",
+    \"donor_name\": \"n\",
+    \"donor_email\": \"ashly64@example.com\",
+    \"is_anonymous\": false,
+    \"status\": \"architecto\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/donations"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "campaign_id": "architecto",
+    "amount": 3357,
+    "payment_method": "architecto",
+    "payment_channel": "architecto",
+    "donor_name": "n",
+    "donor_email": "ashly64@example.com",
+    "is_anonymous": false,
+    "status": "architecto"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/donations';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'campaign_id' =&gt; 'architecto',
+            'amount' =&gt; 3357,
+            'payment_method' =&gt; 'architecto',
+            'payment_channel' =&gt; 'architecto',
+            'donor_name' =&gt; 'n',
+            'donor_email' =&gt; 'ashly64@example.com',
+            'is_anonymous' =&gt; false,
+            'status' =&gt; 'architecto',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-donations">
+</span>
+<span id="execution-results-POSTapi-donations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-donations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-donations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-donations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-donations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-donations" data-method="POST"
+      data-path="api/donations"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-donations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-donations"
+                    onclick="tryItOut('POSTapi-donations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-donations"
+                    onclick="cancelTryOut('POSTapi-donations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-donations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/donations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>campaign_id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="campaign_id"                data-endpoint="POSTapi-donations"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount"                data-endpoint="POSTapi-donations"
+               value="3357"
+               data-component="body">
+    <br>
+<p>Must be at least 10000. Example: <code>3357</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_method</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_method"                data-endpoint="POSTapi-donations"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>payment_channel</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="payment_channel"                data-endpoint="POSTapi-donations"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>donor_name</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="donor_name"                data-endpoint="POSTapi-donations"
+               value="n"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>n</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>donor_email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="donor_email"                data-endpoint="POSTapi-donations"
+               value="ashly64@example.com"
+               data-component="body">
+    <br>
+<p>Must be a valid email address. Must not be greater than 255 characters. Example: <code>ashly64@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_anonymous</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-donations" style="display: none">
+            <input type="radio" name="is_anonymous"
+                   value="true"
+                   data-endpoint="POSTapi-donations"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-donations" style="display: none">
+            <input type="radio" name="is_anonymous"
+                   value="false"
+                   data-endpoint="POSTapi-donations"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="POSTapi-donations"
+               value="architecto"
+               data-component="body">
+    <br>
+<p>Example: <code>architecto</code></p>
+        </div>
+        </form>
+
+                    <h2 id="donasi-GETapi-donations">Audit Transaksi Donasi Moneter (Admin / Sandbox)</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-donations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/donations" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/donations"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/donations';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-donations">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 7,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: 4,
+            &quot;amount&quot;: &quot;10000000.00&quot;,
+            &quot;donor_name&quot;: &quot;fadhilah azzahra&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261028-CSGKCQ&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-29T13:50:11.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;10000000.00&quot;,
+            &quot;donor_name&quot;: &quot;fadhilah azzahra&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-GST-20261028-DIHA5G&quot;,
+            &quot;status&quot;: &quot;pending&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-29T13:50:09.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-28T13:50:09.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:50:09.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;250000.00&quot;,
+            &quot;donor_name&quot;: &quot;Donatur QRIS Live&quot;,
+            &quot;donor_email&quot;: &quot;donatur.live@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-3MF5PX&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:15:28.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;150000.00&quot;,
+            &quot;donor_name&quot;: &quot;Budi Santoso QRIS&quot;,
+            &quot;donor_email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-OK9F6L&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:14:34.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:14:34.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:14:34.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;150000.00&quot;,
+            &quot;donor_name&quot;: &quot;Budi Santoso QRIS&quot;,
+            &quot;donor_email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-YOSHOF&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:14:27.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:14:27.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:14:27.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;25000.00&quot;,
+            &quot;donor_name&quot;: &quot;Donatur Test&quot;,
+            &quot;donor_email&quot;: &quot;test@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-IIRYY7&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:02:56.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:02:56.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:02:56.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 1,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;10000.00&quot;,
+            &quot;donor_name&quot;: &quot;Hamba Allah&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: true,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-GST-20261022-T91VFA&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-23T05:32:31.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-22T05:32:31.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-22T05:32:37.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-donations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-donations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-donations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-donations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-donations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-donations" data-method="GET"
+      data-path="api/donations"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-donations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-donations"
+                    onclick="tryItOut('GETapi-donations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-donations"
+                    onclick="cancelTryOut('GETapi-donations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-donations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/donations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="donasi-GETapi-admin-donations">Audit Transaksi Donasi Moneter (Admin / Sandbox)</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-admin-donations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/admin/donations" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/donations"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/donations';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-admin-donations">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 7,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: 4,
+            &quot;amount&quot;: &quot;10000000.00&quot;,
+            &quot;donor_name&quot;: &quot;fadhilah azzahra&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261028-CSGKCQ&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-29T13:50:11.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 6,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;10000000.00&quot;,
+            &quot;donor_name&quot;: &quot;fadhilah azzahra&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-GST-20261028-DIHA5G&quot;,
+            &quot;status&quot;: &quot;pending&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-29T13:50:09.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-28T13:50:09.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:50:09.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 5,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;250000.00&quot;,
+            &quot;donor_name&quot;: &quot;Donatur QRIS Live&quot;,
+            &quot;donor_email&quot;: &quot;donatur.live@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-3MF5PX&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:15:28.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 4,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;150000.00&quot;,
+            &quot;donor_name&quot;: &quot;Budi Santoso QRIS&quot;,
+            &quot;donor_email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-OK9F6L&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:14:34.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:14:34.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:14:34.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 3,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;150000.00&quot;,
+            &quot;donor_name&quot;: &quot;Budi Santoso QRIS&quot;,
+            &quot;donor_email&quot;: &quot;budi.santoso@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-YOSHOF&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:14:27.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:14:27.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:14:27.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;campaign_id&quot;: 1,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;25000.00&quot;,
+            &quot;donor_name&quot;: &quot;Donatur Test&quot;,
+            &quot;donor_email&quot;: &quot;test@example.com&quot;,
+            &quot;is_anonymous&quot;: false,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-QRIS-20261024-IIRYY7&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-25T17:02:56.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:02:56.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:02:56.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        },
+        {
+            &quot;id&quot;: 1,
+            &quot;campaign_id&quot;: 2,
+            &quot;user_id&quot;: null,
+            &quot;amount&quot;: &quot;10000.00&quot;,
+            &quot;donor_name&quot;: &quot;Hamba Allah&quot;,
+            &quot;donor_email&quot;: &quot;azzahra@actgiving.com&quot;,
+            &quot;is_anonymous&quot;: true,
+            &quot;payment_channel&quot;: &quot;qris&quot;,
+            &quot;reference_code&quot;: &quot;INV-GST-20261022-T91VFA&quot;,
+            &quot;status&quot;: &quot;paid&quot;,
+            &quot;expires_at&quot;: &quot;2026-10-23T05:32:31.000000Z&quot;,
+            &quot;created_at&quot;: &quot;2026-10-22T05:32:31.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-22T05:32:37.000000Z&quot;,
+            &quot;is_approved_by_initiator&quot;: null,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;
+            }
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-admin-donations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-admin-donations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-admin-donations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-admin-donations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-admin-donations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-admin-donations" data-method="GET"
+      data-path="api/admin/donations"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-admin-donations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-admin-donations"
+                    onclick="tryItOut('GETapi-admin-donations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-admin-donations"
+                    onclick="cancelTryOut('GETapi-admin-donations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-admin-donations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/admin/donations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-admin-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-admin-donations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="donasi-POSTapi-donations-guest-checkout">Guest Checkout (Tanpa Login)</h2>
 
 <p>
 </p>
@@ -2975,8 +4151,8 @@ Return dummy QRIS / Virtual Account info.</li>
     \"amount\": 3357,
     \"donor_name\": \"g\",
     \"donor_email\": \"rowan.gulgowski@example.com\",
-    \"is_anonymous\": false,
-    \"payment_channel\": \"mandiri_va\"
+    \"is_anonymous\": true,
+    \"payment_channel\": \"qris\"
 }"
 </code></pre></div>
 
@@ -2996,8 +4172,8 @@ let body = {
     "amount": 3357,
     "donor_name": "g",
     "donor_email": "rowan.gulgowski@example.com",
-    "is_anonymous": false,
-    "payment_channel": "mandiri_va"
+    "is_anonymous": true,
+    "payment_channel": "qris"
 };
 
 fetch(url, {
@@ -3022,8 +4198,8 @@ $response = $client-&gt;post(
             'amount' =&gt; 3357,
             'donor_name' =&gt; 'g',
             'donor_email' =&gt; 'rowan.gulgowski@example.com',
-            'is_anonymous' =&gt; false,
-            'payment_channel' =&gt; 'mandiri_va',
+            'is_anonymous' =&gt; true,
+            'payment_channel' =&gt; 'qris',
         ],
     ]
 );
@@ -3174,7 +4350,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>payment_channel</code></b>&nbsp;&nbsp;
@@ -3183,10 +4359,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="payment_channel"                data-endpoint="POSTapi-donations-guest-checkout"
-               value="mandiri_va"
+               value="qris"
                data-component="body">
     <br>
-<p>Example: <code>mandiri_va</code></p>
+<p>Example: <code>qris</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>qris</code></li> <li><code>bca_va</code></li> <li><code>mandiri_va</code></li> <li><code>bni_va</code></li> <li><code>bri_va</code></li></ul>
         </div>
@@ -3205,14 +4381,14 @@ Must be one of:
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/donations/16/status" \
+    --get "http://localhost:8000/api/donations/1/status" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/donations/16/status"
+    "http://localhost:8000/api/donations/1/status"
 );
 
 const headers = {
@@ -3229,7 +4405,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost:8000/api/donations/16/status';
+$url = 'http://localhost:8000/api/donations/1/status';
 $response = $client-&gt;get(
     $url,
     [
@@ -3341,10 +4517,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="reference_code"                data-endpoint="GETapi-donations--reference_code--status"
-               value="16"
+               value="1"
                data-component="url">
     <br>
-<p>Example: <code>16</code></p>
+<p>Example: <code>1</code></p>
             </div>
                     </form>
 
@@ -3367,7 +4543,7 @@ WAJIB ACID Transaction &amp; lockForUpdate() untuk Update current_amount secara 
     --header "Accept: application/json" \
     --data "{
     \"reference_code\": \"architecto\",
-    \"status\": \"paid\"
+    \"status\": \"expired\"
 }"
 </code></pre></div>
 
@@ -3384,7 +4560,7 @@ const headers = {
 
 let body = {
     "reference_code": "architecto",
-    "status": "paid"
+    "status": "expired"
 };
 
 fetch(url, {
@@ -3406,7 +4582,7 @@ $response = $client-&gt;post(
         ],
         'json' =&gt; [
             'reference_code' =&gt; 'architecto',
-            'status' =&gt; 'paid',
+            'status' =&gt; 'expired',
         ],
     ]
 );
@@ -3508,10 +4684,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="POSTapi-donations-webhook-simulate"
-               value="paid"
+               value="expired"
                data-component="body">
     <br>
-<p>Example: <code>paid</code></p>
+<p>Example: <code>expired</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>paid</code></li> <li><code>expired</code></li></ul>
         </div>
@@ -3882,18 +5058,18 @@ WAJIB ACID Transaction &amp; lockForUpdate().</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost:8000/api/donations/16/approval" \
+    "http://localhost:8000/api/donations/1/approval" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"approval\": false
+    \"approval\": true
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/donations/16/approval"
+    "http://localhost:8000/api/donations/1/approval"
 );
 
 const headers = {
@@ -3902,7 +5078,7 @@ const headers = {
 };
 
 let body = {
-    "approval": false
+    "approval": true
 };
 
 fetch(url, {
@@ -3914,7 +5090,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost:8000/api/donations/16/approval';
+$url = 'http://localhost:8000/api/donations/1/approval';
 $response = $client-&gt;patch(
     $url,
     [
@@ -3923,7 +5099,7 @@ $response = $client-&gt;patch(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'approval' =&gt; false,
+            'approval' =&gt; true,
         ],
     ]
 );
@@ -4013,10 +5189,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PATCHapi-donations--id--approval"
-               value="16"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the donation. Example: <code>16</code></p>
+<p>The ID of the donation. Example: <code>1</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -4039,7 +5215,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -4047,7 +5223,350 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     <p>Pendaftaran dan seleksi relawan kegiatan kampanye.</p>
 
-                                <h2 id="pendaftaran-relawan-GETapi-campaigns--id--registrations">Daftar Pelamar Relawan (Inisiator)</h2>
+                                <h2 id="pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">Daftar sebagai Relawan &amp; Pembuatan Akun Relawan Otomatis</h2>
+
+<p>
+</p>
+
+<p>Jika user belum login, endpoint ini sekaligus membuat record User baru
+dengan password yang di-hash, mencatat pendaftaran relawan ke kampanye,
+dan mengembalikan Sanctum token untuk auto-login ke Dashboard Relawan.</p>
+
+<span id="example-requests-POSTapi-campaigns--id--volunteer-register">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/campaigns/1/volunteer-register" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/campaigns/1/volunteer-register"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/campaigns/1/volunteer-register';
+$response = $client-&gt;post(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-campaigns--id--volunteer-register">
+</span>
+<span id="execution-results-POSTapi-campaigns--id--volunteer-register" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-campaigns--id--volunteer-register"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-campaigns--id--volunteer-register"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-campaigns--id--volunteer-register" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-campaigns--id--volunteer-register">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-campaigns--id--volunteer-register" data-method="POST"
+      data-path="api/campaigns/{id}/volunteer-register"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-campaigns--id--volunteer-register', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-campaigns--id--volunteer-register"
+                    onclick="tryItOut('POSTapi-campaigns--id--volunteer-register');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-campaigns--id--volunteer-register"
+                    onclick="cancelTryOut('POSTapi-campaigns--id--volunteer-register');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-campaigns--id--volunteer-register"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/campaigns/{id}/volunteer-register</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the campaign. Example: <code>1</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="pendaftaran-relawan-GETapi-initiator-volunteers">Daftar Semua Pendaftar Relawan untuk Inisiator (FR Inisiator)</h2>
+
+<p>
+</p>
+
+<p>Inisiator: Mendapatkan daftar seluruh relawan yang mendaftar ke kampanye miliknya.</p>
+
+<span id="example-requests-GETapi-initiator-volunteers">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/initiator/volunteers" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/initiator/volunteers"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/initiator/volunteers';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-initiator-volunteers">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 2,
+            &quot;campaign_id&quot;: 2,
+            &quot;campaignTitle&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+            &quot;user_id&quot;: 6,
+            &quot;name&quot;: &quot;nurfadhilah&quot;,
+            &quot;email&quot;: &quot;fadhilah@actgiving.com&quot;,
+            &quot;phone&quot;: &quot;081234567890&quot;,
+            &quot;city&quot;: &quot;Makassar&quot;,
+            &quot;skills&quot;: &quot;Relawan aktif terverifikasi ActGiving siap diterjunkan ke lapangan.&quot;,
+            &quot;status&quot;: &quot;accepted&quot;,
+            &quot;created_at&quot;: &quot;2026-10-25T12:36:15.000000Z&quot;,
+            &quot;user&quot;: {
+                &quot;id&quot;: 6,
+                &quot;name&quot;: &quot;nurfadhilah&quot;,
+                &quot;email&quot;: &quot;fadhilah@actgiving.com&quot;,
+                &quot;phone_whatsapp&quot;: &quot;081234567890&quot;,
+                &quot;city_domicile&quot;: &quot;Makassar&quot;
+            },
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;activity_date&quot;: &quot;2026-10-29T00:00:00.000000Z&quot;,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;user_id&quot;: 4
+            }
+        },
+        {
+            &quot;id&quot;: 1,
+            &quot;campaign_id&quot;: 1,
+            &quot;campaignTitle&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+            &quot;user_id&quot;: 5,
+            &quot;name&quot;: &quot;Test Relawan Baru&quot;,
+            &quot;email&quot;: &quot;test_relawan_1792931329927@example.com&quot;,
+            &quot;phone&quot;: &quot;081299998888&quot;,
+            &quot;city&quot;: &quot;Indonesia&quot;,
+            &quot;skills&quot;: &quot;Pengalaman medis lapangan dan dapur umum&quot;,
+            &quot;status&quot;: &quot;pending&quot;,
+            &quot;created_at&quot;: &quot;2026-10-25T12:28:50.000000Z&quot;,
+            &quot;user&quot;: {
+                &quot;id&quot;: 5,
+                &quot;name&quot;: &quot;Test Relawan Baru&quot;,
+                &quot;email&quot;: &quot;test_relawan_1792931329927@example.com&quot;,
+                &quot;phone_whatsapp&quot;: &quot;081299998888&quot;,
+                &quot;city_domicile&quot;: null
+            },
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;activity_date&quot;: &quot;2026-10-28T00:00:00.000000Z&quot;,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;user_id&quot;: 2
+            }
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-initiator-volunteers" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-initiator-volunteers"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-initiator-volunteers"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-initiator-volunteers" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-initiator-volunteers">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-initiator-volunteers" data-method="GET"
+      data-path="api/initiator/volunteers"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-initiator-volunteers', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-initiator-volunteers"
+                    onclick="tryItOut('GETapi-initiator-volunteers');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-initiator-volunteers"
+                    onclick="cancelTryOut('GETapi-initiator-volunteers');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-initiator-volunteers"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/initiator/volunteers</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-initiator-volunteers"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-initiator-volunteers"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="pendaftaran-relawan-GETapi-campaigns--id--registrations">Daftar Pelamar Relawan per Kampanye (Inisiator)</h2>
 
 <p>
 </p>
@@ -4101,7 +5620,7 @@ print_r(json_decode((string) $body));</code></pre></div>
 
 <span id="example-responses-GETapi-campaigns--id--registrations">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -4113,7 +5632,37 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;success&quot;: true,
+    &quot;data&quot;: {
+        &quot;campaign&quot;: {
+            &quot;id&quot;: 1,
+            &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+            &quot;current_volunteers&quot;: 4,
+            &quot;target_volunteers&quot;: 10
+        },
+        &quot;registrations&quot;: [
+            {
+                &quot;id&quot;: 1,
+                &quot;campaign_id&quot;: 1,
+                &quot;campaignTitle&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;user_id&quot;: 5,
+                &quot;name&quot;: &quot;Test Relawan Baru&quot;,
+                &quot;email&quot;: &quot;test_relawan_1792931329927@example.com&quot;,
+                &quot;phone&quot;: &quot;081299998888&quot;,
+                &quot;city&quot;: &quot;-&quot;,
+                &quot;skills&quot;: &quot;Pengalaman medis lapangan dan dapur umum&quot;,
+                &quot;status&quot;: &quot;pending&quot;,
+                &quot;created_at&quot;: &quot;2026-10-25T12:28:50.000000Z&quot;,
+                &quot;user&quot;: {
+                    &quot;id&quot;: 5,
+                    &quot;name&quot;: &quot;Test Relawan Baru&quot;,
+                    &quot;email&quot;: &quot;test_relawan_1792931329927@example.com&quot;,
+                    &quot;phone_whatsapp&quot;: &quot;081299998888&quot;,
+                    &quot;city_domicile&quot;: null
+                }
+            }
+        ]
+    }
 }</code>
  </pre>
     </span>
@@ -4217,7 +5766,7 @@ WAJIB ACID Transaction &amp; lockForUpdate() untuk mencegah over-capacity.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PATCH \
-    "http://localhost:8000/api/volunteer-registrations/16/status" \
+    "http://localhost:8000/api/volunteer-registrations/1/status" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -4228,7 +5777,7 @@ WAJIB ACID Transaction &amp; lockForUpdate() untuk mencegah over-capacity.</p>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/volunteer-registrations/16/status"
+    "http://localhost:8000/api/volunteer-registrations/1/status"
 );
 
 const headers = {
@@ -4249,7 +5798,7 @@ fetch(url, {
 
 <div class="php-example">
     <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost:8000/api/volunteer-registrations/16/status';
+$url = 'http://localhost:8000/api/volunteer-registrations/1/status';
 $response = $client-&gt;patch(
     $url,
     [
@@ -4348,10 +5897,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="number" style="display: none"
                step="any"               name="id"                data-endpoint="PATCHapi-volunteer-registrations--id--status"
-               value="16"
+               value="1"
                data-component="url">
     <br>
-<p>The ID of the volunteer registration. Example: <code>16</code></p>
+<p>The ID of the volunteer registration. Example: <code>1</code></p>
             </div>
                             <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
@@ -4366,171 +5915,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Example: <code>rejected</code></p>
 Must be one of:
-<ul style="list-style-type: square;"><li><code>accepted</code></li> <li><code>rejected</code></li></ul>
-        </div>
-        </form>
-
-                    <h2 id="pendaftaran-relawan-POSTapi-campaigns--id--volunteer-register">Daftar sebagai Relawan</h2>
-
-<p>
-</p>
-
-<p>Relawan: Mendaftar ke suatu kampanye.</p>
-
-<span id="example-requests-POSTapi-campaigns--id--volunteer-register">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/campaigns/1/volunteer-register" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"skills\": \"b\"
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/campaigns/1/volunteer-register"
-);
-
-const headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "skills": "b"
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-
-<div class="php-example">
-    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
-$url = 'http://localhost:8000/api/campaigns/1/volunteer-register';
-$response = $client-&gt;post(
-    $url,
-    [
-        'headers' =&gt; [
-            'Content-Type' =&gt; 'application/json',
-            'Accept' =&gt; 'application/json',
-        ],
-        'json' =&gt; [
-            'skills' =&gt; 'b',
-        ],
-    ]
-);
-$body = $response-&gt;getBody();
-print_r(json_decode((string) $body));</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTapi-campaigns--id--volunteer-register">
-</span>
-<span id="execution-results-POSTapi-campaigns--id--volunteer-register" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTapi-campaigns--id--volunteer-register"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-campaigns--id--volunteer-register"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTapi-campaigns--id--volunteer-register" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-campaigns--id--volunteer-register">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTapi-campaigns--id--volunteer-register" data-method="POST"
-      data-path="api/campaigns/{id}/volunteer-register"
-      data-authed="0"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-campaigns--id--volunteer-register', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-campaigns--id--volunteer-register"
-                    onclick="tryItOut('POSTapi-campaigns--id--volunteer-register');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-campaigns--id--volunteer-register"
-                    onclick="cancelTryOut('POSTapi-campaigns--id--volunteer-register');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-campaigns--id--volunteer-register"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>api/campaigns/{id}/volunteer-register</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
-                    <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="id"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
-               value="1"
-               data-component="url">
-    <br>
-<p>The ID of the campaign. Example: <code>1</code></p>
-            </div>
-                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>skills</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="skills"                data-endpoint="POSTapi-campaigns--id--volunteer-register"
-               value="b"
-               data-component="body">
-    <br>
-<p>Must not be greater than 1000 characters. Example: <code>b</code></p>
+<ul style="list-style-type: square;"><li><code>accepted</code></li> <li><code>rejected</code></li> <li><code>pending</code></li></ul>
         </div>
         </form>
 
@@ -5612,7 +6997,7 @@ print_r(json_decode((string) $body));</code></pre></div>
 
 <span id="example-responses-GETapi-admin-campaigns">
             <blockquote>
-            <p>Example response (401):</p>
+            <p>Example response (200):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -5624,7 +7009,156 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Unauthenticated.&quot;
+    &quot;success&quot;: true,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 10,
+            &quot;user_id&quot;: 2,
+            &quot;category_id&quot;: 1,
+            &quot;title&quot;: &quot;Uji Coba Moderasi Kampanye Baru 1792862057985&quot;,
+            &quot;description&quot;: &quot;Deskripsi lengkap uji coba kampanye baru agar masuk ke antrean moderasi admin.&quot;,
+            &quot;target_amount&quot;: &quot;10000000.00&quot;,
+            &quot;current_amount&quot;: &quot;0.00&quot;,
+            &quot;target_volunteers&quot;: 5,
+            &quot;current_volunteers&quot;: 0,
+            &quot;location&quot;: &quot;Bandung, Jawa Barat&quot;,
+            &quot;activity_date&quot;: null,
+            &quot;status&quot;: &quot;active&quot;,
+            &quot;campaign_mode&quot;: &quot;both&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:14:18.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-25T11:45:13.000000Z&quot;,
+            &quot;image_url&quot;: null,
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;category_name&quot;: &quot;Bencana Alam&quot;,
+                &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Yayasan Peduli Bersama&quot;,
+                &quot;email&quot;: &quot;inisiator@actgiving.com&quot;,
+                &quot;is_verified&quot;: true
+            },
+            &quot;lpj_reports&quot;: []
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;user_id&quot;: 4,
+            &quot;category_id&quot;: 1,
+            &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+            &quot;description&quot;: &quot;Kebakaran hutan dan lahan (Karhutla) di Kalimantan semakin meluas, menyebabkan kabut asap pekat yang menyelimuti pemukiman. Jarak pandang menurun drastis dan ribuan warga, terutama balita dan lansia, mulai berjatuhan sakit akibat ISPA (Infeksi Saluran Pernapasan Akut). Kami sangat membutuhkan dana darurat untuk pengadaan masker N95, tabung oksigen portabel, obat-obatan pernapasan, dan vitamin. Kami juga memanggil relawan untuk turun langsung membantu evakuasi warga rentan dan mendistribusikan bantuan medis dari rumah ke rumah. Mari bergerak cepat selamatkan napas saudara kita!&quot;,
+            &quot;target_amount&quot;: &quot;10000000.00&quot;,
+            &quot;current_amount&quot;: &quot;10010000.00&quot;,
+            &quot;target_volunteers&quot;: 20,
+            &quot;current_volunteers&quot;: 1,
+            &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+            &quot;activity_date&quot;: &quot;2026-10-29T00:00:00.000000Z&quot;,
+            &quot;status&quot;: &quot;active&quot;,
+            &quot;campaign_mode&quot;: &quot;both&quot;,
+            &quot;created_at&quot;: &quot;2026-10-21T16:43:14.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:50:11.000000Z&quot;,
+            &quot;image_url&quot;: &quot;http://127.0.0.1:8000/storage/campaigns/ff131484-5b78-4db8-a1f9-beb8cac09a76_1792647116.jpeg&quot;,
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;category_name&quot;: &quot;Bencana Alam&quot;,
+                &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 4,
+                &quot;name&quot;: &quot;fadhilah azzahra&quot;,
+                &quot;email&quot;: &quot;azzahra@actgiving.com&quot;,
+                &quot;is_verified&quot;: false
+            },
+            &quot;lpj_reports&quot;: [
+                {
+                    &quot;id&quot;: 3,
+                    &quot;campaign_id&quot;: 2,
+                    &quot;description&quot;: &quot;Puji syukur, distribusi bantuan tahap pertama berjalan lancar meski jarak pandang sangat terbatas akibat kabut asap pekat. Tim relawan berhasil mendistribusikan 500 masker N95 secara door-to-door kepada warga rentan (lansia dan balita) di Kecamatan Jekan Raya. Kami juga mengaktifkan posko oksigen darurat yang langsung menangani puluhan warga dengan gejala sesak napas akut pada hari pertama. Respons warga sangat haru dan berterima kasih. Bantuan dari para donatur sangat menyelamatkan nyawa mereka hari ini. Selanjutnya, kami akan memperluas area distribusi logistik medis ke kecamatan tetangga.&quot;,
+                    &quot;proof_image_url&quot;: &quot;http://127.0.0.1:8000/storage/lpj_proofs/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg&quot;,
+                    &quot;created_at&quot;: &quot;2026-10-28T14:53:38.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2026-10-28T14:53:38.000000Z&quot;,
+                    &quot;activity_photos&quot;: [
+                        &quot;http://127.0.0.1:8000/storage/lpj_proofs/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg&quot;,
+                        &quot;http://127.0.0.1:8000/storage/lpj_proofs/71d19770-0b75-4aed-bb64-91bbbef8a305_1793199218.jpeg&quot;
+                    ],
+                    &quot;status&quot;: &quot;pending&quot;,
+                    &quot;title&quot;: &quot;Laporan Penggunaan Dana&quot;,
+                    &quot;amount_spent&quot;: &quot;1000000.00&quot;,
+                    &quot;budget_items&quot;: [
+                        {
+                            &quot;name&quot;: &quot;Masker&quot;,
+                            &quot;amount&quot;: 1000000
+                        }
+                    ],
+                    &quot;beneficiaries_count&quot;: 100,
+                    &quot;volunteers_involved&quot;: 20,
+                    &quot;field_location&quot;: &quot;Kalimantan&quot;,
+                    &quot;verified_at&quot;: null,
+                    &quot;is_final&quot;: false,
+                    &quot;report_type&quot;: &quot;progress&quot;,
+                    &quot;total_realisasi&quot;: 1000000,
+                    &quot;realized_amount&quot;: 1000000
+                }
+            ]
+        },
+        {
+            &quot;id&quot;: 1,
+            &quot;user_id&quot;: 2,
+            &quot;category_id&quot;: 1,
+            &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+            &quot;description&quot;: &quot;Penyaluran logistik darurat, masker, makanan siap saji, dan posko medis untuk warga terdampak erupsi Semeru.&quot;,
+            &quot;target_amount&quot;: &quot;50000000.00&quot;,
+            &quot;current_amount&quot;: &quot;15575000.00&quot;,
+            &quot;target_volunteers&quot;: 10,
+            &quot;current_volunteers&quot;: 4,
+            &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+            &quot;activity_date&quot;: &quot;2026-10-28T00:00:00.000000Z&quot;,
+            &quot;status&quot;: &quot;active&quot;,
+            &quot;campaign_mode&quot;: &quot;both&quot;,
+            &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-24T17:15:28.000000Z&quot;,
+            &quot;image_url&quot;: null,
+            &quot;category&quot;: {
+                &quot;id&quot;: 1,
+                &quot;category_name&quot;: &quot;Bencana Alam&quot;,
+                &quot;created_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;,
+                &quot;updated_at&quot;: &quot;2026-10-14T02:54:38.000000Z&quot;
+            },
+            &quot;user&quot;: {
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Yayasan Peduli Bersama&quot;,
+                &quot;email&quot;: &quot;inisiator@actgiving.com&quot;,
+                &quot;is_verified&quot;: true
+            },
+            &quot;lpj_reports&quot;: [
+                {
+                    &quot;id&quot;: 2,
+                    &quot;campaign_id&quot;: 1,
+                    &quot;description&quot;: &quot;Distribusi sembako dan obat-obatan tahap dua kepada 150 KK warga terdampak bencana.&quot;,
+                    &quot;proof_image_url&quot;: &quot;http://127.0.0.1:8000/storage/lpj_proofs/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png&quot;,
+                    &quot;created_at&quot;: &quot;2026-10-24T17:17:46.000000Z&quot;,
+                    &quot;updated_at&quot;: &quot;2026-10-28T13:51:07.000000Z&quot;,
+                    &quot;activity_photos&quot;: [
+                        &quot;http://127.0.0.1:8000/storage/lpj_proofs/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png&quot;
+                    ],
+                    &quot;status&quot;: &quot;pending_audit&quot;,
+                    &quot;title&quot;: &quot;LPJ Pengadaan Logistik Tahap 2&quot;,
+                    &quot;amount_spent&quot;: &quot;12500000.00&quot;,
+                    &quot;budget_items&quot;: null,
+                    &quot;beneficiaries_count&quot;: 0,
+                    &quot;volunteers_involved&quot;: 0,
+                    &quot;field_location&quot;: &quot;Posko Tanggap Darurat Bencana&quot;,
+                    &quot;verified_at&quot;: null,
+                    &quot;is_final&quot;: false,
+                    &quot;report_type&quot;: &quot;progress&quot;,
+                    &quot;total_realisasi&quot;: 12500000,
+                    &quot;realized_amount&quot;: 12500000
+                }
+            ]
+        }
+    ]
 }</code>
  </pre>
     </span>
@@ -5718,7 +7252,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"status\": \"active\"
+    \"status\": \"rejected\"
 }"
 </code></pre></div>
 
@@ -5734,7 +7268,7 @@ const headers = {
 };
 
 let body = {
-    "status": "active"
+    "status": "rejected"
 };
 
 fetch(url, {
@@ -5755,7 +7289,7 @@ $response = $client-&gt;patch(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'status' =&gt; 'active',
+            'status' =&gt; 'rejected',
         ],
     ]
 );
@@ -5858,10 +7392,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="PATCHapi-admin-campaigns--id--status"
-               value="active"
+               value="rejected"
                data-component="body">
     <br>
-<p>Example: <code>active</code></p>
+<p>Example: <code>rejected</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>active</code></li> <li><code>rejected</code></li> <li><code>closed</code></li></ul>
         </div>
@@ -6027,7 +7561,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"is_verified\": true
+    \"is_verified\": false
 }"
 </code></pre></div>
 
@@ -6043,7 +7577,7 @@ const headers = {
 };
 
 let body = {
-    "is_verified": true
+    "is_verified": false
 };
 
 fetch(url, {
@@ -6064,7 +7598,7 @@ $response = $client-&gt;patch(
             'Accept' =&gt; 'application/json',
         ],
         'json' =&gt; [
-            'is_verified' =&gt; true,
+            'is_verified' =&gt; false,
         ],
     ]
 );
@@ -6180,20 +7714,21 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
                 <h1 id="laporan-pertanggungjawaban-lpj">Laporan Pertanggungjawaban (LPJ)</h1>
 
-    <p>Upload bukti laporan kegiatan kampanye (FR-12).</p>
+    <p>Endpoint pengelolaan LPJ digital, verifikasi audit admin, dan kontrol status.</p>
 
-                                <h2 id="laporan-pertanggungjawaban-lpj-GETapi-campaigns--id--lpj">Daftar LPJ Kampanye</h2>
+                                <h2 id="laporan-pertanggungjawaban-lpj-GETapi-campaigns--id--lpj">Daftar LPJ Publik Suatu Kampanye</h2>
 
 <p>
 </p>
 
-<p>Menampilkan riwayat LPJ suatu kampanye.</p>
+<p>HANYA menampilkan LPJ yang berstatus 'verified' atau 'sah' untuk konsumsi publik.
+Inisiator pemilik kampanye atau Admin dapat melihat seluruh status bila diminta.</p>
 
 <span id="example-requests-GETapi-campaigns--id--lpj">
 <blockquote>Example request:</blockquote>
@@ -6349,13 +7884,679 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
-                    <h2 id="laporan-pertanggungjawaban-lpj-POSTapi-campaigns--id--lpj">Upload LPJ &amp; Bukti Gambar (Inisiator, FR-12)</h2>
+                    <h2 id="laporan-pertanggungjawaban-lpj-GETapi-admin-lpj">Daftar Seluruh LPJ untuk Audit Admin</h2>
 
 <p>
 </p>
 
-<p>Inisiator: Mengunggah Laporan Pertanggungjawaban (LPJ) beserta bukti gambar fisik.
-Menggunakan FileUploadService untuk menyimpan ke public storage disk.</p>
+<p>Admin: Melihat seluruh antrean LPJ beserta statusnya.</p>
+
+<span id="example-requests-GETapi-admin-lpj">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/admin/lpj" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/lpj"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/lpj';
+$response = $client-&gt;get(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-admin-lpj">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: 3,
+            &quot;campaign_id&quot;: 2,
+            &quot;description&quot;: &quot;Puji syukur, distribusi bantuan tahap pertama berjalan lancar meski jarak pandang sangat terbatas akibat kabut asap pekat. Tim relawan berhasil mendistribusikan 500 masker N95 secara door-to-door kepada warga rentan (lansia dan balita) di Kecamatan Jekan Raya. Kami juga mengaktifkan posko oksigen darurat yang langsung menangani puluhan warga dengan gejala sesak napas akut pada hari pertama. Respons warga sangat haru dan berterima kasih. Bantuan dari para donatur sangat menyelamatkan nyawa mereka hari ini. Selanjutnya, kami akan memperluas area distribusi logistik medis ke kecamatan tetangga.&quot;,
+            &quot;proof_image_url&quot;: &quot;http://127.0.0.1:8000/storage/lpj_proofs/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg&quot;,
+            &quot;created_at&quot;: &quot;2026-10-28T14:53:38.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T14:53:38.000000Z&quot;,
+            &quot;activity_photos&quot;: [
+                &quot;http://127.0.0.1:8000/storage/lpj_proofs/bb5d4029-cdc9-458a-ae47-45e5721ef7a6_1793199218.jpeg&quot;,
+                &quot;http://127.0.0.1:8000/storage/lpj_proofs/71d19770-0b75-4aed-bb64-91bbbef8a305_1793199218.jpeg&quot;
+            ],
+            &quot;status&quot;: &quot;pending&quot;,
+            &quot;title&quot;: &quot;Laporan Penggunaan Dana&quot;,
+            &quot;amount_spent&quot;: &quot;1000000.00&quot;,
+            &quot;budget_items&quot;: [
+                {
+                    &quot;name&quot;: &quot;Masker&quot;,
+                    &quot;amount&quot;: 1000000
+                }
+            ],
+            &quot;beneficiaries_count&quot;: 100,
+            &quot;volunteers_involved&quot;: 20,
+            &quot;field_location&quot;: &quot;Kalimantan&quot;,
+            &quot;verified_at&quot;: null,
+            &quot;is_final&quot;: false,
+            &quot;report_type&quot;: &quot;progress&quot;,
+            &quot;total_realisasi&quot;: 1000000,
+            &quot;realized_amount&quot;: 1000000,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 2,
+                &quot;title&quot;: &quot;Bantuan Darurat Medis &amp; Masker untuk Korban Kabut Asap Karhutla Kalimantan&quot;,
+                &quot;user_id&quot;: 4,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;user&quot;: {
+                    &quot;id&quot;: 4,
+                    &quot;name&quot;: &quot;fadhilah azzahra&quot;,
+                    &quot;email&quot;: &quot;azzahra@actgiving.com&quot;
+                }
+            }
+        },
+        {
+            &quot;id&quot;: 2,
+            &quot;campaign_id&quot;: 1,
+            &quot;description&quot;: &quot;Distribusi sembako dan obat-obatan tahap dua kepada 150 KK warga terdampak bencana.&quot;,
+            &quot;proof_image_url&quot;: &quot;http://127.0.0.1:8000/storage/lpj_proofs/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png&quot;,
+            &quot;created_at&quot;: &quot;2026-10-24T17:17:46.000000Z&quot;,
+            &quot;updated_at&quot;: &quot;2026-10-28T13:51:07.000000Z&quot;,
+            &quot;activity_photos&quot;: [
+                &quot;http://127.0.0.1:8000/storage/lpj_proofs/753a91e5-a2dc-42a9-b2dc-472b3b9b7997_1792862266.png&quot;
+            ],
+            &quot;status&quot;: &quot;pending_audit&quot;,
+            &quot;title&quot;: &quot;LPJ Pengadaan Logistik Tahap 2&quot;,
+            &quot;amount_spent&quot;: &quot;12500000.00&quot;,
+            &quot;budget_items&quot;: null,
+            &quot;beneficiaries_count&quot;: 0,
+            &quot;volunteers_involved&quot;: 0,
+            &quot;field_location&quot;: &quot;Posko Tanggap Darurat Bencana&quot;,
+            &quot;verified_at&quot;: null,
+            &quot;is_final&quot;: false,
+            &quot;report_type&quot;: &quot;progress&quot;,
+            &quot;total_realisasi&quot;: 12500000,
+            &quot;realized_amount&quot;: 12500000,
+            &quot;campaign&quot;: {
+                &quot;id&quot;: 1,
+                &quot;title&quot;: &quot;Tanggap Darurat Erupsi Gunung Semeru&quot;,
+                &quot;user_id&quot;: 2,
+                &quot;status&quot;: &quot;active&quot;,
+                &quot;location&quot;: &quot;Lumajang, Jawa Timur&quot;,
+                &quot;user&quot;: {
+                    &quot;id&quot;: 2,
+                    &quot;name&quot;: &quot;Yayasan Peduli Bersama&quot;,
+                    &quot;email&quot;: &quot;inisiator@actgiving.com&quot;
+                }
+            }
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-admin-lpj" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-admin-lpj"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-admin-lpj"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-admin-lpj" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-admin-lpj">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-admin-lpj" data-method="GET"
+      data-path="api/admin/lpj"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-admin-lpj', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-admin-lpj"
+                    onclick="tryItOut('GETapi-admin-lpj');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-admin-lpj"
+                    onclick="cancelTryOut('GETapi-admin-lpj');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-admin-lpj"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/admin/lpj</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-admin-lpj"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-admin-lpj"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--status">Ubah Status LPJ oleh Admin (Verifikasi Sah / Batal)</h2>
+
+<p>
+</p>
+
+<p>Endpoint: PATCH/PUT /api/admin/lpj/{id}/status atau /api/admin/lpj/{id}</p>
+
+<span id="example-requests-PATCHapi-admin-lpj--id--status">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PATCH \
+    "http://localhost:8000/api/admin/lpj/architecto/status" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"status\": \"pending_audit\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/lpj/architecto/status"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "status": "pending_audit"
+};
+
+fetch(url, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/lpj/architecto/status';
+$response = $client-&gt;patch(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+        'json' =&gt; [
+            'status' =&gt; 'pending_audit',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-PATCHapi-admin-lpj--id--status">
+</span>
+<span id="execution-results-PATCHapi-admin-lpj--id--status" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PATCHapi-admin-lpj--id--status"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PATCHapi-admin-lpj--id--status"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PATCHapi-admin-lpj--id--status" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PATCHapi-admin-lpj--id--status">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PATCHapi-admin-lpj--id--status" data-method="PATCH"
+      data-path="api/admin/lpj/{id}/status"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PATCHapi-admin-lpj--id--status', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PATCHapi-admin-lpj--id--status"
+                    onclick="tryItOut('PATCHapi-admin-lpj--id--status');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PATCHapi-admin-lpj--id--status"
+                    onclick="cancelTryOut('PATCHapi-admin-lpj--id--status');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PATCHapi-admin-lpj--id--status"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-purple">PATCH</small>
+            <b><code>api/admin/lpj/{id}/status</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PATCHapi-admin-lpj--id--status"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PATCHapi-admin-lpj--id--status"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PATCHapi-admin-lpj--id--status"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>status</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="status"                data-endpoint="PATCHapi-admin-lpj--id--status"
+               value="pending_audit"
+               data-component="body">
+    <br>
+<p>Example: <code>pending_audit</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>verified</code></li> <li><code>sah</code></li> <li><code>pending</code></li> <li><code>pending_audit</code></li> <li><code>needs_review</code></li> <li><code>rejected</code></li></ul>
+        </div>
+        </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--verify">Verifikasi Sah LPJ (Admin Shortcut)</h2>
+
+<p>
+</p>
+
+<p>Endpoint: PATCH /api/admin/lpj/{id}/verify</p>
+
+<span id="example-requests-PATCHapi-admin-lpj--id--verify">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PATCH \
+    "http://localhost:8000/api/admin/lpj/architecto/verify" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/lpj/architecto/verify"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "PATCH",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/lpj/architecto/verify';
+$response = $client-&gt;patch(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-PATCHapi-admin-lpj--id--verify">
+</span>
+<span id="execution-results-PATCHapi-admin-lpj--id--verify" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PATCHapi-admin-lpj--id--verify"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PATCHapi-admin-lpj--id--verify"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PATCHapi-admin-lpj--id--verify" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PATCHapi-admin-lpj--id--verify">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PATCHapi-admin-lpj--id--verify" data-method="PATCH"
+      data-path="api/admin/lpj/{id}/verify"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PATCHapi-admin-lpj--id--verify', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PATCHapi-admin-lpj--id--verify"
+                    onclick="tryItOut('PATCHapi-admin-lpj--id--verify');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PATCHapi-admin-lpj--id--verify"
+                    onclick="cancelTryOut('PATCHapi-admin-lpj--id--verify');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PATCHapi-admin-lpj--id--verify"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-purple">PATCH</small>
+            <b><code>api/admin/lpj/{id}/verify</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PATCHapi-admin-lpj--id--verify"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PATCHapi-admin-lpj--id--verify"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PATCHapi-admin-lpj--id--verify"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-PATCHapi-admin-lpj--id--unverify">Batalkan Verifikasi LPJ (Admin Shortcut)</h2>
+
+<p>
+</p>
+
+<p>Endpoint: PATCH /api/admin/lpj/{id}/unverify</p>
+
+<span id="example-requests-PATCHapi-admin-lpj--id--unverify">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PATCH \
+    "http://localhost:8000/api/admin/lpj/architecto/unverify" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/admin/lpj/architecto/unverify"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "PATCH",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/admin/lpj/architecto/unverify';
+$response = $client-&gt;patch(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-PATCHapi-admin-lpj--id--unverify">
+</span>
+<span id="execution-results-PATCHapi-admin-lpj--id--unverify" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PATCHapi-admin-lpj--id--unverify"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PATCHapi-admin-lpj--id--unverify"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PATCHapi-admin-lpj--id--unverify" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PATCHapi-admin-lpj--id--unverify">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PATCHapi-admin-lpj--id--unverify" data-method="PATCH"
+      data-path="api/admin/lpj/{id}/unverify"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PATCHapi-admin-lpj--id--unverify', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PATCHapi-admin-lpj--id--unverify"
+                    onclick="tryItOut('PATCHapi-admin-lpj--id--unverify');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PATCHapi-admin-lpj--id--unverify"
+                    onclick="cancelTryOut('PATCHapi-admin-lpj--id--unverify');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PATCHapi-admin-lpj--id--unverify"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-purple">PATCH</small>
+            <b><code>api/admin/lpj/{id}/unverify</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PATCHapi-admin-lpj--id--unverify"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PATCHapi-admin-lpj--id--unverify"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PATCHapi-admin-lpj--id--unverify"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-POSTapi-campaigns--id--lpj">Upload LPJ Baru (Inisiator, FR-12)</h2>
+
+<p>
+</p>
+
+<p>Status awal: 'pending' (Menunggu Review &amp; Verifikasi Sah oleh Admin).</p>
 
 <span id="example-requests-POSTapi-campaigns--id--lpj">
 <blockquote>Example request:</blockquote>
@@ -6367,7 +8568,16 @@ Menggunakan FileUploadService untuk menyimpan ke public storage disk.</p>
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
     --form "description=Eius et animi quos velit et."\
-    --form "proof_image=@C:\Users\ASUS\AppData\Local\Temp\phpAD0B.tmp" </code></pre></div>
+    --form "title=v"\
+    --form "amount_spent=42"\
+    --form "total_realisasi=37"\
+    --form "realized_amount=9"\
+    --form "field_location=n"\
+    --form "beneficiaries_count=8"\
+    --form "volunteers_involved=75"\
+    --form "report_type=progress"\
+    --form "proof_image=@C:\Users\ASUS\AppData\Local\Temp\php5156.tmp" \
+    --form "activity_photos[]=@C:\Users\ASUS\AppData\Local\Temp\php5157.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -6382,7 +8592,16 @@ const headers = {
 
 const body = new FormData();
 body.append('description', 'Eius et animi quos velit et.');
+body.append('title', 'v');
+body.append('amount_spent', '42');
+body.append('total_realisasi', '37');
+body.append('realized_amount', '9');
+body.append('field_location', 'n');
+body.append('beneficiaries_count', '8');
+body.append('volunteers_involved', '75');
+body.append('report_type', 'progress');
 body.append('proof_image', document.querySelector('input[name="proof_image"]').files[0]);
+body.append('activity_photos[]', document.querySelector('input[name="activity_photos[]"]').files[0]);
 
 fetch(url, {
     method: "POST",
@@ -6407,8 +8626,44 @@ $response = $client-&gt;post(
                 'contents' =&gt; 'Eius et animi quos velit et.'
             ],
             [
+                'name' =&gt; 'title',
+                'contents' =&gt; 'v'
+            ],
+            [
+                'name' =&gt; 'amount_spent',
+                'contents' =&gt; '42'
+            ],
+            [
+                'name' =&gt; 'total_realisasi',
+                'contents' =&gt; '37'
+            ],
+            [
+                'name' =&gt; 'realized_amount',
+                'contents' =&gt; '9'
+            ],
+            [
+                'name' =&gt; 'field_location',
+                'contents' =&gt; 'n'
+            ],
+            [
+                'name' =&gt; 'beneficiaries_count',
+                'contents' =&gt; '8'
+            ],
+            [
+                'name' =&gt; 'volunteers_involved',
+                'contents' =&gt; '75'
+            ],
+            [
+                'name' =&gt; 'report_type',
+                'contents' =&gt; 'progress'
+            ],
+            [
                 'name' =&gt; 'proof_image',
-                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\phpAD0B.tmp', 'r')
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php5156.tmp', 'r')
+            ],
+            [
+                'name' =&gt; 'activity_photos[]',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php5157.tmp', 'r')
             ],
         ],
     ]
@@ -6518,18 +8773,1075 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Must be at least 10 characters. Example: <code>Eius et animi quos velit et.</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>title</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="title"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="v"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>v</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount_spent</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount_spent"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="42"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>42</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total_realisasi</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="total_realisasi"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="37"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>37</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>realized_amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="realized_amount"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="9"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>9</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>field_location</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="field_location"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="n"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>n</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>beneficiaries_count</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="beneficiaries_count"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="8"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>8</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>volunteers_involved</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="volunteers_involved"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="75"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>75</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>budget_items</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="budget_items"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_final</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="is_final"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>report_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="report_type"                data-endpoint="POSTapi-campaigns--id--lpj"
+               value="progress"
+               data-component="body">
+    <br>
+<p>Example: <code>progress</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>progress</code></li> <li><code>final</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>proof_image</code></b>&nbsp;&nbsp;
 <small>file</small>&nbsp;
- &nbsp;
+<i>optional</i> &nbsp;
  &nbsp;
                 <input type="file" style="display: none"
                               name="proof_image"                data-endpoint="POSTapi-campaigns--id--lpj"
                value=""
                data-component="body">
     <br>
-<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\phpAD0B.tmp</code></p>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\php5156.tmp</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>activity_photos</code></b>&nbsp;&nbsp;
+<small>file[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="activity_photos[0]"                data-endpoint="POSTapi-campaigns--id--lpj"
+               data-component="body">
+        <input type="file" style="display: none"
+               name="activity_photos[1]"                data-endpoint="POSTapi-campaigns--id--lpj"
+               data-component="body">
+    <br>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes.</p>
         </div>
         </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-PUTapi-campaigns--campaign_id--lpj--id-">Update LPJ (Inisiator)</h2>
+
+<p>
+</p>
+
+<p>ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+Inisiator DILARANG mengubah data (Read-Only / 403 Forbidden).</p>
+
+<span id="example-requests-PUTapi-campaigns--campaign_id--lpj--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PUT \
+    "http://localhost:8000/api/campaigns/1/lpj/architecto" \
+    --header "Content-Type: multipart/form-data" \
+    --header "Accept: application/json" \
+    --form "title=b"\
+    --form "description=Et animi quos velit et fugiat."\
+    --form "amount_spent=42"\
+    --form "total_realisasi=37"\
+    --form "realized_amount=9"\
+    --form "field_location=n"\
+    --form "beneficiaries_count=8"\
+    --form "volunteers_involved=75"\
+    --form "report_type=final"\
+    --form "proof_image=@C:\Users\ASUS\AppData\Local\Temp\php5169.tmp" \
+    --form "activity_photos[]=@C:\Users\ASUS\AppData\Local\Temp\php516A.tmp" </code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/campaigns/1/lpj/architecto"
+);
+
+const headers = {
+    "Content-Type": "multipart/form-data",
+    "Accept": "application/json",
+};
+
+const body = new FormData();
+body.append('title', 'b');
+body.append('description', 'Et animi quos velit et fugiat.');
+body.append('amount_spent', '42');
+body.append('total_realisasi', '37');
+body.append('realized_amount', '9');
+body.append('field_location', 'n');
+body.append('beneficiaries_count', '8');
+body.append('volunteers_involved', '75');
+body.append('report_type', 'final');
+body.append('proof_image', document.querySelector('input[name="proof_image"]').files[0]);
+body.append('activity_photos[]', document.querySelector('input[name="activity_photos[]"]').files[0]);
+
+fetch(url, {
+    method: "PUT",
+    headers,
+    body,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/campaigns/1/lpj/architecto';
+$response = $client-&gt;put(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'multipart/form-data',
+            'Accept' =&gt; 'application/json',
+        ],
+        'multipart' =&gt; [
+            [
+                'name' =&gt; 'title',
+                'contents' =&gt; 'b'
+            ],
+            [
+                'name' =&gt; 'description',
+                'contents' =&gt; 'Et animi quos velit et fugiat.'
+            ],
+            [
+                'name' =&gt; 'amount_spent',
+                'contents' =&gt; '42'
+            ],
+            [
+                'name' =&gt; 'total_realisasi',
+                'contents' =&gt; '37'
+            ],
+            [
+                'name' =&gt; 'realized_amount',
+                'contents' =&gt; '9'
+            ],
+            [
+                'name' =&gt; 'field_location',
+                'contents' =&gt; 'n'
+            ],
+            [
+                'name' =&gt; 'beneficiaries_count',
+                'contents' =&gt; '8'
+            ],
+            [
+                'name' =&gt; 'volunteers_involved',
+                'contents' =&gt; '75'
+            ],
+            [
+                'name' =&gt; 'report_type',
+                'contents' =&gt; 'final'
+            ],
+            [
+                'name' =&gt; 'proof_image',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php5169.tmp', 'r')
+            ],
+            [
+                'name' =&gt; 'activity_photos[]',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php516A.tmp', 'r')
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-PUTapi-campaigns--campaign_id--lpj--id-">
+</span>
+<span id="execution-results-PUTapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PUTapi-campaigns--campaign_id--lpj--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PUTapi-campaigns--campaign_id--lpj--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PUTapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PUTapi-campaigns--campaign_id--lpj--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PUTapi-campaigns--campaign_id--lpj--id-" data-method="PUT"
+      data-path="api/campaigns/{campaign_id}/lpj/{id}"
+      data-authed="0"
+      data-hasfiles="1"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-campaigns--campaign_id--lpj--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PUTapi-campaigns--campaign_id--lpj--id-"
+                    onclick="tryItOut('PUTapi-campaigns--campaign_id--lpj--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PUTapi-campaigns--campaign_id--lpj--id-"
+                    onclick="cancelTryOut('PUTapi-campaigns--campaign_id--lpj--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PUTapi-campaigns--campaign_id--lpj--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-darkblue">PUT</small>
+            <b><code>api/campaigns/{campaign_id}/lpj/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="multipart/form-data"
+               data-component="header">
+    <br>
+<p>Example: <code>multipart/form-data</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>campaign_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="campaign_id"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the campaign. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>title</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="title"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="b"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>b</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="Et animi quos velit et fugiat."
+               data-component="body">
+    <br>
+<p>Must be at least 10 characters. Example: <code>Et animi quos velit et fugiat.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount_spent</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount_spent"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="42"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>42</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total_realisasi</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="total_realisasi"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="37"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>37</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>realized_amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="realized_amount"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="9"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>9</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>field_location</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="field_location"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="n"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>n</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>beneficiaries_count</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="beneficiaries_count"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="8"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>8</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>volunteers_involved</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="volunteers_involved"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="75"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>75</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>budget_items</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="budget_items"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_final</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="is_final"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>report_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="report_type"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value="final"
+               data-component="body">
+    <br>
+<p>Example: <code>final</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>progress</code></li> <li><code>final</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>proof_image</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="proof_image"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\php5169.tmp</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>activity_photos</code></b>&nbsp;&nbsp;
+<small>file[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="activity_photos[0]"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               data-component="body">
+        <input type="file" style="display: none"
+               name="activity_photos[1]"                data-endpoint="PUTapi-campaigns--campaign_id--lpj--id-"
+               data-component="body">
+    <br>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes.</p>
+        </div>
+        </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-PATCHapi-campaigns--campaign_id--lpj--id-">Update LPJ (Inisiator)</h2>
+
+<p>
+</p>
+
+<p>ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+Inisiator DILARANG mengubah data (Read-Only / 403 Forbidden).</p>
+
+<span id="example-requests-PATCHapi-campaigns--campaign_id--lpj--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PATCH \
+    "http://localhost:8000/api/campaigns/1/lpj/architecto" \
+    --header "Content-Type: multipart/form-data" \
+    --header "Accept: application/json" \
+    --form "title=b"\
+    --form "description=Et animi quos velit et fugiat."\
+    --form "amount_spent=42"\
+    --form "total_realisasi=37"\
+    --form "realized_amount=9"\
+    --form "field_location=n"\
+    --form "beneficiaries_count=8"\
+    --form "volunteers_involved=75"\
+    --form "report_type=final"\
+    --form "proof_image=@C:\Users\ASUS\AppData\Local\Temp\php516B.tmp" \
+    --form "activity_photos[]=@C:\Users\ASUS\AppData\Local\Temp\php517C.tmp" </code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/campaigns/1/lpj/architecto"
+);
+
+const headers = {
+    "Content-Type": "multipart/form-data",
+    "Accept": "application/json",
+};
+
+const body = new FormData();
+body.append('title', 'b');
+body.append('description', 'Et animi quos velit et fugiat.');
+body.append('amount_spent', '42');
+body.append('total_realisasi', '37');
+body.append('realized_amount', '9');
+body.append('field_location', 'n');
+body.append('beneficiaries_count', '8');
+body.append('volunteers_involved', '75');
+body.append('report_type', 'final');
+body.append('proof_image', document.querySelector('input[name="proof_image"]').files[0]);
+body.append('activity_photos[]', document.querySelector('input[name="activity_photos[]"]').files[0]);
+
+fetch(url, {
+    method: "PATCH",
+    headers,
+    body,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/campaigns/1/lpj/architecto';
+$response = $client-&gt;patch(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'multipart/form-data',
+            'Accept' =&gt; 'application/json',
+        ],
+        'multipart' =&gt; [
+            [
+                'name' =&gt; 'title',
+                'contents' =&gt; 'b'
+            ],
+            [
+                'name' =&gt; 'description',
+                'contents' =&gt; 'Et animi quos velit et fugiat.'
+            ],
+            [
+                'name' =&gt; 'amount_spent',
+                'contents' =&gt; '42'
+            ],
+            [
+                'name' =&gt; 'total_realisasi',
+                'contents' =&gt; '37'
+            ],
+            [
+                'name' =&gt; 'realized_amount',
+                'contents' =&gt; '9'
+            ],
+            [
+                'name' =&gt; 'field_location',
+                'contents' =&gt; 'n'
+            ],
+            [
+                'name' =&gt; 'beneficiaries_count',
+                'contents' =&gt; '8'
+            ],
+            [
+                'name' =&gt; 'volunteers_involved',
+                'contents' =&gt; '75'
+            ],
+            [
+                'name' =&gt; 'report_type',
+                'contents' =&gt; 'final'
+            ],
+            [
+                'name' =&gt; 'proof_image',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php516B.tmp', 'r')
+            ],
+            [
+                'name' =&gt; 'activity_photos[]',
+                'contents' =&gt; fopen('C:\Users\ASUS\AppData\Local\Temp\php517C.tmp', 'r')
+            ],
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-PATCHapi-campaigns--campaign_id--lpj--id-">
+</span>
+<span id="execution-results-PATCHapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PATCHapi-campaigns--campaign_id--lpj--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PATCHapi-campaigns--campaign_id--lpj--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PATCHapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PATCHapi-campaigns--campaign_id--lpj--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PATCHapi-campaigns--campaign_id--lpj--id-" data-method="PATCH"
+      data-path="api/campaigns/{campaign_id}/lpj/{id}"
+      data-authed="0"
+      data-hasfiles="1"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PATCHapi-campaigns--campaign_id--lpj--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PATCHapi-campaigns--campaign_id--lpj--id-"
+                    onclick="tryItOut('PATCHapi-campaigns--campaign_id--lpj--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PATCHapi-campaigns--campaign_id--lpj--id-"
+                    onclick="cancelTryOut('PATCHapi-campaigns--campaign_id--lpj--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PATCHapi-campaigns--campaign_id--lpj--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-purple">PATCH</small>
+            <b><code>api/campaigns/{campaign_id}/lpj/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="multipart/form-data"
+               data-component="header">
+    <br>
+<p>Example: <code>multipart/form-data</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>campaign_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="campaign_id"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the campaign. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>title</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="title"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="b"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>b</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>description</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="description"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="Et animi quos velit et fugiat."
+               data-component="body">
+    <br>
+<p>Must be at least 10 characters. Example: <code>Et animi quos velit et fugiat.</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>amount_spent</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="amount_spent"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="42"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>42</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>total_realisasi</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="total_realisasi"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="37"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>37</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>realized_amount</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="realized_amount"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="9"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>9</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>field_location</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="field_location"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="n"
+               data-component="body">
+    <br>
+<p>Must not be greater than 255 characters. Example: <code>n</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>beneficiaries_count</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="beneficiaries_count"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="8"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>8</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>volunteers_involved</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="volunteers_involved"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="75"
+               data-component="body">
+    <br>
+<p>Must be at least 0. Example: <code>75</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>budget_items</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="budget_items"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_final</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="is_final"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>report_type</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="report_type"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value="final"
+               data-component="body">
+    <br>
+<p>Example: <code>final</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>progress</code></li> <li><code>final</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>proof_image</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="proof_image"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               value=""
+               data-component="body">
+    <br>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes. Example: <code>C:\Users\ASUS\AppData\Local\Temp\php516B.tmp</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>activity_photos</code></b>&nbsp;&nbsp;
+<small>file[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="activity_photos[0]"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               data-component="body">
+        <input type="file" style="display: none"
+               name="activity_photos[1]"                data-endpoint="PATCHapi-campaigns--campaign_id--lpj--id-"
+               data-component="body">
+    <br>
+<p>Must be a file. Must be an image. Must not be greater than 5120 kilobytes.</p>
+        </div>
+        </form>
+
+                    <h2 id="laporan-pertanggungjawaban-lpj-DELETEapi-campaigns--campaign_id--lpj--id-">Hapus LPJ (Inisiator)</h2>
+
+<p>
+</p>
+
+<p>ATURAN PENGUNCIAN: Jika LPJ sudah berstatus 'verified' atau 'sah',
+Inisiator DILARANG menghapus data (403 Forbidden).</p>
+
+<span id="example-requests-DELETEapi-campaigns--campaign_id--lpj--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/campaigns/1/lpj/architecto" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/campaigns/1/lpj/architecto"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+
+<div class="php-example">
+    <pre><code class="language-php">$client = new \GuzzleHttp\Client();
+$url = 'http://localhost:8000/api/campaigns/1/lpj/architecto';
+$response = $client-&gt;delete(
+    $url,
+    [
+        'headers' =&gt; [
+            'Content-Type' =&gt; 'application/json',
+            'Accept' =&gt; 'application/json',
+        ],
+    ]
+);
+$body = $response-&gt;getBody();
+print_r(json_decode((string) $body));</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-campaigns--campaign_id--lpj--id-">
+</span>
+<span id="execution-results-DELETEapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-campaigns--campaign_id--lpj--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-campaigns--campaign_id--lpj--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-campaigns--campaign_id--lpj--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-campaigns--campaign_id--lpj--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-campaigns--campaign_id--lpj--id-" data-method="DELETE"
+      data-path="api/campaigns/{campaign_id}/lpj/{id}"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-campaigns--campaign_id--lpj--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-campaigns--campaign_id--lpj--id-"
+                    onclick="tryItOut('DELETEapi-campaigns--campaign_id--lpj--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-campaigns--campaign_id--lpj--id-"
+                    onclick="cancelTryOut('DELETEapi-campaigns--campaign_id--lpj--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-campaigns--campaign_id--lpj--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/campaigns/{campaign_id}/lpj/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-campaigns--campaign_id--lpj--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-campaigns--campaign_id--lpj--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>campaign_id</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="campaign_id"                data-endpoint="DELETEapi-campaigns--campaign_id--lpj--id-"
+               value="1"
+               data-component="url">
+    <br>
+<p>The ID of the campaign. Example: <code>1</code></p>
+            </div>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="DELETEapi-campaigns--campaign_id--lpj--id-"
+               value="architecto"
+               data-component="url">
+    <br>
+<p>The ID of the lpj. Example: <code>architecto</code></p>
+            </div>
+                    </form>
 
             
 

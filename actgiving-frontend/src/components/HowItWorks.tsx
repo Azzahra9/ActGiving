@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   Zap, 
   Users, 
@@ -30,7 +30,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({
   const [activeTab, setActiveTab] = useState<'donatur' | 'relawan' | 'inisiator'>('donatur');
 
   return (
-    <section id="tutorial-interaktif" className="py-16 bg-white border-b border-slate-200">
+    <section id="tutorial-interaktif" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
