@@ -1,5 +1,5 @@
 import api from '../lib/axios';
-import { Campaign, CampaignMode, Category, LpjItem } from '../types';
+import { Campaign, CampaignMode, CampaignSchedule, Category, LpjItem } from '../types';
 
 export interface CampaignQueryParams {
   category_id?: number;
@@ -38,9 +38,27 @@ export const mapBackendModeToFrontend = (mode?: string): CampaignMode => {
 
 // Konversi LPJ Report dari backend
 export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
+  const realizedAmount = Number(
+    lpj.total_realisasi || lpj.amount_spent || lpj.realized_amount || lpj.realizedAmount || 0
+  );
+  const title = lpj.title || lpj.judul_kegiatan || 'Laporan Penggunaan Dana';
+  const fieldLocation = lpj.field_location || lpj.fieldLocation || lpj.lokasi_aksi || lpj.location || undefined;
+  const beneficiariesCount = lpj.beneficiaries_count || lpj.beneficiariesCount || lpj.penerima_manfaat || undefined;
+  const volunteersInvolved = lpj.volunteers_involved || lpj.volunteersInvolved || lpj.relawan_terlibat || undefined;
+  const activityPhotos = Array.isArray(lpj.activity_photos)
+    ? lpj.activity_photos
+    : Array.isArray(lpj.activityPhotos)
+    ? lpj.activityPhotos
+    : Array.isArray(lpj.photos)
+    ? lpj.photos
+    : [
+        'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
+      ];
+
   return {
     id: String(lpj.id),
-    title: lpj.title || 'Laporan Penggunaan Dana',
+    title,
+    judul_kegiatan: title,
     date: lpj.report_date
       ? new Date(lpj.report_date).toLocaleDateString('id-ID', {
           day: 'numeric',
@@ -58,26 +76,31 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
           month: 'long',
           year: 'numeric',
         }),
-    createdAt: lpj.created_at || undefined,
-    realizedAmount: Number(lpj.total_realisasi || lpj.amount_spent || lpj.realized_amount || 0),
+    createdAt: lpj.created_at || lpj.createdAt || undefined,
+    realizedAmount,
+    total_realisasi: realizedAmount,
     description: lpj.description || '',
     photoUrl:
       lpj.receipt_image_url ||
       lpj.proof_image_url ||
       lpj.photo_url ||
+      lpj.photoUrl ||
+      activityPhotos[0] ||
       'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-    activityPhotos: lpj.activity_photos || [
-      'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-    ],
-    budgetItems: lpj.budget_items || [],
-    beneficiariesCount: lpj.beneficiaries_count || undefined,
-    volunteersInvolved: lpj.volunteers_involved || undefined,
-    fieldLocation: lpj.field_location || undefined,
-    digitalRegNumber: lpj.digital_reg_number || undefined,
-    receiptUrl: lpj.receipt_image_url || lpj.proof_image_url || undefined,
+    activityPhotos,
+    activity_photos: activityPhotos,
+    budgetItems: lpj.budget_items || lpj.budgetItems || [],
+    beneficiariesCount,
+    penerima_manfaat: beneficiariesCount,
+    volunteersInvolved,
+    relawan_terlibat: volunteersInvolved,
+    fieldLocation,
+    lokasi_aksi: fieldLocation,
+    digitalRegNumber: lpj.digital_reg_number || lpj.digitalRegNumber || undefined,
+    receiptUrl: lpj.receipt_image_url || lpj.proof_image_url || lpj.receiptUrl || undefined,
     status: (lpj.status as 'pending' | 'verified' | 'sah' | 'rejected') || 'pending',
-    isFinal: Boolean(lpj.is_final || lpj.report_type === 'final'),
-    reportType: (lpj.report_type as 'progress' | 'final') || (lpj.is_final ? 'final' : 'progress'),
+    isFinal: Boolean(lpj.is_final || lpj.isFinal || lpj.report_type === 'final' || lpj.reportType === 'final'),
+    reportType: (lpj.report_type as 'progress' | 'final') || (lpj.reportType as 'progress' | 'final') || (lpj.is_final ? 'final' : 'progress'),
   };
 };
 
@@ -131,7 +154,12 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
       'Kondisi fisik sehat dan prima',
       'Mengikuti instruksi koordinator lapangan',
     ],
-    lpjReports: Array.isArray(item.lpj_reports) ? item.lpj_reports.map(mapBackendLpjToFrontend) : [],
+    lpjReports: Array.isArray(item.lpj_reports)
+      ? item.lpj_reports.map(mapBackendLpjToFrontend)
+      : Array.isArray(item.lpjReports)
+      ? item.lpjReports.map(mapBackendLpjToFrontend)
+      : [],
+    schedules: Array.isArray(item.schedules) ? item.schedules : [],
   };
 };
 
@@ -180,6 +208,72 @@ export const campaignService = {
    */
   async getCategories(): Promise<any[]> {
     const response = await api.get('/categories');
+    return response.data?.data || [];
+  },
+
+  /**
+   * Mengambil daftar jadwal harian untuk kampanye tertentu
+   * Endpoint: GET /api/campaigns/{campaignId}/schedules
+   */
+  async getCampaignSchedules(campaignId: string | number): Promise<CampaignSchedule[]> {
+    const response = await api.get(`/campaigns/${campaignId}/schedules`);
+    return response.data?.data || [];
+  },
+
+  /**
+   * Menambahkan jadwal harian baru (Inisiator)
+   * Endpoint: POST /api/campaigns/{campaignId}/schedules
+   */
+  async createCampaignSchedule(
+    campaignId: string | number,
+    data: {
+      event_date: string;
+      start_time?: string;
+      end_time?: string;
+      title: string;
+      description_tasks?: string;
+    }
+  ): Promise<CampaignSchedule> {
+    const response = await api.post(`/campaigns/${campaignId}/schedules`, data);
+    return response.data?.data;
+  },
+
+  /**
+   * Memperbarui jadwal harian kampanye (Inisiator)
+   * Endpoint: PUT /api/campaigns/{campaignId}/schedules/{scheduleId}
+   */
+  async updateCampaignSchedule(
+    campaignId: string | number,
+    scheduleId: string | number,
+    data: {
+      event_date?: string;
+      start_time?: string;
+      end_time?: string;
+      title?: string;
+      description_tasks?: string;
+    }
+  ): Promise<CampaignSchedule> {
+    const response = await api.put(`/campaigns/${campaignId}/schedules/${scheduleId}`, data);
+    return response.data?.data;
+  },
+
+  /**
+   * Menghapus jadwal harian kampanye (Inisiator)
+   * Endpoint: DELETE /api/campaigns/{campaignId}/schedules/{scheduleId}
+   */
+  async deleteCampaignSchedule(
+    campaignId: string | number,
+    scheduleId: string | number
+  ): Promise<void> {
+    await api.delete(`/campaigns/${campaignId}/schedules/${scheduleId}`);
+  },
+
+  /**
+   * Mengambil jadwal relawan untuk kampanye yang pendaftarannya berstatus 'accepted'
+   * Endpoint: GET /api/my-volunteer-schedules
+   */
+  async getMyVolunteerSchedules(): Promise<CampaignSchedule[]> {
+    const response = await api.get('/my-volunteer-schedules');
     return response.data?.data || [];
   },
 };

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CampaignController;
 use App\Http\Controllers\Api\CampaignReportController;
+use App\Http\Controllers\Api\CampaignScheduleController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DisbursementController;
 use App\Http\Controllers\Api\DonationController;
@@ -29,6 +30,7 @@ Route::prefix('auth')->middleware('throttle:auth-limit')->group(function () {
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/campaigns', [CampaignController::class, 'index']);
 Route::get('/campaigns/{id}', [CampaignController::class, 'show']);
+Route::get('/campaigns/{id}/schedules', [CampaignScheduleController::class, 'index']); // Public list jadwal harian kampanye
 Route::get('/campaigns/{id}/lpj', [LPJController::class, 'index']); // Public list LPJ
 Route::post('/campaigns/{id}/reports', [CampaignReportController::class, 'store']); // FR-13: Laporan Aduan Publik
 Route::post('/campaigns/{id}/volunteer-register', [VolunteerRegistrationController::class, 'register']); // Registrasi akun relawan baru & lamaran misi
@@ -78,6 +80,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'update']);
     Route::delete('/campaigns/{campaign_id}/lpj/{id}', [LPJController::class, 'destroy']);
 
+    // Manajemen Jadwal & Misi Harian Kampanye oleh Inisiator
+    Route::post('/campaigns/{id}/schedules', [CampaignScheduleController::class, 'store']);
+    Route::put('/campaigns/{campaign_id}/schedules/{id}', [CampaignScheduleController::class, 'update']);
+    Route::delete('/campaigns/{campaign_id}/schedules/{id}', [CampaignScheduleController::class, 'destroy']);
+
     // FR-11: Pencairan Dana oleh Inisiator
     Route::post('/campaigns/{id}/disbursements', [DisbursementController::class, 'store']);
     Route::get('/campaigns/{id}/disbursements', [DisbursementController::class, 'indexByCampaign']);
@@ -85,8 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // FR: Manajemen Izin Donasi oleh Inisiator (Approve/Reject)
     Route::patch('/donations/{id}/approval', [DonationController::class, 'updateApproval']);
 
-    // RELAWAN: Riwayat Pendaftaran
+    // RELAWAN: Riwayat Pendaftaran & Jadwal Lapangan Terverifikasi
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
+    Route::get('/my-volunteer-schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
+    Route::get('/volunteer/schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
 
     // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports
     Route::prefix('admin')->middleware('admin')->group(function () {

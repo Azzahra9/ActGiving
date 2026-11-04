@@ -16,15 +16,21 @@ export interface LpjBudgetItem {
 export interface LpjItem {
   id: string;
   title: string;
+  judul_kegiatan?: string;
   date: string;
   realizedAmount: number;
+  total_realisasi?: number;
   description: string;
   photoUrl: string;
   activityPhotos?: string[];
+  activity_photos?: string[];
   budgetItems?: LpjBudgetItem[];
   beneficiariesCount?: number;
+  penerima_manfaat?: number;
   volunteersInvolved?: number;
+  relawan_terlibat?: number;
   fieldLocation?: string;
+  lokasi_aksi?: string;
   digitalRegNumber?: string;
   receiptUrl?: string;
   status?: 'pending' | 'pending_audit' | 'needs_review' | 'verified' | 'sah' | 'rejected';
@@ -59,22 +65,39 @@ export const DEFAULT_GUEST_USER: UserProfile = {
   managedCampaignIds: [],
 };
 
+export interface CampaignSchedule {
+  id: number | string;
+  campaign_id: number | string;
+  event_date: string;
+  start_time?: string;
+  end_time?: string;
+  title: string;
+  description_tasks?: string;
+  created_at?: string;
+  updated_at?: string;
+  campaign?: any;
+}
+
 export interface Campaign {
   id: string;
   title: string;
   initiatorName: string;
-  initiatorRole: string;
+  initiatorRole?: string;
   category: Category;
-  mode: CampaignMode;
+  mode?: CampaignMode;
+  campaignMode?: string;
   locationCity: string;
-  distanceKm: number;
+  distanceKm?: number;
   imageUrl: string;
   description: string;
-  status?: 'active' | 'pending_approval' | 'rejected' | 'completed' | 'closed' | 'suspended';
+  initiatorAvatar?: string;
+  status?: 'active' | 'pending' | 'pending_approval' | 'rejected' | 'completed' | 'closed' | 'suspended';
   // Mode Dana
   targetFunds?: number;
   collectedFunds?: number;
   deadlineDays?: number;
+  daysLeft?: number;
+  startDate?: string;
   // Mode Relawan
   targetVolunteers?: number;
   filledVolunteers?: number;
@@ -83,6 +106,8 @@ export interface Campaign {
   taskCriteria?: string[];
   // LPJ
   lpjReports?: LpjItem[];
+  // Jadwal & Misi Harian
+  schedules?: CampaignSchedule[];
 }
 
 export interface DonationFormState {

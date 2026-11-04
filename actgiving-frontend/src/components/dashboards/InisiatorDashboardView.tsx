@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, 
   FileText, AlertCircle, ArrowLeft, Eye, MessageSquare, ShieldCheck, 
@@ -10,6 +10,7 @@ import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
 import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
+import { CampaignScheduleModal } from '../CampaignScheduleModal';
 
 interface InisiatorDashboardViewProps {
   currentUser: UserProfile;
@@ -77,6 +78,18 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [isLoadingVolunteers, setIsLoadingVolunteers] = useState<boolean>(false);
   const [selectedVolunteerModal, setSelectedVolunteerModal] = useState<any | null>(null);
   const [updatingVolId, setUpdatingVolId] = useState<number | null>(null);
+  const [scheduleModalCampaign, setScheduleModalCampaign] = useState<Campaign | null>(null);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+
+  const handleOpenScheduleModal = (camp: Campaign) => {
+    setScheduleModalCampaign(camp);
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleCloseScheduleModal = () => {
+    setIsScheduleModalOpen(false);
+    setScheduleModalCampaign(null);
+  };
 
   // Fetch volunteer applicants directly from initiator endpoint or per-campaign
   const fetchVolunteersList = useCallback(async () => {
@@ -834,6 +847,17 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-1.5">
+                        {/* Tombol Kelola Jadwal/Misi */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenScheduleModal(camp)}
+                          className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                          title="Kelola Jadwal & Misi Harian Relawan"
+                        >
+                          <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Kelola Jadwal/Misi</span>
+                        </button>
+
                         {/* Tombol Edit Kampanye */}
                         <button
                           type="button"
@@ -1839,6 +1863,14 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
           </div>
         )}
 
+
+        {/* Modal Kelola Jadwal & Misi Lapangan */}
+        <CampaignScheduleModal
+          isOpen={isScheduleModalOpen}
+          campaign={scheduleModalCampaign}
+          onClose={handleCloseScheduleModal}
+          onSchedulesUpdated={fetchInitiatorData}
+        />
       </div>
     </div>
   );

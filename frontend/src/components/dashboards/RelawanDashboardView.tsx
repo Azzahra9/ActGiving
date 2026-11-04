@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  HeartHandshake, Calendar, Clock, MapPin, MessageSquare, Award, 
+  RefreshCw, HeartHandshake, Calendar, Clock, MapPin, MessageSquare, Award, 
   CheckCircle2, ExternalLink, Compass, QrCode, ShieldCheck, 
   Users, AlertCircle, ArrowLeft, Download, Eye, Sparkles, Check, Phone
 } from 'lucide-react';
-import { Campaign, UserProfile } from '../../types';
+import { Campaign, CampaignSchedule, UserProfile } from '../../types';
 import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 
@@ -39,14 +39,34 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [registeredCampaigns, setRegisteredCampaigns] = useState<Campaign[]>([]);
+  const [acceptedCampaigns, setAcceptedCampaigns] = useState<Campaign[]>([]);
+  const [volunteerSchedules, setVolunteerSchedules] = useState<CampaignSchedule[]>([]);
+  const [isLoadingSchedules, setIsLoadingSchedules] = useState<boolean>(true);
+
+  const formatIndoDate = (dateStr?: string) => {
+    if (!dateStr) return 'Tanggal belum ditentukan';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
 
   const handleRegisterVolunteerMission = async (camp: Campaign) => {
     try {
       await api.post(`/campaigns/${camp.id}/volunteer-register`, {
         skills: 'Relawan aktif terverifikasi ActGiving siap diterjunkan ke lapangan.',
       });
-      showToast(`Pendaftaran berhasil! Anda telah resmi terdaftar pada misi "${camp.title}".`);
+      showToast(`Pendaftaran berhasil! Anda telah resmi mendaftar pada misi "${camp.title}".`);
       setRegisteredCampaigns((prev) => [camp, ...prev.filter((c) => c.id !== camp.id)]);
+      fetchVolunteerData();
     } catch (err: any) {
       if (onOpenVolunteerModal) {
         onOpenVolunteerModal(camp);
@@ -58,28 +78,58 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
     }
   };
 
-  // Fetch real volunteer registrations from Laravel REST API
-  useEffect(() => {
-    const fetchMyRegistrations = async () => {
-      try {
-        const response = await api.get('/my-volunteer-registrations');
-        const items = response.data?.data?.data || response.data?.data || [];
-        if (Array.isArray(items)) {
-          const regCamps: Campaign[] = items
-            .filter((reg: any) => reg.campaign)
-            .map((reg: any) => mapBackendCampaignToFrontend(reg.campaign));
-          setRegisteredCampaigns(regCamps);
-        }
-      } catch (err) {
-        console.warn('Gagal memuat riwayat relawan dari API:', err);
-      }
-    };
+  // Fetch real volunteer registrations & accepted schedules from Laravel REST API
+  const fetchVolunteerData = React.useCallback(async () => {
+    setIsLoadingSchedules(true);
+    try {
+      // 1. Ambil riwayat pendaftaran relawan
+      const regRes = await api.get('/my-volunteer-registrations').catch(() => null);
+      const regItems = regRes?.data?.data?.data || regRes?.data?.data || [];
 
-    fetchMyRegistrations();
+      let approved: Campaign[] = [];
+      if (Array.isArray(regItems)) {
+        // Filter kampanye dengan status pendaftaran 'accepted'
+        const acceptedRegs = regItems.filter((r: any) => r.status === 'accepted' && r.campaign);
+        approved = acceptedRegs.map((r: any) => mapBackendCampaignToFrontend(r.campaign));
+        setAcceptedCampaigns(approved);
+
+        const allRegCamps = regItems.filter((r: any) => r.campaign).map((r: any) => mapBackendCampaignToFrontend(r.campaign));
+        setRegisteredCampaigns(allRegCamps);
+      }
+
+      // 2. Ambil data CampaignSchedule riil dari kampanye yang status relawannya 'accepted'
+      const schedRes = await api.get('/my-volunteer-schedules').catch(() => null);
+      const schedItems = schedRes?.data?.data || [];
+
+      if (Array.isArray(schedItems) && schedItems.length > 0) {
+        setVolunteerSchedules(schedItems);
+      } else if (approved.length > 0) {
+        // Fallback jika /my-volunteer-schedules kosong, periksa schedules tertanam di campaign
+        const aggregated: CampaignSchedule[] = [];
+        approved.forEach((camp) => {
+          if (Array.isArray(camp.schedules) && camp.schedules.length > 0) {
+            camp.schedules.forEach((s) => aggregated.push({ ...s, campaign: camp }));
+          }
+        });
+        setVolunteerSchedules(aggregated);
+      } else {
+        setVolunteerSchedules([]);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat jadwal lapangan relawan:', err);
+    } finally {
+      setIsLoadingSchedules(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchVolunteerData();
+  }, [fetchVolunteerData]);
+
   // Filter campaigns this volunteer has joined
-  const joinedCampaigns = registeredCampaigns.length > 0
+  const joinedCampaigns = acceptedCampaigns.length > 0
+    ? acceptedCampaigns
+    : registeredCampaigns.length > 0
     ? registeredCampaigns
     : campaigns.filter((c) => currentUser.joinedCampaignIds?.includes(c.id));
 
@@ -217,7 +267,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                   <Calendar className="w-5 h-5 text-blue-600 shrink-0" />
                   <span>Jadwal & Tugas Lapangan</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
-                    {joinedCampaigns.length} Program
+                    {volunteerSchedules.length > 0 ? `${volunteerSchedules.length} Misi Terjadwal` : `${acceptedCampaigns.length} Program`}
                   </span>
                 </>
               )}
@@ -260,140 +310,278 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
           <div className="mt-6 space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-blue-900">
               <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-              <div>
+              <div className="flex-1">
                 <p className="font-bold">Panduan Operasional Kehadiran Lapangan</p>
                 <p className="text-blue-700 mt-0.5 leading-relaxed">
-                  Pastikan hadir tepat waktu di posko sesuai alamat. Sebelum penugasan dimulai, lakukan 
-                  konfirmasi presensi dengan menunjukkan <strong>QR Code Check-in</strong> kepada koordinator lapangan atau klik tombol konfirmasi mandiri.
+                  Jadwal di bawah ini disinkronkan langsung dari kampanye yang pendaftaran Anda telah <strong>disetujui (accepted)</strong> oleh inisiator.
+                  Pastikan hadir tepat waktu di lokasi kegiatan dan tunjukkan <strong>QR Code Check-in</strong> kepada koordinator lapangan.
                 </p>
               </div>
+              <button
+                type="button"
+                onClick={fetchVolunteerData}
+                disabled={isLoadingSchedules}
+                className="px-2.5 py-1 bg-white border border-blue-300 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer shrink-0"
+                title="Perbarui Jadwal"
+              >
+                <RefreshCw className={`w-3 h-3 ${isLoadingSchedules ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
             </div>
 
-            {joinedCampaigns.length > 0 ? (
+            {isLoadingSchedules ? (
+              <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 flex flex-col items-center justify-center gap-3">
+                <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+                <h4 className="font-bold text-slate-800 text-sm">Memuat Jadwal Misi Lapangan...</h4>
+                <p className="text-xs text-slate-500">Menghubungkan data jadwal harian dari sistem kampanye resmi.</p>
+              </div>
+            ) : volunteerSchedules.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {joinedCampaigns.map((camp) => {
-                const isCheckedIn = checkedInIds.includes(camp.id);
-                return (
-                  <div
-                    key={camp.id}
-                    className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
-                  >
-                    <div className="relative h-44 w-full">
-                      <img
-                        src={camp.imageUrl}
-                        alt={camp.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
-                      
-                      <div className="absolute top-3 left-3 flex items-center gap-2">
-                        <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                          {camp.category}
-                        </span>
-                        <span className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-sky-400" />
-                          {camp.locationCity} ({camp.distanceKm} km)
-                        </span>
-                      </div>
+                {volunteerSchedules.map((sched, idx) => {
+                  const camp = sched.campaign ? (sched.campaign.category ? mapBackendCampaignToFrontend(sched.campaign) : sched.campaign) : null;
+                  const campTitle = camp?.title || 'Kampanye Sosial';
+                  const campCategory = camp?.category || 'Sosial & Kemanusiaan';
+                  const campLocation = camp?.locationCity || camp?.location || 'Indonesia';
+                  const campImage = camp?.imageUrl || 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80';
+                  const initiatorName = camp?.initiatorName || camp?.user?.name || 'Inisiator Kampanye';
+                  const initiatorPhone = camp?.user?.phone_whatsapp || camp?.initiatorPhone || '6281234567890';
+                  const isCheckedIn = checkedInIds.includes(String(sched.id)) || (camp && checkedInIds.includes(camp.id));
 
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <h3 className="text-base font-bold text-white line-clamp-1">
-                          {camp.title}
-                        </h3>
-                        <p className="text-xs text-slate-300">
-                          Inisiator: <span className="text-white font-medium">{camp.initiatorName}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                      {/* Schedule info box */}
-                      <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 grid grid-cols-2 gap-3 text-xs">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
-                          <div>
-                            <span className="text-slate-500 text-[10px] block">Tanggal Kegiatan:</span>
-                            <span className="font-bold text-slate-800">{camp.eventDate || 'Sabtu, 14 Sept 2025'}</span>
-                          </div>
+                  return (
+                    <div
+                      key={sched.id || idx}
+                      className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
+                    >
+                      <div className="relative h-44 w-full">
+                        <img
+                          src={campImage}
+                          alt={campTitle}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        
+                        <div className="absolute top-3 left-3 flex items-center gap-2">
+                          <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                            {campCategory}
+                          </span>
+                          <span className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-sky-400" />
+                            {campLocation}
+                          </span>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-blue-600 shrink-0" />
-                          <div>
-                            <span className="text-slate-500 text-[10px] block">Waktu Penugasan:</span>
-                            <span className="font-bold text-slate-800">{camp.eventTime || '07:30 - 16:00 WIB'}</span>
-                          </div>
+                        <div className="absolute top-3 right-3">
+                          <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Disetujui
+                          </span>
+                        </div>
+
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <h3 className="text-base font-bold text-white line-clamp-1">
+                            {campTitle}
+                          </h3>
+                          <p className="text-xs text-slate-300">
+                            Inisiator: <span className="text-white font-medium">{initiatorName}</span>
+                          </p>
                         </div>
                       </div>
 
-                      {/* Criteria & Task Details */}
-                      <div>
-                        <span className="text-xs font-bold text-slate-700 block mb-1.5">
-                          Tugas & Kriteria Khusus:
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {(camp.taskCriteria || [
-                            'Fisik prima & siap kerja outdoor',
-                            'Membawa pakaian ganti & sepatu boots',
-                            'Pernah mengikuti briefing safety dasar'
-                          ]).map((task, idx) => (
-                            <span
-                              key={idx}
-                              className="text-[11px] bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200"
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div className="space-y-3">
+                          {/* Nama Misi Harian Spesifik */}
+                          <div>
+                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block mb-1">
+                              Misi Harian Lapangan
+                            </span>
+                            <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                              {sched.title}
+                            </h4>
+                          </div>
+
+                          {/* Info Box: Tanggal & Waktu Riil */}
+                          <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 grid grid-cols-2 gap-3 text-xs">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+                              <div>
+                                <span className="text-slate-500 text-[10px] block">Tanggal Kegiatan:</span>
+                                <span className="font-bold text-slate-800">
+                                  {formatIndoDate(sched.event_date)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-blue-600 shrink-0" />
+                              <div>
+                                <span className="text-slate-500 text-[10px] block">Waktu Penugasan:</span>
+                                <span className="font-bold text-slate-800">
+                                  {sched.start_time ? sched.start_time.substring(0, 5) : '08:00'} - {sched.end_time ? sched.end_time.substring(0, 5) : 'Selesai'} WIB
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Rincian Tugas Riil dari Database */}
+                          <div>
+                            <span className="text-xs font-bold text-slate-700 block mb-1">
+                              Rincian Tugas & SOP Relawan:
+                            </span>
+                            {sched.description_tasks ? (
+                              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-700 whitespace-pre-line leading-relaxed">
+                                {sched.description_tasks}
+                              </div>
+                            ) : (
+                              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-500 italic">
+                                Tugas dan pembagian regu akan diarahkan langsung di lokasi oleh inisiator kegiatan.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Presensi & Action Buttons */}
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2">
+                            {isCheckedIn ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-300">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Presensi Terkonfirmasi
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
+                                <Clock className="w-3.5 h-3.5" />
+                                Menunggu Hari-H
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setShowQrModal(camp)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
                             >
-                              • {task}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                              <QrCode className="w-3.5 h-3.5 text-blue-600" />
+                              <span>QR Presensi</span>
+                            </button>
 
-                      {/* Presence Status */}
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <div className="flex items-center gap-2">
-                          {isCheckedIn ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-300">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              Presensi Terkonfirmasi
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
-                              <Clock className="w-3.5 h-3.5" />
-                              Menunggu Hari-H
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setShowQrModal(camp)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
-                          >
-                            <QrCode className="w-3.5 h-3.5 text-blue-600" />
-                            <span>QR Presensi</span>
-                          </button>
-
-                          <a
-                            href={`https://wa.me/6281234567890?text=Halo%20Admin%20${encodeURIComponent(camp.title)},%20saya%20relawan%20${encodeURIComponent(currentUser.name)}%20siap%20hadir.`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            <span>Grup WA</span>
-                          </a>
+                            <a
+                              href={`https://wa.me/${String(initiatorPhone).replace(/[^0-9]/g, '') || '6281234567890'}?text=Halo%20Admin%20${encodeURIComponent(campTitle)},%20saya%20relawan%20${encodeURIComponent(currentUser.name)}%20siap%20hadir%20untuk%20misi%20${encodeURIComponent(sched.title)}.`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>Grup WA</span>
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            ) : acceptedCampaigns.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {acceptedCampaigns.map((camp) => {
+                  const isCheckedIn = checkedInIds.includes(camp.id);
+                  return (
+                    <div
+                      key={camp.id}
+                      className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
+                    >
+                      <div className="relative h-44 w-full">
+                        <img
+                          src={camp.imageUrl}
+                          alt={camp.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        
+                        <div className="absolute top-3 left-3 flex items-center gap-2">
+                          <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                            {camp.category}
+                          </span>
+                          <span className="bg-black/60 backdrop-blur-xs text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-sky-400" />
+                            {camp.locationCity}
+                          </span>
+                        </div>
+
+                        <div className="absolute top-3 right-3">
+                          <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Pendaftaran Disetujui
+                          </span>
+                        </div>
+
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <h3 className="text-base font-bold text-white line-clamp-1">
+                            {camp.title}
+                          </h3>
+                          <p className="text-xs text-slate-300">
+                            Inisiator: <span className="text-white font-medium">{camp.initiatorName}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div className="space-y-3">
+                          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 flex items-start gap-2">
+                            <Calendar className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-bold">Pendaftaran Telah Diterima</p>
+                              <p className="text-amber-700 mt-0.5 leading-relaxed">
+                                Inisiator sedang menyusun jadwal harian detail untuk kegiatan ini. Periksa kembali halaman ini secara berkala untuk pembaruan sesi misi lapangan.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 text-xs flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+                            <div>
+                              <span className="text-slate-500 text-[10px] block">Perkiraan Waktu Mulai:</span>
+                              <span className="font-bold text-slate-800">{camp.eventDate || 'Akan diumumkan segera'}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
+                            <Clock className="w-3.5 h-3.5" />
+                            Menunggu Jadwal Spesifik
+                          </span>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setShowQrModal(camp)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                            >
+                              <QrCode className="w-3.5 h-3.5 text-blue-600" />
+                              <span>QR Presensi</span>
+                            </button>
+
+                            <a
+                              href={`https://wa.me/6281234567890?text=Halo%20Admin%20${encodeURIComponent(camp.title)},%20saya%20relawan%20${encodeURIComponent(currentUser.name)}%20ingin%20menanyakan%20jadwal%20kegiatan.`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              <span>Grup WA</span>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
                 <Calendar className="w-10 h-10 text-blue-500 mx-auto mb-2 opacity-60" />
                 <h4 className="font-bold text-slate-800 text-sm">Belum Ada Jadwal Aksi yang Diikuti</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                  Anda belum terdaftar dalam kegiatan relawan aktif. Buka menu &quot;Cari Kegiatan Baru&quot; untuk bergabung dengan program kemanusiaan.
+                  Anda belum terdaftar dalam kegiatan relawan aktif atau pendaftaran Anda masih menunggu verifikasi inisiator. Buka menu &quot;Cari Misi Relawan Baru&quot; untuk bergabung dengan program kemanusiaan.
                 </p>
               </div>
             )}
@@ -769,3 +957,5 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
     </div>
   );
 };
+
+export { RelawanDashboardView as VolunteerDashboardView };

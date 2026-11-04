@@ -80,6 +80,7 @@ class CampaignController extends Controller
         $campaign = Campaign::with([
             'category:id,category_name',
             'user:id,name,city_domicile,is_verified',
+            'schedules',
             'lpjReports' => function ($q) {
                 $q->whereIn('status', ['verified', 'sah'])->latest();
             },
@@ -156,7 +157,7 @@ class CampaignController extends Controller
      */
     public function myCampaigns(Request $request): JsonResponse
     {
-        $campaigns = Campaign::with(['category', 'lpjReports'])
+        $campaigns = Campaign::with(['category', 'lpjReports', 'schedules'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->paginate(10);

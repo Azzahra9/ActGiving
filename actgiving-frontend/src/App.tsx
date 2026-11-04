@@ -466,7 +466,10 @@ export default function App() {
               )}
 
               {/* 2. Hero Section */}
-              <HeroSection />
+              <HeroSection
+                campaigns={campaigns}
+                onViewLpj={(camp) => setLpjCampaign(camp)}
+              />
 
               {/* 3. Katalog Aksi Terdekat 3 Mode Kampanye */}
               <CampaignCatalog

@@ -93,4 +93,14 @@ class Campaign extends Model
     {
         return $this->hasMany(CampaignReport::class, 'campaign_id');
     }
+
+    /**
+     * Jadwal / misi harian lapangan kampanye.
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(CampaignSchedule::class, 'campaign_id')
+            ->orderBy('event_date', 'asc')
+            ->orderBy('start_time', 'asc');
+    }
 }

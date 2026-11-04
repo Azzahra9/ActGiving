@@ -163,7 +163,12 @@ class VolunteerRegistrationController extends Controller
      */
     public function myRegistrations(Request $request): JsonResponse
     {
-        $registrations = VolunteerRegistration::with('campaign:id,title,location,activity_date,status')
+        $registrations = VolunteerRegistration::with([
+            'campaign:id,title,location,activity_date,status,campaign_mode,image_url,user_id,category_id',
+            'campaign.category:id,category_name',
+            'campaign.user:id,name,phone_whatsapp',
+            'campaign.schedules'
+        ])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->paginate(10);
