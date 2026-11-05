@@ -93,25 +93,25 @@ export const Footer: React.FC<FooterProps> = ({
       {/* ========================================================= */}
       {/* 1. TOP PANEL: STATISTIK PENYALURAN & KETERLIBATAN PUBLIK */}
       {/* ========================================================= */}
-      <div className="bg-white py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200">
+      <div className="bg-blue-600 py-14 sm:py-16 px-4 sm:px-6 lg:px-8 border-b border-blue-500/30">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-brand-blue text-[11px] font-bold uppercase tracking-wider mb-2.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-wider mb-2.5">
+            <Sparkles className="w-3.5 h-3.5 text-white" />
             <span>Akuntabilitas Terpadu</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sans">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans">
             Statistik Penyaluran & Keterlibatan Publik
           </h2>
 
-          <p className="text-xs sm:text-sm text-slate-600 mt-2 max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-blue-50 mt-2 max-w-xl mx-auto">
             Setiap donasi dan partisipasi relawan tercatat secara otomatis dan diaudit terbuka.
           </p>
 
           {/* 4 Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-10">
             {/* Card 1: Total Donasi Terkumpul */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-white text-center shadow-lg shadow-blue-800/30 hover:shadow-xl hover:scale-[1.02] transition-all group">
               <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 {formatRupiah(totalDonationRp || 1485250000)}
               </div>
@@ -121,7 +121,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* Card 2: Penerima Manfaat */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-white text-center shadow-lg shadow-blue-800/30 hover:shadow-xl hover:scale-[1.02] transition-all group">
               <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 2.840 Jiwa
               </div>
@@ -131,7 +131,7 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* Card 3: Relawan */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-brand-blue/50 transition-all group">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-white text-center shadow-lg shadow-blue-800/30 hover:shadow-xl hover:scale-[1.02] transition-all group">
               <div className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 font-sans tracking-tight group-hover:text-blue-600 transition-colors">
                 {totalVolunteers > 0 ? `${totalVolunteers} Relawan` : '3.842 Relawan'}
               </div>
@@ -141,12 +141,12 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             {/* Card 4: LPJ Terbit & Terverifikasi */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 text-center shadow-sm hover:border-emerald-500/50 transition-all group">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-400 font-sans tracking-tight group-hover:scale-105 transition-transform">
+            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-white text-center shadow-lg shadow-blue-800/30 hover:shadow-xl hover:scale-[1.02] transition-all group">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-black text-emerald-600 font-sans tracking-tight group-hover:scale-105 transition-transform">
                 100%
               </div>
               <p className="text-xs text-slate-600 mt-2 font-medium flex items-center justify-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 inline" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 inline" />
                 <span>LPJ Terbit & Terverifikasi</span>
               </p>
             </div>

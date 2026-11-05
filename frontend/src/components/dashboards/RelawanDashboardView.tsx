@@ -59,6 +59,41 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
     }
   };
 
+  /**
+   * Pembanding Tanggal Kegiatan Relawan (Dinamis):
+   * - expired: event_date < today (Kegiatan Selesai)
+   * - today: event_date === today (Hari-H / Sedang Berlangsung)
+   * - upcoming: event_date > today (Menunggu Hari-H)
+   */
+  const getScheduleTimeStatus = (eventDateStr?: string): 'expired' | 'today' | 'upcoming' => {
+    if (!eventDateStr) return 'upcoming';
+    try {
+      const now = new Date();
+      // Normalisasi waktu hari ini ke jam 00:00:00 lokal
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+      let targetTime: number;
+      const dateOnly = String(eventDateStr).split('T')[0].split(' ')[0];
+      const parts = dateOnly.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        targetTime = new Date(y, m, d).getTime();
+      } else {
+        const parsed = new Date(eventDateStr);
+        if (isNaN(parsed.getTime())) return 'upcoming';
+        targetTime = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()).getTime();
+      }
+
+      if (targetTime < today) return 'expired';
+      if (targetTime === today) return 'today';
+      return 'upcoming';
+    } catch {
+      return 'upcoming';
+    }
+  };
+
   const handleRegisterVolunteerMission = async (camp: Campaign) => {
     try {
       await api.post(`/campaigns/${camp.id}/volunteer-register`, {
@@ -346,6 +381,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                   const initiatorName = camp?.initiatorName || camp?.user?.name || 'Inisiator Kampanye';
                   const initiatorPhone = camp?.user?.phone_whatsapp || camp?.initiatorPhone || '6281234567890';
                   const isCheckedIn = checkedInIds.includes(String(sched.id)) || (camp && checkedInIds.includes(camp.id));
+                  const timeStatus = getScheduleTimeStatus(sched.event_date);
 
                   return (
                     <div
@@ -371,10 +407,22 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                         </div>
 
                         <div className="absolute top-3 right-3">
-                          <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
-                            <CheckCircle2 className="w-3 h-3" />
-                            Disetujui
-                          </span>
+                          {timeStatus === 'expired' ? (
+                            <span className="bg-slate-800/90 backdrop-blur-xs text-slate-200 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                              Kegiatan Selesai
+                            </span>
+                          ) : timeStatus === 'today' ? (
+                            <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs animate-pulse">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                              Hari-H
+                            </span>
+                          ) : (
+                            <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Disetujui
+                            </span>
+                          )}
                         </div>
 
                         <div className="absolute bottom-3 left-3 right-3">
@@ -440,29 +488,61 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                         </div>
 
                         {/* Presensi & Action Buttons */}
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
                           <div className="flex items-center gap-2">
                             {isCheckedIn ? (
                               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-300">
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Presensi Terkonfirmasi
                               </span>
+                            ) : timeStatus === 'expired' ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                Kegiatan Selesai
+                              </span>
+                            ) : timeStatus === 'today' ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300 animate-pulse">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                Sedang Berlangsung / Hari-H
+                              </span>
                             ) : (
                               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
-                                <Clock className="w-3.5 h-3.5" />
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
                                 Menunggu Hari-H
                               </span>
                             )}
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setShowQrModal(camp)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
-                            >
-                              <QrCode className="w-3.5 h-3.5 text-blue-600" />
-                              <span>QR Presensi</span>
-                            </button>
+                            {timeStatus === 'expired' ? (
+                              <button
+                                onClick={() => {
+                                  if (camp) {
+                                    setSelectedCertCamp(camp);
+                                  } else {
+                                    setActiveTab('riwayat');
+                                  }
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                                title="Lihat Rekap & Unduh E-Sertifikat"
+                              >
+                                <Award className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Lihat Rekap / Unduh Sertifikat</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowQrModal(camp)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                                  timeStatus === 'today'
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs hover:scale-[1.02]'
+                                    : 'border border-slate-300 hover:bg-slate-50 text-slate-700'
+                                }`}
+                                title={timeStatus === 'today' ? 'Buka QR Presensi Hari-H' : 'Pratinjau Kode QR Presensi'}
+                              >
+                                <QrCode className={`w-3.5 h-3.5 ${timeStatus === 'today' ? 'text-white' : 'text-blue-600'}`} />
+                                <span>QR Presensi</span>
+                              </button>
+                            )}
 
                             <a
                               href={`https://wa.me/${String(initiatorPhone).replace(/[^0-9]/g, '') || '6281234567890'}?text=Halo%20Admin%20${encodeURIComponent(campTitle)},%20saya%20relawan%20${encodeURIComponent(currentUser.name)}%20siap%20hadir%20untuk%20misi%20${encodeURIComponent(sched.title)}.`}
@@ -484,6 +564,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {acceptedCampaigns.map((camp) => {
                   const isCheckedIn = checkedInIds.includes(camp.id);
+                  const campTimeStatus = getScheduleTimeStatus(camp.eventDate);
                   return (
                     <div
                       key={camp.id}
@@ -508,10 +589,22 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                         </div>
 
                         <div className="absolute top-3 right-3">
-                          <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
-                            <CheckCircle2 className="w-3 h-3" />
-                            Pendaftaran Disetujui
-                          </span>
+                          {campTimeStatus === 'expired' ? (
+                            <span className="bg-slate-800/90 backdrop-blur-xs text-slate-200 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                              Kegiatan Selesai
+                            </span>
+                          ) : campTimeStatus === 'today' ? (
+                            <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs animate-pulse">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                              Hari-H
+                            </span>
+                          ) : (
+                            <span className="bg-emerald-600/90 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Pendaftaran Disetujui
+                            </span>
+                          )}
                         </div>
 
                         <div className="absolute bottom-3 left-3 right-3">
@@ -545,20 +638,54 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
-                            <Clock className="w-3.5 h-3.5" />
-                            Menunggu Jadwal Spesifik
-                          </span>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2">
+                            {isCheckedIn ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-300">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Presensi Terkonfirmasi
+                              </span>
+                            ) : campTimeStatus === 'expired' ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                Kegiatan Selesai
+                              </span>
+                            ) : campTimeStatus === 'today' ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300 animate-pulse">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                Sedang Berlangsung / Hari-H
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300">
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                                Menunggu Jadwal Spesifik
+                              </span>
+                            )}
+                          </div>
 
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setShowQrModal(camp)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
-                            >
-                              <QrCode className="w-3.5 h-3.5 text-blue-600" />
-                              <span>QR Presensi</span>
-                            </button>
+                            {campTimeStatus === 'expired' ? (
+                              <button
+                                onClick={() => setSelectedCertCamp(camp)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                                title="Lihat Rekap & Unduh E-Sertifikat"
+                              >
+                                <Award className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Lihat Rekap / Unduh Sertifikat</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowQrModal(camp)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                                  campTimeStatus === 'today'
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs hover:scale-[1.02]'
+                                    : 'border border-slate-300 hover:bg-slate-50 text-slate-700'
+                                }`}
+                              >
+                                <QrCode className={`w-3.5 h-3.5 ${campTimeStatus === 'today' ? 'text-white' : 'text-blue-600'}`} />
+                                <span>QR Presensi</span>
+                              </button>
+                            )}
 
                             <a
                               href={`https://wa.me/6281234567890?text=Halo%20Admin%20${encodeURIComponent(camp.title)},%20saya%20relawan%20${encodeURIComponent(currentUser.name)}%20ingin%20menanyakan%20jadwal%20kegiatan.`}
