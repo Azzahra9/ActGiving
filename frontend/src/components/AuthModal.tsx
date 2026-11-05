@@ -22,6 +22,7 @@ interface AuthModalProps {
   onSelectUser?: (user: UserProfile) => void;
   initialTab?: 'login' | 'register';
   initialRole?: 'relawan' | 'inisiator';
+  onOpenForgotPassword?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -30,7 +31,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   currentUser: propUser,
   onSelectUser,
   initialTab = 'login',
-  initialRole = 'relawan'
+  initialRole = 'relawan',
+  onOpenForgotPassword
 }) => {
   const { user: authUser, login, register } = useAuth();
   const currentUser = propUser || authUser;
@@ -253,6 +255,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </button>
                   </div>
                 </div>
+
+                {tab === 'login' && (
+                  <div className="flex justify-end pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenForgotPassword?.();
+                      }}
+                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer transition-colors"
+                    >
+                      Lupa Password?
+                    </button>
+                  </div>
+                )}
 
                 {tab === 'register' && (
                   <>

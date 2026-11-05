@@ -157,7 +157,7 @@ class CampaignController extends Controller
      */
     public function myCampaigns(Request $request): JsonResponse
     {
-        $campaigns = Campaign::with(['category', 'lpjReports', 'schedules'])
+        $campaigns = Campaign::with(['category', 'lpjReports', 'schedules', 'disbursements'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->paginate(10);

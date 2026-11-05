@@ -17,6 +17,8 @@ import { RegisterModal } from './components/RegisterModal';
 import { LpjModal } from './components/LpjModal';
 import { CreateCampaignModal } from './components/CreateCampaignModal';
 import { AuthModal } from './components/AuthModal';
+import { ForgotPasswordModal } from './components/ForgotPasswordModal';
+import { ResetPasswordModal } from './components/ResetPasswordModal';
 import { StandaloneHtmlModal } from './components/StandaloneHtmlModal';
 import { WireframeHtmlModal } from './components/WireframeHtmlModal';
 import { AdminModerationModal } from './components/AdminModerationModal';
@@ -50,7 +52,7 @@ export default function App() {
   // Active sub-tab states for each role (controlled via Role-Specific Sidebar)
   const [relawanTab, setRelawanTab] = useState<'jadwal' | 'riwayat' | 'cari' | 'profil'>('jadwal');
   const [inisiatorTab, setInisiatorTab] = useState<'kampanye' | 'lpj' | 'relawan' | 'panduan'>('kampanye');
-  const [adminTab, setAdminTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem'>('moderasi');
+  const [adminTab, setAdminTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users'>('moderasi');
 
   // Global Application State (REST API & Real Data)
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -131,6 +133,26 @@ export default function App() {
     setCampaigns((prev) => prev.filter((c) => c.id !== campaignId));
   };
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+  const [resetPasswordData, setResetPasswordData] = useState<{ token: string; email: string }>({ token: '', email: '' });
+
+  // Auto-detect link reset kata sandi dari parameter URL (AUTH-03 / FR-05)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || urlParams.get('reset_token');
+    const email = urlParams.get('email');
+    const action = urlParams.get('action');
+
+    if (token || action === 'reset-password') {
+      setResetPasswordData({
+        token: token || '',
+        email: email || '',
+      });
+      setIsResetPasswordOpen(true);
+    }
+  }, []);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
   const [sourceModalMode, setSourceModalMode] = useState<'hifi' | 'wireframe'>('hifi');
 
@@ -566,6 +588,37 @@ export default function App() {
         onClose={() => setIsAuthOpen(false)}
         currentUser={currentUser}
         onSelectUser={handleSelectUser}
+        onOpenForgotPassword={() => {
+          setIsAuthOpen(false);
+          setIsForgotPasswordOpen(true);
+        }}
+      />
+
+      {/* MODAL AUTH-03: Lupa Kata Sandi (FR-05) */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        onOpenLogin={() => {
+          setIsForgotPasswordOpen(false);
+          setIsAuthOpen(true);
+        }}
+        onOpenResetPassword={(email, token) => {
+          setIsForgotPasswordOpen(false);
+          setResetPasswordData({ email, token });
+          setIsResetPasswordOpen(true);
+        }}
+      />
+
+      {/* MODAL AUTH-03: Reset Kata Sandi Baru (FR-05) */}
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => setIsResetPasswordOpen(false)}
+        initialToken={resetPasswordData.token}
+        initialEmail={resetPasswordData.email}
+        onSuccess={() => {
+          setIsResetPasswordOpen(false);
+          setIsAuthOpen(true);
+        }}
       />
 
       {/* MODAL 6: Standalone HTML Code Modal (Desain Berwarna Hi-Fi) */}

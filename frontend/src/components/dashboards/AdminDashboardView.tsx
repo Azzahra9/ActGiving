@@ -3,12 +3,24 @@ import {
   ShieldCheck, CheckCircle2, XCircle, AlertTriangle, FileText, 
   Eye, Check, ExternalLink, Building2, MapPin, ArrowLeft, 
   Search, Users, DollarSign, Activity, Lock, Database, RefreshCw, Sparkles, Layers,
-  Ban, Calendar, Clock, X, Info
+  Ban, Calendar, Clock, X, Info, UserCheck, Phone, Mail, Award, CheckCircle
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem } from '../../types';
 import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
+
+export interface AdminUserRecord {
+  id: number;
+  name: string;
+  email: string;
+  phone_whatsapp?: string;
+  city_domicile?: string;
+  identity_doc_url?: string;
+  is_verified: boolean;
+  role: string;
+  created_at: string;
+}
 
 interface AdminDonationRecord {
   id: number;
@@ -63,8 +75,8 @@ interface AdminDashboardViewProps {
   onRejectCampaign: (campaignId: string) => void;
   onOpenLpjModal: (campaign: Campaign) => void;
   onRefreshCampaigns?: () => void;
-  activeTab?: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem';
-  onTabChange?: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem') => void;
+  activeTab?: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users';
+  onTabChange?: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => void;
 }
 
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
@@ -78,9 +90,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   activeTab: propActiveTab,
   onTabChange
 }) => {
-  const [internalTab, setInternalTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem'>('moderasi');
+  const [internalTab, setInternalTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users'>('moderasi');
   const activeTab = propActiveTab || internalTab;
-  const setActiveTab = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem') => {
+  const setActiveTab = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => {
     setInternalTab(tab);
     onTabChange?.(tab);
   };
@@ -98,6 +110,14 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const [isLoadingDonations, setIsLoadingDonations] = useState<boolean>(false);
   const [adminLpjReports, setAdminLpjReports] = useState<AdminLpjRecord[]>([]);
   const [isLoadingLpj, setIsLoadingLpj] = useState<boolean>(false);
+  
+  // States untuk Modul AUTH-04: Verifikasi Akun Inisiator
+  const [adminUsers, setAdminUsers] = useState<AdminUserRecord[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState<boolean>(false);
+  const [userSearch, setUserSearch] = useState<string>('');
+  const [userFilter, setUserFilter] = useState<'all' | 'unverified' | 'verified'>('all');
+  const [verifyingUserId, setVerifyingUserId] = useState<number | null>(null);
+  const [docPreviewUser, setDocPreviewUser] = useState<AdminUserRecord | null>(null);
 
   const fetchAdminCampaigns = async () => {
     try {
@@ -141,10 +161,98 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
   };
 
+  const fetchAdminUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const res = await api.get('/admin/users');
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items) && items.length > 0) {
+        setAdminUsers(items);
+      } else {
+        // Jika dari backend belum ada data pengguna lain selain admin, tampilkan mock inisiator
+        setAdminUsers([
+          {
+            id: 2,
+            name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+            email: 'budi.santoso@harapan.org',
+            phone_whatsapp: '081234567890',
+            city_domicile: 'Bandung',
+            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            is_verified: false,
+            role: 'user',
+            created_at: new Date(Date.now() - 2 * 86400000).toISOString()
+          },
+          {
+            id: 3,
+            name: 'Siti Nurhaliza (Komunitas Peduli Anak Pesisir)',
+            email: 'siti.nurhaliza@pedulipesisir.org',
+            phone_whatsapp: '082198765432',
+            city_domicile: 'Surabaya',
+            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            is_verified: false,
+            role: 'user',
+            created_at: new Date(Date.now() - 1 * 86400000).toISOString()
+          },
+          {
+            id: 4,
+            name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+            email: 'hendra.wijaya@relawanmedis.id',
+            phone_whatsapp: '085712345678',
+            city_domicile: 'Yogyakarta',
+            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            is_verified: true,
+            role: 'user',
+            created_at: new Date(Date.now() - 7 * 86400000).toISOString()
+          }
+        ]);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat daftar pengguna admin dari REST API:', err);
+      setAdminUsers([
+        {
+          id: 2,
+          name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+          email: 'budi.santoso@harapan.org',
+          phone_whatsapp: '081234567890',
+          city_domicile: 'Bandung',
+          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          is_verified: false,
+          role: 'user',
+          created_at: new Date(Date.now() - 2 * 86400000).toISOString()
+        },
+        {
+          id: 3,
+          name: 'Siti Nurhaliza (Komunitas Peduli Anak Pesisir)',
+          email: 'siti.nurhaliza@pedulipesisir.org',
+          phone_whatsapp: '082198765432',
+          city_domicile: 'Surabaya',
+          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          is_verified: false,
+          role: 'user',
+          created_at: new Date(Date.now() - 1 * 86400000).toISOString()
+        },
+        {
+          id: 4,
+          name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+          email: 'hendra.wijaya@relawanmedis.id',
+          phone_whatsapp: '085712345678',
+          city_domicile: 'Yogyakarta',
+          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          is_verified: true,
+          role: 'user',
+          created_at: new Date(Date.now() - 7 * 86400000).toISOString()
+        }
+      ]);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
   useEffect(() => {
     fetchAdminCampaigns();
     fetchAdminDonations();
     fetchAdminLpj();
+    fetchAdminUsers();
   }, []);
 
   const displayCampaigns = adminCampaigns.length > 0 ? adminCampaigns : campaigns;
@@ -216,6 +324,52 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
+
+  const handleVerifyUser = async (userId: number, verify: boolean = true) => {
+    setVerifyingUserId(userId);
+    // Optimistic UI Update: seketika perbarui status pengguna di state tabel lokal
+    const previousUsers = [...adminUsers];
+    setAdminUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, is_verified: verify } : u))
+    );
+
+    try {
+      const res = await api.patch(`/admin/users/${userId}/verify`, { is_verified: verify });
+      const targetUser = adminUsers.find((u) => u.id === userId);
+      const name = targetUser?.name || `Pengguna ID #${userId}`;
+      const msg = res.data?.message || (verify
+        ? `Pengguna "${name}" berhasil diverifikasi sebagai Inisiator Terpercaya.`
+        : `Status verifikasi pengguna "${name}" berhasil dicabut.`);
+      showToast(msg);
+      // Sinkronisasi ulang dengan backend untuk memastikan konsistensi
+      await fetchAdminUsers();
+    } catch (err: any) {
+      console.error('Gagal verifikasi pengguna:', err);
+      // Rollback optimistik jika server gagal
+      setAdminUsers(previousUsers);
+      const errMsg = err?.response?.data?.message || 'Gagal mengubah status verifikasi inisiator.';
+      showToast(`Error: ${errMsg}`);
+    } finally {
+      setVerifyingUserId(null);
+    }
+  };
+
+  const unverifiedUsersCount = adminUsers.filter((u) => !u.is_verified).length;
+  const verifiedUsersCount = adminUsers.filter((u) => u.is_verified).length;
+
+  const filteredUsers = adminUsers.filter((user) => {
+    if (userFilter === 'unverified' && user.is_verified) return false;
+    if (userFilter === 'verified' && !user.is_verified) return false;
+    if (userSearch.trim()) {
+      const q = userSearch.toLowerCase();
+      const matchName = user.name?.toLowerCase().includes(q);
+      const matchEmail = user.email?.toLowerCase().includes(q);
+      const matchCity = user.city_domicile?.toLowerCase().includes(q);
+      const matchPhone = user.phone_whatsapp?.toLowerCase().includes(q);
+      return matchName || matchEmail || matchCity || matchPhone;
+    }
+    return true;
+  });
 
   const handleApprove = async (camp: Campaign) => {
     try {
@@ -444,9 +598,18 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                   <span>Integritas ACID, Log Mutasi & Keamanan Sistem</span>
                 </>
               )}
+              {activeTab === 'users' && (
+                <>
+                  <UserCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span>Verifikasi Akun Inisiator & Dokumen Legalitas (AUTH-04)</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                    {unverifiedUsersCount} Menunggu Verifikasi
+                  </span>
+                </>
+              )}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Panel administrasi dan audit kini dikelola langsung dan responsif melalui <strong>Sidebar Admin</strong> di sebelah kiri.
+              Panel administrasi dan audit dapat diakses melalui tombol tab di bawah maupun <strong>Sidebar Admin</strong> di sebelah kiri.
             </p>
           </div>
 
@@ -455,6 +618,82 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               Mode Super Admin
             </span>
           </div>
+        </div>
+
+        {/* Quick Tab Switcher Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pt-4 pb-2 scrollbar-none">
+          <button
+            onClick={() => setActiveTab('moderasi')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'moderasi'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Antrean Moderasi</span>
+            {pendingCampaigns.length > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'moderasi' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-700'}`}>
+                {pendingCampaigns.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('audit_lpj')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'audit_lpj'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Audit LPJ & Kuitansi</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('transaksi')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'transaksi'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Audit Transaksi</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'users'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <UserCheck className="w-4 h-4 text-emerald-500" />
+            <span>Verifikasi Inisiator</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'users' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'}`}>
+              AUTH-04
+            </span>
+            {unverifiedUsersCount > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'users' ? 'bg-emerald-800 text-white' : 'bg-amber-100 text-amber-800'}`}>
+                {unverifiedUsersCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('sistem')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'sistem'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <Database className="w-4 h-4" />
+            <span>Integritas Sistem</span>
+          </button>
         </div>
 
         {/* TAB 1: MODERASI KAMPANYE */}
@@ -1021,6 +1260,245 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
         )}
 
+        {/* TAB 5: VERIFIKASI AKUN INISIATOR (AUTH-04) */}
+        {activeTab === 'users' && (
+          <div className="mt-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-emerald-600" />
+                  <span>Daftar Pengguna & Verifikasi Inisiator Terpercaya</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Tinjau identitas, nomor kontak, domisili, dan dokumen KTP/Legalitas organisasi calon inisiator sebelum mengaktifkan izin pembukaan kampanye donasi.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={fetchAdminUsers}
+                  disabled={isLoadingUsers}
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingUsers ? 'animate-spin' : ''}`} />
+                  <span>Segarkan Data</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  placeholder="Cari nama, email, no telepon, atau kota domisili..."
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl self-start sm:self-auto overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setUserFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    userFilter === 'all'
+                      ? 'bg-white text-slate-900 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Semua ({adminUsers.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUserFilter('unverified')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    userFilter === 'unverified'
+                      ? 'bg-amber-500 text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>Menunggu Verifikasi</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${userFilter === 'unverified' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'}`}>
+                    {unverifiedUsersCount}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUserFilter('verified')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    userFilter === 'verified'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>Inisiator Terverifikasi</span>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${userFilter === 'verified' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+                    {verifiedUsersCount}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Users Table */}
+            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold">
+                      <th className="py-3 px-4">Pengguna / Inisiator</th>
+                      <th className="py-3 px-4">Kontak & Domisili</th>
+                      <th className="py-3 px-4">Dokumen Legalitas</th>
+                      <th className="py-3 px-4">Status Akun</th>
+                      <th className="py-3 px-4 text-right">Aksi Verifikasi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {isLoadingUsers ? (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-500">
+                          <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-600" />
+                          <span>Memuat daftar akun pengguna & inisiator...</span>
+                        </td>
+                      </tr>
+                    ) : filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center text-slate-500">
+                          <Users className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+                          <p className="font-semibold text-slate-700">Tidak ada data pengguna yang cocok</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau filter status verifikasi.</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredUsers.map((user) => {
+                        const isVerifying = verifyingUserId === user.id;
+                        return (
+                          <tr key={user.id} className="hover:bg-slate-50/80 transition-colors">
+                            {/* User Info */}
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-500 text-white font-bold flex items-center justify-center shrink-0 shadow-xs text-xs">
+                                  {user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                    <span>{user.name}</span>
+                                    {user.role === 'admin' && (
+                                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 font-bold">
+                                        ADMIN
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                                    <Mail className="w-3 h-3 text-slate-400" />
+                                    <span>{user.email}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Contact & Domicile */}
+                            <td className="py-3.5 px-4">
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-1 text-slate-700">
+                                  <Phone className="w-3 h-3 text-slate-400" />
+                                  <span>{user.phone_whatsapp || 'Belum diisi'}</span>
+                                </div>
+                                <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                                  <MapPin className="w-3 h-3 text-slate-400" />
+                                  <span>{user.city_domicile || 'Indonesia'}</span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Identity Document */}
+                            <td className="py-3.5 px-4">
+                              {user.identity_doc_url ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setDocPreviewUser(user)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-[11px] border border-blue-200 transition-colors"
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  <span>Lihat Dokumen</span>
+                                </button>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic">
+                                  Belum diunggah
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Verification Status */}
+                            <td className="py-3.5 px-4">
+                              {user.is_verified ? (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>Inisiator Terverifikasi</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                                  <span>Belum Terverifikasi / Reguler</span>
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Action Buttons */}
+                            <td className="py-3.5 px-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {!user.is_verified ? (
+                                  <button
+                                    type="button"
+                                    disabled={isVerifying}
+                                    onClick={() => handleVerifyUser(user.id, true)}
+                                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                                    title="Verifikasi pengguna ini sebagai inisiator resmi"
+                                  >
+                                    {isVerifying ? (
+                                      <>
+                                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                        <span>Memproses...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <UserCheck className="w-3.5 h-3.5" />
+                                        <span>Verifikasi Inisiator</span>
+                                      </>
+                                    )}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={isVerifying}
+                                    onClick={() => handleVerifyUser(user.id, false)}
+                                    className="px-2.5 py-1.5 text-slate-500 hover:text-amber-700 bg-slate-100 hover:bg-amber-50 rounded-xl text-xs font-semibold transition-colors border border-slate-200 flex items-center gap-1 disabled:opacity-50"
+                                    title="Batalkan status verifikasi inisiator"
+                                  >
+                                    {isVerifying ? (
+                                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                      <XCircle className="w-3.5 h-3.5 text-slate-400 hover:text-amber-600" />
+                                    )}
+                                    <span>Cabut Status</span>
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Detail Modal for Selected Campaign */}
@@ -1391,6 +1869,77 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Preview Dokumen Legalitas Inisiator (AUTH-04) */}
+      {docPreviewUser && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Dokumen Identitas & Legalitas
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {docPreviewUser.name} • {docPreviewUser.email}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setDocPreviewUser(null)}
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 max-h-72 flex items-center justify-center">
+                {docPreviewUser.identity_doc_url ? (
+                  <img
+                    src={docPreviewUser.identity_doc_url}
+                    alt={`Dokumen Identitas ${docPreviewUser.name}`}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <p className="text-xs text-slate-400 py-8">Dokumen tidak dapat dimuat</p>
+                )}
+              </div>
+
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+                <p><strong>Nama Pemohon:</strong> {docPreviewUser.name}</p>
+                <p><strong>WhatsApp:</strong> {docPreviewUser.phone_whatsapp || '-'}</p>
+                <p><strong>Kota Domisili:</strong> {docPreviewUser.city_domicile || '-'}</p>
+                <p><strong>Status Saat Ini:</strong> {docPreviewUser.is_verified ? 'Terverifikasi' : 'Menunggu Verifikasi'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <button
+                onClick={() => setDocPreviewUser(null)}
+                className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100"
+              >
+                Tutup
+              </button>
+              {!docPreviewUser.is_verified && (
+                <button
+                  onClick={() => {
+                    handleVerifyUser(docPreviewUser.id, true);
+                    setDocPreviewUser(null);
+                  }}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Verifikasi Inisiator Sekarang</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

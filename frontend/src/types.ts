@@ -65,6 +65,22 @@ export const DEFAULT_GUEST_USER: UserProfile = {
   managedCampaignIds: [],
 };
 
+export interface DisbursementRecord {
+  id: number | string;
+  campaign_id: number | string;
+  user_id?: number | string;
+  amount: number | string;
+  bank_name: string;
+  account_number: string;
+  bank_account?: string;
+  account_name: string;
+  reason?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  admin_notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface CampaignSchedule {
   id: number | string;
   campaign_id: number | string;
@@ -108,6 +124,8 @@ export interface Campaign {
   lpjReports?: LpjItem[];
   // Jadwal & Misi Harian
   schedules?: CampaignSchedule[];
+  // Pencairan Dana (Disbursements)
+  disbursements?: DisbursementRecord[];
 }
 
 export interface DonationFormState {

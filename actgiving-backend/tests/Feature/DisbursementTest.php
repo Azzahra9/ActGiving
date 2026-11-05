@@ -1,0 +1,171 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Campaign;
+use App\Models\Category;
+use App\Models\Disbursement;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class DisbursementTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private User $initiator;
+    private User $otherUser;
+    private Campaign $campaign;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $category = Category::create(['category_name' => 'Bencana Alam']);
+
+        $this->initiator = User::create([
+            'name' => 'Inisiator Kebaikan',
+            'email' => 'inisiator@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+
+        $this->otherUser = User::create([
+            'name' => 'User Lain',
+            'email' => 'other@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => false,
+        ]);
+
+        $this->campaign = Campaign::create([
+            'user_id' => $this->initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Bantuan Korban Banjir',
+            'description' => 'Bantuan pengadaan logistik dan air bersih.',
+            'target_amount' => 10000000,
+            'current_amount' => 5000000,
+            'target_volunteers' => 10,
+            'current_volunteers' => 2,
+            'location' => 'Semarang',
+            'activity_date' => now()->addDays(7)->toDateString(),
+            'status' => 'active',
+            'campaign_mode' => 'both',
+        ]);
+    }
+
+    public function test_guest_cannot_request_disbursement(): void
+    {
+        $response = $this->postJson("/api/campaigns/{$this->campaign->id}/disbursements", [
+            'amount' => 1000000,
+            'bank_name' => 'BCA',
+            'account_number' => '1234567890',
+            'account_name' => 'Yayasan Kebaikan',
+            'reason' => 'Operasional logistik',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_other_user_cannot_request_disbursement_for_unowned_campaign(): void
+    {
+        $response = $this->actingAs($this->otherUser, 'sanctum')->postJson("/api/campaigns/{$this->campaign->id}/disbursements", [
+            'amount' => 1000000,
+            'bank_name' => 'BCA',
+            'account_number' => '1234567890',
+            'account_name' => 'Yayasan Kebaikan',
+            'reason' => 'Operasional logistik',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_initiator_can_request_disbursement_successfully(): void
+    {
+        $response = $this->actingAs($this->initiator, 'sanctum')->postJson("/api/campaigns/{$this->campaign->id}/disbursements", [
+            'amount' => 2000000,
+            'bank_name' => 'BCA',
+            'account_number' => '8899001122',
+            'account_name' => 'Inisiator Kebaikan',
+            'reason' => 'Pengadaan sembako tahap pertama',
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Pengajuan pencairan dana berhasil diajukan dan menunggu persetujuan Administrator.',
+            'data' => [
+                'campaign_id' => $this->campaign->id,
+                'amount' => '2000000.00',
+                'bank_name' => 'BCA',
+                'account_number' => '8899001122',
+                'account_name' => 'Inisiator Kebaikan',
+                'reason' => 'Pengadaan sembako tahap pertama',
+                'status' => 'pending',
+            ],
+        ]);
+
+        $this->assertDatabaseHas('disbursements', [
+            'campaign_id' => $this->campaign->id,
+            'user_id' => $this->initiator->id,
+            'bank_name' => 'BCA',
+            'account_number' => '8899001122',
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_disbursement_validation_fails_on_missing_fields(): void
+    {
+        $response = $this->actingAs($this->initiator, 'sanctum')->postJson("/api/campaigns/{$this->campaign->id}/disbursements", [
+            'amount' => 5000, // min 10000
+            'bank_name' => '',
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_disbursement_fails_if_amount_exceeds_available_balance(): void
+    {
+        $response = $this->actingAs($this->initiator, 'sanctum')->postJson("/api/campaigns/{$this->campaign->id}/disbursements", [
+            'amount' => 10000000, // saldo hanya 5.000.000
+            'bank_name' => 'Mandiri',
+            'account_number' => '1370001234567',
+            'account_name' => 'Inisiator Kebaikan',
+            'reason' => 'Penarikan penuh',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+        ]);
+    }
+
+    public function test_initiator_can_get_disbursement_history(): void
+    {
+        Disbursement::create([
+            'campaign_id' => $this->campaign->id,
+            'user_id' => $this->initiator->id,
+            'amount' => 500000,
+            'bank_name' => 'BNI',
+            'bank_account' => '0987654321',
+            'account_number' => '0987654321',
+            'account_name' => 'Inisiator Kebaikan',
+            'reason' => 'Uang muka logistik',
+            'status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->initiator, 'sanctum')->getJson("/api/campaigns/{$this->campaign->id}/disbursements");
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'data' => [
+                'campaign_title',
+                'current_amount',
+                'disbursements',
+            ],
+        ]);
+        $this->assertCount(1, $response->json('data.disbursements'));
+    }
+}

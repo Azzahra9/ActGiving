@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ResetPasswordMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -117,7 +120,7 @@ class AuthController extends Controller
     }
 
     /**
-     * FR-05: Lupa Kata Sandi (Generate Token Reset Password - Kadaluwarsa 60 Menit).
+     * FR-05: Lupa Kata Sandi (Generate Token Reset Password - Kadaluwarsa 60 Menit & Kirim Email).
      */
     public function forgotPassword(Request $request): JsonResponse
     {
@@ -136,12 +139,23 @@ class AuthController extends Controller
             ]
         );
 
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $resetUrl = rtrim($frontendUrl, '/') . '/?token=' . $token . '&email=' . urlencode($request->email);
+
+        // Kirim email notifikasi reset kata sandi
+        try {
+            Mail::to($request->email)->send(new ResetPasswordMail($token, $request->email, $resetUrl));
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengirimkan email reset password: ' . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Token reset kata sandi berhasil dibuat (berlaku 60 menit).',
+            'message' => 'Tautan dan token reset kata sandi berhasil dikirim ke email Anda (berlaku 60 menit).',
             'data' => [
                 'email' => $request->email,
-                'reset_token' => $token, // Disajikan untuk simulasi pengiriman email
+                'reset_token' => $token, // Disajikan untuk simulasi pengiriman email / UAT
+                'reset_url' => $resetUrl,
                 'expires_in_minutes' => 60,
             ],
         ]);

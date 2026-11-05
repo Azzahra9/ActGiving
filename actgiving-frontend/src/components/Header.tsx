@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   const effectiveUser = currentUser && currentUser.role !== 'guest' ? currentUser : authUser;
 
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -64,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleLogout = async () => {
     setUserDropdownOpen(false);
-    setMobileNavOpen(false);
+    setIsMobileMenuOpen(false);
     try {
       await logout();
     } catch (err) {
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const scrollToSection = (id: string) => {
-    setMobileNavOpen(false);
+    setIsMobileMenuOpen(false);
     if (activeView !== 'public') {
       onNavigateView('public');
       setTimeout(() => {
@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* ======================================================= */}
           {/* 1. LEFT BRAND & PORTAL DONASI BADGE                     */}
           {/* ======================================================= */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Sidebar toggle for Dashboard views */}
             {activeView !== 'public' && (
               <button
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
                     Act<span className="text-brand-blue">Giving</span>
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full border border-blue-200">
+                  <span className="hidden sm:flex items-center text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-brand-blue px-2 py-0.5 rounded-full border border-blue-200">
                     Portal Donasi
                   </span>
                 </div>
@@ -142,39 +142,39 @@ export const Header: React.FC<HeaderProps> = ({
           {/* ======================================================= */}
           {/* 2. CENTER NAVIGATION LINKS (EXACT FIGMA LAYOUT)         */}
           {/* ======================================================= */}
-          <nav className="hidden lg:flex items-center gap-8 text-xs sm:text-sm font-semibold text-slate-600">
+          <nav className="hidden xl:flex items-center gap-6 2xl:gap-8 text-xs sm:text-sm font-semibold text-slate-600 whitespace-nowrap">
             {activeView === 'public' ? (
               <>
                 <button
                   onClick={() => scrollToSection('katalog-aksi')}
-                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Compass className="w-4 h-4 text-brand-blue" />
-                  <span>Eksplorasi Katalog</span>
+                  <span className="whitespace-nowrap">Eksplorasi Katalog</span>
                 </button>
 
                 <button
                   onClick={() => scrollToSection('galeri-kegiatan')}
-                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Camera className="w-4 h-4 text-brand-blue" />
-                  <span>Foto Kegiatan & LPJ</span>
+                  <span className="whitespace-nowrap">Foto Kegiatan & LPJ</span>
                 </button>
 
                 <button
                   onClick={() => scrollToSection('transparansi-counter')}
-                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Activity className="w-4 h-4 text-brand-blue" />
-                  <span>Transparansi Live</span>
+                  <span className="whitespace-nowrap">Transparansi Live</span>
                 </button>
 
                 <button
                   onClick={() => scrollToSection('tutorial-interaktif')}
-                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 hover:text-brand-blue transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <BookOpen className="w-4 h-4 text-brand-blue" />
-                  <span>Panduan Donatur</span>
+                  <span className="whitespace-nowrap">Panduan Donatur</span>
                 </button>
               </>
             ) : null}
@@ -183,15 +183,25 @@ export const Header: React.FC<HeaderProps> = ({
           {/* ======================================================= */}
           {/* 3. RIGHT PRIMARY CTA: "DONASI SEKARANG" (PILL BUTTON)   */}
           {/* ======================================================= */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
-            {/* Primary Action Button: Donasi Sekarang */}
+            {/* Mobile / Tablet Hamburger Menu (sebelah kiri tombol Donasi Sekarang) */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="flex xl:hidden items-center justify-center p-2.5 text-slate-700 hover:text-brand-blue hover:bg-slate-100 rounded-xl border border-slate-200 transition-colors cursor-pointer shrink-0"
+              aria-label="Toggle Menu"
+              title="Menu Navigasi"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5 text-slate-700" /> : <Menu className="w-5 h-5 text-slate-700" />}
+            </button>
+
+            {/* Primary Action Button: Donasi Sekarang (Hidden on mobile < md) */}
             <button
               onClick={() => scrollToSection('katalog-aksi')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-blue/30 transition-all hover:scale-[1.02] cursor-pointer"
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-blue hover:bg-brand-blue-hover text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-blue/30 transition-all hover:scale-[1.02] cursor-pointer whitespace-nowrap shrink-0"
             >
               <Heart className="w-4 h-4 fill-white" />
-              <span>Donasi Sekarang</span>
+              <span className="whitespace-nowrap">Donasi Sekarang</span>
             </button>
 
             {/* Profile Avatar / Login Icon */}
@@ -288,61 +298,65 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
 
-            {/* Mobile Hamburger Menu */}
-            <button
-              onClick={() => setMobileNavOpen(!mobileNavOpen)}
-              className="p-2 text-slate-600 hover:text-brand-blue hover:bg-slate-100 rounded-xl lg:hidden cursor-pointer"
-              aria-label="Toggle Menu"
-            >
-              {mobileNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
           </div>
 
         </div>
 
         {/* Mobile Dropdown Menu */}
-        {mobileNavOpen && (
-          <div className="lg:hidden py-4 border-t border-slate-100 space-y-2 animate-in fade-in">
+        {isMobileMenuOpen && (
+          <div className="xl:hidden py-4 border-t border-slate-100 space-y-2 animate-in fade-in">
             <button
               onClick={() => scrollToSection('katalog-aksi')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
             >
               <Compass className="w-4 h-4 text-brand-blue" />
-              <span>Eksplorasi Katalog</span>
+              <span className="whitespace-nowrap">Eksplorasi Katalog</span>
             </button>
             <button
               onClick={() => scrollToSection('galeri-kegiatan')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
             >
               <Camera className="w-4 h-4 text-brand-blue" />
-              <span>Foto Kegiatan & LPJ</span>
+              <span className="whitespace-nowrap">Foto Kegiatan & LPJ</span>
             </button>
             <button
               onClick={() => scrollToSection('transparansi-counter')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
             >
               <Activity className="w-4 h-4 text-brand-blue" />
-              <span>Transparansi Live</span>
+              <span className="whitespace-nowrap">Transparansi Live</span>
             </button>
             <button
               onClick={() => scrollToSection('tutorial-interaktif')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 whitespace-nowrap cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-brand-blue" />
-              <span>Panduan Donatur</span>
+              <span className="whitespace-nowrap">Panduan Donatur</span>
             </button>
+            {/* Mobile Primary CTA: Donasi Sekarang */}
             <div className="pt-2">
               <button
-                onClick={() => {
-                  setMobileNavOpen(false);
-                  onOpenAuth();
-                }}
-                className="w-full py-2.5 px-4 rounded-xl bg-brand-blue text-white text-xs font-bold shadow-sm text-center"
+                onClick={() => scrollToSection('katalog-aksi')}
+                className="w-full py-3 px-4 rounded-xl bg-brand-blue hover:bg-brand-blue-hover text-white text-sm font-bold shadow-md shadow-brand-blue/30 text-center cursor-pointer flex items-center justify-center gap-2 transition-all"
               >
-                Masuk / Daftar Akun
+                <Heart className="w-4 h-4 fill-white" />
+                <span>Donasi Sekarang</span>
               </button>
             </div>
+
+            {!isAuthenticated && (!effectiveUser || effectiveUser.role === 'guest') && (
+              <div className="pt-1">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenAuth();
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold text-center cursor-pointer transition-colors"
+                >
+                  Masuk / Daftar Akun
+                </button>
+              </div>
+            )}
           </div>
         )}
 

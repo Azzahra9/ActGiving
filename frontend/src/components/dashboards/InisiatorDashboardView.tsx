@@ -6,11 +6,12 @@ import {
   Camera, Trash2, Pencil, Plus, ReceiptText, Lock, Layers, FileCheck2, ZoomIn, ArrowRight, RefreshCw,
   X, XCircle, Clock, UserX, Phone, Mail
 } from 'lucide-react';
-import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
+import { Campaign, UserProfile, LpjItem, LpjBudgetItem, DisbursementRecord } from '../../types';
 import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 import { CampaignScheduleModal } from '../CampaignScheduleModal';
+import { DisbursementModal } from '../DisbursementModal';
 
 interface InisiatorDashboardViewProps {
   currentUser: UserProfile;
@@ -81,6 +82,9 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [scheduleModalCampaign, setScheduleModalCampaign] = useState<Campaign | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
+  const [disbursementModalCampaign, setDisbursementModalCampaign] = useState<Campaign | null>(null);
+  const [isDisbursementModalOpen, setIsDisbursementModalOpen] = useState(false);
+
   const handleOpenScheduleModal = (camp: Campaign) => {
     setScheduleModalCampaign(camp);
     setIsScheduleModalOpen(true);
@@ -89,6 +93,33 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const handleCloseScheduleModal = () => {
     setIsScheduleModalOpen(false);
     setScheduleModalCampaign(null);
+  };
+
+  const handleOpenDisbursementModal = (camp: Campaign) => {
+    setDisbursementModalCampaign(camp);
+    setIsDisbursementModalOpen(true);
+  };
+
+  const handleCloseDisbursementModal = () => {
+    setIsDisbursementModalOpen(false);
+    setDisbursementModalCampaign(null);
+  };
+
+  const handleDisbursementSuccess = (newDisbursement: DisbursementRecord, successMsg: string) => {
+    showToast(successMsg || 'Pengajuan pencairan berhasil dicatat dan menunggu persetujuan admin');
+    setInitiatorCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === String(newDisbursement.campaign_id)) {
+          const existing = c.disbursements || [];
+          return {
+            ...c,
+            disbursements: [newDisbursement, ...existing],
+          };
+        }
+        return c;
+      })
+    );
+    fetchInitiatorData();
   };
 
   // Fetch volunteer applicants directly from initiator endpoint or per-campaign
@@ -134,6 +165,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   }, [initiatorCampaigns, campaigns]);
 
   // Fetch real initiator campaigns from Laravel REST API
+  // Fetch real initiator campaigns from Laravel REST API
   const fetchInitiatorData = useCallback(async () => {
     try {
       const response = await api.get('/my-campaigns').catch(() => null);
@@ -150,7 +182,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   useEffect(() => {
     fetchInitiatorData();
     fetchVolunteersList();
-  }, [fetchInitiatorData, fetchVolunteersList]);
+  }, [fetchInitiatorData, fetchVolunteersList, campaigns]);
 
   // Refetch saat tab relawan dibuka
   useEffect(() => {
@@ -184,15 +216,29 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const currentUserName = currentUser?.name?.toLowerCase() || '';
 
   // Filter campaigns belonging to this initiator
-  const myCampaigns = initiatorCampaigns.length > 0
-    ? initiatorCampaigns
-    : (campaigns || []).filter(
-        (c) =>
-          Boolean(c) &&
-          (Boolean(currentUser?.managedCampaignIds?.includes(c.id)) ||
-          Boolean(c.initiatorName && currentUserName && c.initiatorName.toLowerCase().includes(currentUserName)) ||
+  // Filter campaigns belonging to this initiator (termasuk yang baru dibuat dari modal)
+  const myCampaigns = React.useMemo(() => {
+    const currentUserName = currentUser?.name?.toLowerCase() || '';
+    const managedIds = new Set(currentUser?.managedCampaignIds || []);
+
+    const fromProps = (campaigns || []).filter(
+      (c) =>
+        Boolean(c) &&
+        (managedIds.has(c.id) ||
+          (Boolean(c.initiatorName && currentUserName && c.initiatorName.toLowerCase().includes(currentUserName))) ||
+          c.status === 'pending_approval' ||
+          c.status === 'pending' ||
           c.id === 'camp-01')
-      );
+    );
+
+    const combined = [...initiatorCampaigns, ...fromProps];
+    const seen = new Set<string | number>();
+    return combined.filter((c) => {
+      if (!c || seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
+  }, [initiatorCampaigns, campaigns, currentUser]);
 
   const totalDanaTerkumpul = myCampaigns.reduce((acc, c) => acc + (c?.collectedFunds || 0), 0);
   const totalTargetDana = myCampaigns.reduce((acc, c) => acc + (c?.targetFunds || 0), 0);
@@ -255,31 +301,41 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     });
     const uniqueIncoming = Array.from(uniqueIncomingMap.values());
 
-    // 2. Filter terhadap state foto yang sudah ada sebelumnya
+    // 2. Filter terhadap file yang sudah ada di activityPhotoFiles
+    const existingKeys = new Set(activityPhotoFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+    const nonDuplicateFiles = uniqueIncoming.filter((f) => !existingKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
+
+    if (nonDuplicateFiles.length === 0) {
+      showToast('Foto ini sudah ada dalam daftar pratinjau.');
+      if (e.target) e.target.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // 3. Buat Object URL preview hanya untuk file baru
+    const newPreviews = nonDuplicateFiles.map((file) => URL.createObjectURL(file));
+
+    // 4. Update kedua state secara terpisah dan murni (pure) tanpa memanggil setState di dalam updater lain
     setActivityPhotoFiles((prevFiles) => {
-      const existingKeys = new Set(prevFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
-      const nonDuplicateFiles = uniqueIncoming.filter((f) => !existingKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
-
-      if (nonDuplicateFiles.length === 0) {
-        showToast('Foto ini sudah ada dalam daftar pratinjau.');
-        return prevFiles;
-      }
-
-      // Buat Object URL preview hanya untuk file baru yang unik
-      const newPreviews = nonDuplicateFiles.map((file) => URL.createObjectURL(file));
-      setActivityPhotos((prevPhotos) => [...prevPhotos, ...newPreviews]);
-      showToast(`${nonDuplicateFiles.length} foto kegiatan berhasil ditambahkan.`);
-
-      return [...prevFiles, ...nonDuplicateFiles];
+      const prevKeys = new Set(prevFiles.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+      const trulyNew = nonDuplicateFiles.filter((f) => !prevKeys.has(`${f.name}_${f.size}_${f.lastModified}`));
+      return [...prevFiles, ...trulyNew];
     });
 
-    // 3. Reset value input file agar tidak terjadi double-trigger dan mengizinkan pemilihan ulang
+    setActivityPhotos((prevPhotos) => {
+      const existingUrls = new Set(prevPhotos);
+      const trulyNewUrls = newPreviews.filter((url) => !existingUrls.has(url));
+      return [...prevPhotos, ...trulyNewUrls];
+    });
+
+    showToast(`${nonDuplicateFiles.length} foto kegiatan berhasil ditambahkan.`);
+
+    // 5. Reset input file
     e.target.value = '';
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
   const handleRemoveActivityPhoto = (indexToRemove: number) => {
     const previewUrl = activityPhotos[indexToRemove];
     if (previewUrl && previewUrl.startsWith('blob:')) {
@@ -811,6 +867,19 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                               </div>
                             </div>
                           )}
+
+                          {/* Status Pengajuan Pencairan Dana (DIS-01) */}
+                          {camp.disbursements?.some(d => d.status === 'pending') && (
+                            <div className="mt-2 text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200 flex items-center justify-between">
+                              <span className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                <span>Pencairan Dana Sedang Diproses Admin</span>
+                              </span>
+                              <span className="font-mono text-amber-900 font-bold">
+                                {formatRupiah(camp.disbursements.find(d => d.status === 'pending')?.amount || 0)}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -822,6 +891,19 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-1.5">
+                        {/* Tombol Ajukan Pencairan Dana (DIS-01) */}
+                        {(camp.mode === 'dana' || camp.mode === 'keduanya') && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDisbursementModal(camp)}
+                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                            title="Ajukan Pencairan Dana (DIS-01)"
+                          >
+                            <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Ajukan Pencairan</span>
+                          </button>
+                        )}
+
                         {/* Tombol Kelola Jadwal/Misi */}
                         <button
                           type="button"
@@ -1845,6 +1927,14 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
           campaign={scheduleModalCampaign}
           onClose={handleCloseScheduleModal}
           onSchedulesUpdated={fetchInitiatorData}
+        />
+
+        {/* Modal Ajukan Pencairan Dana (DIS-01) */}
+        <DisbursementModal
+          isOpen={isDisbursementModalOpen}
+          campaign={disbursementModalCampaign}
+          onClose={handleCloseDisbursementModal}
+          onSuccess={handleDisbursementSuccess}
         />
       </div>
     </div>

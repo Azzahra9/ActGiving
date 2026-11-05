@@ -34,8 +34,8 @@ interface SidebarProps {
   onSelectRelawanTab: (tab: 'jadwal' | 'riwayat' | 'cari' | 'profil') => void;
   inisiatorTab: 'kampanye' | 'lpj' | 'relawan' | 'panduan';
   onSelectInisiatorTab: (tab: 'kampanye' | 'lpj' | 'relawan' | 'panduan') => void;
-  adminTab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem';
-  onSelectAdminTab: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem') => void;
+  adminTab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users';
+  onSelectAdminTab: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => void;
   campaigns?: Campaign[];
   onOpenCreateCampaign: () => void;
   onOpenAuth: () => void;
@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobile();
   };
 
-  const handleAdminItemClick = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem') => {
+  const handleAdminItemClick = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => {
     onSelectAdminTab(tab);
     onCloseMobile();
   };
@@ -559,6 +559,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Database className="w-4 h-4 shrink-0 text-blue-400" />
                     {(!isCollapsedDesktop || isOpenMobile) && (
                       <span className="truncate">Integritas Data & Log</span>
+                    )}
+                  </button>
+
+                  {/* 5. Verifikasi Akun Inisiator (AUTH-04) */}
+                  <button
+                    onClick={() => handleAdminItemClick('users')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      activeView === 'admin_dashboard' && adminTab === 'users'
+                        ? theme.activeBg
+                        : 'text-slate-300 ' + theme.hoverBg
+                    } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
+                    title="Verifikasi Akun Inisiator (AUTH-04)"
+                  >
+                    <UserCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                    {(!isCollapsedDesktop || isOpenMobile) && (
+                      <div className="truncate flex-1 text-left flex items-center justify-between">
+                        <span className="truncate">Verifikasi Inisiator</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">
+                          AUTH-04
+                        </span>
+                      </div>
                     )}
                   </button>
                 </nav>

@@ -16,6 +16,9 @@ class Disbursement extends Model
         'amount',
         'bank_name',
         'bank_account',
+        'account_number',
+        'account_name',
+        'reason',
         'status',
         'admin_notes',
     ];
@@ -25,6 +28,25 @@ class Disbursement extends Model
         return [
             'amount' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Accessor: account_number fallback ke bank_account jika belum terisi.
+     */
+    public function getAccountNumberAttribute($value)
+    {
+        return $value ?? $this->bank_account;
+    }
+
+    /**
+     * Mutator: set account_number sekaligus bank_account untuk kompatibilitas.
+     */
+    public function setAccountNumberAttribute($value)
+    {
+        $this->attributes['account_number'] = $value;
+        if (!isset($this->attributes['bank_account']) || empty($this->attributes['bank_account'])) {
+            $this->attributes['bank_account'] = $value;
+        }
     }
 
     /**

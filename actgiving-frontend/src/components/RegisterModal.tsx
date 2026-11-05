@@ -9,6 +9,7 @@ export interface RegisterModalProps {
   onSelectUser?: (user: UserProfile) => void;
   initialTab?: 'login' | 'register';
   initialRole?: 'relawan' | 'inisiator';
+  onOpenForgotPassword?: () => void;
 }
 
 /**
@@ -23,6 +24,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   onSelectUser,
   initialTab = 'register',
   initialRole = 'relawan',
+  onOpenForgotPassword,
 }) => {
   return (
     <AuthModal
@@ -32,6 +34,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
       onSelectUser={onSelectUser}
       initialTab={initialTab}
       initialRole={initialRole}
+      onOpenForgotPassword={onOpenForgotPassword}
     />
   );
 };

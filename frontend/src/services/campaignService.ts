@@ -160,6 +160,7 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
       ? item.lpjReports.map(mapBackendLpjToFrontend)
       : [],
     schedules: Array.isArray(item.schedules) ? item.schedules : [],
+    disbursements: Array.isArray(item.disbursements) ? item.disbursements : [],
   };
 };
 

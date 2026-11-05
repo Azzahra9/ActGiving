@@ -6,11 +6,12 @@ import {
   Camera, Trash2, Pencil, Plus, ReceiptText, Lock, Layers, FileCheck2, ZoomIn, ArrowRight, RefreshCw,
   X, XCircle, Clock, UserX, Phone, Mail
 } from 'lucide-react';
-import { Campaign, UserProfile, LpjItem, LpjBudgetItem } from '../../types';
+import { Campaign, UserProfile, LpjItem, LpjBudgetItem, DisbursementRecord } from '../../types';
 import api from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 import { CampaignScheduleModal } from '../CampaignScheduleModal';
+import { DisbursementModal } from '../DisbursementModal';
 
 interface InisiatorDashboardViewProps {
   currentUser: UserProfile;
@@ -81,6 +82,9 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [scheduleModalCampaign, setScheduleModalCampaign] = useState<Campaign | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
+  const [disbursementModalCampaign, setDisbursementModalCampaign] = useState<Campaign | null>(null);
+  const [isDisbursementModalOpen, setIsDisbursementModalOpen] = useState(false);
+
   const handleOpenScheduleModal = (camp: Campaign) => {
     setScheduleModalCampaign(camp);
     setIsScheduleModalOpen(true);
@@ -89,6 +93,33 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const handleCloseScheduleModal = () => {
     setIsScheduleModalOpen(false);
     setScheduleModalCampaign(null);
+  };
+
+  const handleOpenDisbursementModal = (camp: Campaign) => {
+    setDisbursementModalCampaign(camp);
+    setIsDisbursementModalOpen(true);
+  };
+
+  const handleCloseDisbursementModal = () => {
+    setIsDisbursementModalOpen(false);
+    setDisbursementModalCampaign(null);
+  };
+
+  const handleDisbursementSuccess = (newDisbursement: DisbursementRecord, successMsg: string) => {
+    showToast(successMsg || 'Pengajuan pencairan berhasil dicatat dan menunggu persetujuan admin');
+    setInitiatorCampaigns((prev) =>
+      prev.map((c) => {
+        if (c.id === String(newDisbursement.campaign_id)) {
+          const existing = c.disbursements || [];
+          return {
+            ...c,
+            disbursements: [newDisbursement, ...existing],
+          };
+        }
+        return c;
+      })
+    );
+    fetchInitiatorData();
   };
 
   // Fetch volunteer applicants directly from initiator endpoint or per-campaign
@@ -836,6 +867,19 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                               </div>
                             </div>
                           )}
+
+                          {/* Status Pengajuan Pencairan Dana (DIS-01) */}
+                          {camp.disbursements?.some(d => d.status === 'pending') && (
+                            <div className="mt-2 text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200 flex items-center justify-between">
+                              <span className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                <span>Pencairan Dana Sedang Diproses Admin</span>
+                              </span>
+                              <span className="font-mono text-amber-900 font-bold">
+                                {formatRupiah(camp.disbursements.find(d => d.status === 'pending')?.amount || 0)}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -847,6 +891,19 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                       </div>
 
                       <div className="flex flex-wrap items-center gap-1.5">
+                        {/* Tombol Ajukan Pencairan Dana (DIS-01) */}
+                        {(camp.mode === 'dana' || camp.mode === 'keduanya') && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDisbursementModal(camp)}
+                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                            title="Ajukan Pencairan Dana (DIS-01)"
+                          >
+                            <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Ajukan Pencairan</span>
+                          </button>
+                        )}
+
                         {/* Tombol Kelola Jadwal/Misi */}
                         <button
                           type="button"
@@ -1870,6 +1927,14 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
           campaign={scheduleModalCampaign}
           onClose={handleCloseScheduleModal}
           onSchedulesUpdated={fetchInitiatorData}
+        />
+
+        {/* Modal Ajukan Pencairan Dana (DIS-01) */}
+        <DisbursementModal
+          isOpen={isDisbursementModalOpen}
+          campaign={disbursementModalCampaign}
+          onClose={handleCloseDisbursementModal}
+          onSuccess={handleDisbursementSuccess}
         />
       </div>
     </div>

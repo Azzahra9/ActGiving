@@ -100,7 +100,17 @@ class AdminController extends Controller
             $query->where('is_verified', $request->boolean('is_verified'));
         }
 
-        $users = $query->latest()->paginate(15);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('city_domicile', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = (int) $request->input('per_page', 50);
+        $users = $query->latest()->paginate($perPage);
 
         return response()->json([
             'success' => true,
@@ -109,26 +119,31 @@ class AdminController extends Controller
     }
 
     /**
-     * Verifikasi Pengguna / Inisiator (Admin)
+     * Verifikasi Pengguna / Inisiator (Admin - AUTH-04)
      *
-     * Admin: Verifikasi dokumen identitas pengguna/inisiator.
+     * Admin: Verifikasi akun/dokumen identitas pengguna menjadi inisiator terverifikasi.
      */
     public function verifyUser(Request $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
-        $validated = $request->validate([
-            'is_verified' => 'required|boolean',
+        $request->validate([
+            'is_verified' => 'nullable|boolean',
         ]);
 
-        $user->is_verified = $validated['is_verified'];
+        // Default ke true jika tidak disertakan dalam body (misal PATCH tanpa payload)
+        $isVerified = $request->has('is_verified')
+            ? $request->boolean('is_verified')
+            : true;
+
+        $user->is_verified = $isVerified;
         $user->save();
 
         return response()->json([
             'success' => true,
             'message' => $user->is_verified
-                ? 'Pengguna/Inisiator berhasil diverifikasi.'
-                : 'Status verifikasi pengguna dicabut.',
+                ? "Pengguna {$user->name} berhasil diverifikasi sebagai Inisiator Terpercaya."
+                : "Status verifikasi pengguna {$user->name} berhasil dicabut.",
             'data' => $user,
         ]);
     }
