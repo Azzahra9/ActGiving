@@ -11,7 +11,9 @@ import {
   ArrowUpRight,
   ShieldCheck,
 
-  Camera
+  Camera,
+  Flag,
+  Eye
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
@@ -21,13 +23,17 @@ interface CampaignCardProps {
   onDonateClick: (campaign: Campaign) => void;
   onVolunteerClick: (campaign: Campaign) => void;
   onViewLpjClick: (campaign: Campaign) => void;
+  onDetailClick?: (campaign: Campaign) => void;
+  onReportClick?: (campaign: Campaign) => void;
 }
 
 export const CampaignCard: React.FC<CampaignCardProps> = ({
   campaign,
   onDonateClick,
   onVolunteerClick,
-  onViewLpjClick
+  onViewLpjClick,
+  onDetailClick,
+  onReportClick
 }) => {
   if (!campaign) return null;
 
@@ -127,7 +133,12 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
           </div>
 
           {/* Campaign Title */}
-          <h3 className="text-sm sm:text-base font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-brand-blue transition-colors mb-2">
+          <h3
+            onClick={() => onDetailClick?.(campaign)}
+            className={`text-sm sm:text-base font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-brand-blue transition-colors mb-2 ${
+              onDetailClick ? 'cursor-pointer' : ''
+            }`}
+          >
             {campaign.title}
           </h3>
 
@@ -270,6 +281,36 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
                 : `Lihat Foto & ${campaign.lpjReports?.length || 1} File Dokumentasi Laporan (LPJ)`}
             </span>
           </button>
+
+          {/* 6. Detail Kampanye & Tombol Laporkan Kampanye Ini (REP-01) */}
+          {(onDetailClick || onReportClick) && (
+            <div className="pt-2 mt-1 border-t border-slate-100 flex items-center justify-between gap-2">
+              {onDetailClick ? (
+                <button
+                  type="button"
+                  onClick={() => onDetailClick(campaign)}
+                  className="text-[11px] font-semibold text-slate-500 hover:text-brand-blue flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Detail Kampanye</span>
+                </button>
+              ) : (
+                <span />
+              )}
+
+              {onReportClick && (
+                <button
+                  type="button"
+                  onClick={() => onReportClick(campaign)}
+                  className="text-[11px] font-medium text-slate-400 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Laporkan kampanye jika terdapat kejanggalan atau indikasi penipuan"
+                >
+                  <Flag className="w-3 h-3" />
+                  <span>Laporkan Kampanye Ini</span>
+                </button>
+              )}
+            </div>
+          )}
 
         </div>
 

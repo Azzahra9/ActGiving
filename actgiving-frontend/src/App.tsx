@@ -26,8 +26,10 @@ import { RelawanActivityModal } from './components/RelawanActivityModal';
 import { InisiatorDashboardModal } from './components/InisiatorDashboardModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Footer } from './components/Footer';
+import { CampaignDetailModal } from './components/CampaignDetailModal';
+import { ReportCampaignModal } from './components/ReportCampaignModal';
 import { formatRupiah } from './utils/format';
-import { HeartHandshake, ShieldCheck, CheckCircle2, ArrowUpRight, LayoutDashboard } from 'lucide-react';
+import { HeartHandshake, ShieldCheck, CheckCircle2, ArrowUpRight, LayoutDashboard, X } from 'lucide-react';
 
 export default function App() {
   const { user: authUser, setUser: setAuthUser } = useAuth();
@@ -52,7 +54,7 @@ export default function App() {
   // Active sub-tab states for each role (controlled via Role-Specific Sidebar)
   const [relawanTab, setRelawanTab] = useState<'jadwal' | 'riwayat' | 'cari' | 'profil'>('jadwal');
   const [inisiatorTab, setInisiatorTab] = useState<'kampanye' | 'lpj' | 'relawan' | 'panduan'>('kampanye');
-  const [adminTab, setAdminTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users'>('moderasi');
+  const [adminTab, setAdminTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports'>('moderasi');
 
   // Global Application State (REST API & Real Data)
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -112,8 +114,18 @@ export default function App() {
   const [checkoutCampaign, setCheckoutCampaign] = useState<Campaign | null>(null);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [lpjCampaign, setLpjCampaign] = useState<Campaign | null>(null);
+  const [detailCampaign, setDetailCampaign] = useState<Campaign | null>(null);
+  const [reportCampaign, setReportCampaign] = useState<Campaign | null>(null);
+  const [reportSuccessToast, setReportSuccessToast] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [campaignToEdit, setCampaignToEdit] = useState<Campaign | null>(null);
+
+  const handleReportSuccess = useCallback((message: string) => {
+    setReportSuccessToast(message);
+    setTimeout(() => {
+      setReportSuccessToast((prev) => (prev === message ? null : prev));
+    }, 6000);
+  }, []);
 
   const handleOpenCreateCampaign = () => {
     setCampaignToEdit(null);
@@ -502,6 +514,8 @@ export default function App() {
                 onDonateClick={(camp) => setCheckoutCampaign(camp)}
                 onVolunteerClick={() => setIsRegisterOpen(true)}
                 onViewLpjClick={(camp) => setLpjCampaign(camp)}
+                onDetailClick={(camp) => setDetailCampaign(camp)}
+                onReportClick={(camp) => setReportCampaign(camp)}
                 onResetFilters={handleResetFilters}
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
@@ -668,6 +682,47 @@ export default function App() {
           onAddLpj={handleAddLpj}
         />
       </ErrorBoundary>
+
+      {/* MODAL 10: Detail Kampanye Publik (termasuk Bagikan & Laporkan Kampanye Ini) */}
+      <CampaignDetailModal
+        campaign={detailCampaign}
+        isOpen={!!detailCampaign}
+        onClose={() => setDetailCampaign(null)}
+        onDonateClick={(camp) => setCheckoutCampaign(camp)}
+        onVolunteerClick={() => setIsRegisterOpen(true)}
+        onViewLpjClick={(camp) => setLpjCampaign(camp)}
+        onReportClick={(camp) => setReportCampaign(camp)}
+      />
+
+      {/* MODAL 11: Laporan Pengaduan Kampanye Publik (REP-01) */}
+      <ReportCampaignModal
+        campaign={reportCampaign}
+        isOpen={!!reportCampaign}
+        onClose={() => setReportCampaign(null)}
+        currentUser={currentUser}
+        onReportSuccess={handleReportSuccess}
+      />
+
+      {/* Global Toast Sukses Pengaduan Kampanye (REP-01) */}
+      {reportSuccessToast && (
+        <div
+          role="alert"
+          className="fixed top-20 right-4 z-[70] max-w-md bg-emerald-950 text-white px-4 py-3.5 rounded-2xl shadow-2xl border border-emerald-500/70 flex items-start gap-3 animate-in fade-in slide-in-from-top-2"
+        >
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="text-xs font-medium leading-relaxed flex-1">
+            {reportSuccessToast}
+          </div>
+          <button
+            type="button"
+            onClick={() => setReportSuccessToast(null)}
+            aria-label="Tutup Notifikasi"
+            className="p-1 text-emerald-300 hover:text-white rounded-lg transition-colors cursor-pointer shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
     </div>
   );

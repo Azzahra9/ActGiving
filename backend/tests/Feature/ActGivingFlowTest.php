@@ -140,10 +140,11 @@ class ActGivingFlowTest extends TestCase
         $this->assertEquals(50000, $campaign->fresh()->current_amount);
         $this->assertEquals('approved', Disbursement::find($disburseId)->status);
 
-        // 11. FR-13: Laporan Aduan Kampanye Fiktif
+        // 11. FR-13 / REP-01: Laporan Aduan Kampanye Fiktif
         $reportRes = $this->postJson("/api/campaigns/{$campaign->id}/reports", [
+            'reporter_name' => 'Warga Peduli',
             'reporter_email' => 'citizen@example.com',
-            'reason_category' => 'Indikasi Fiktif',
+            'category' => 'fiktif',
             'description' => 'Mohon diteliti bukti fisik kegiatannya.',
         ]);
         $reportRes->assertStatus(201);

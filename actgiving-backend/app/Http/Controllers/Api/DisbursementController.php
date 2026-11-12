@@ -208,4 +208,20 @@ class DisbursementController extends Controller
             ]);
         });
     }
+
+    /**
+     * DIS-02: Antrean Pencairan Dana (Admin Endpoint Bridge)
+     */
+    public function indexDisbursements(Request $request): JsonResponse
+    {
+        return app(AdminController::class)->indexDisbursements($request);
+    }
+
+    /**
+     * DIS-02: Validasi Persetujuan Pencairan Dana (Admin Endpoint Bridge)
+     */
+    public function updateDisbursementStatus(Request $request, $id): JsonResponse
+    {
+        return app(AdminController::class)->updateDisbursementStatus($request, $id);
+    }
 }

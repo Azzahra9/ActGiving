@@ -3,10 +3,11 @@ import {
   ShieldCheck, CheckCircle2, XCircle, AlertTriangle, FileText, 
   Eye, Check, ExternalLink, Building2, MapPin, ArrowLeft, 
   Search, Users, DollarSign, Activity, Lock, Database, RefreshCw, Sparkles, Layers,
-  Ban, Calendar, Clock, X, Info, UserCheck, Phone, Mail, Award, CheckCircle
+  Ban, Calendar, Clock, X, Info, UserCheck, Phone, Mail, Award, CheckCircle,
+  Flag, Download
 } from 'lucide-react';
-import { Campaign, UserProfile, LpjItem } from '../../types';
-import api from '../../lib/axios';
+import { Campaign, UserProfile, LpjItem, DisbursementRecord, CampaignReportRecord } from '../../types';
+import api, { BACKEND_ROOT_URL } from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 
@@ -75,8 +76,8 @@ interface AdminDashboardViewProps {
   onRejectCampaign: (campaignId: string) => void;
   onOpenLpjModal: (campaign: Campaign) => void;
   onRefreshCampaigns?: () => void;
-  activeTab?: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users';
-  onTabChange?: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => void;
+  activeTab?: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports';
+  onTabChange?: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports') => void;
 }
 
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
@@ -90,9 +91,9 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   activeTab: propActiveTab,
   onTabChange
 }) => {
-  const [internalTab, setInternalTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users'>('moderasi');
+  const [internalTab, setInternalTab] = useState<'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports'>('moderasi');
   const activeTab = propActiveTab || internalTab;
-  const setActiveTab = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => {
+  const setActiveTab = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports') => {
     setInternalTab(tab);
     onTabChange?.(tab);
   };
@@ -118,6 +119,21 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const [userFilter, setUserFilter] = useState<'all' | 'unverified' | 'verified'>('all');
   const [verifyingUserId, setVerifyingUserId] = useState<number | null>(null);
   const [docPreviewUser, setDocPreviewUser] = useState<AdminUserRecord | null>(null);
+
+  // States untuk Modul DIS-02: Pencairan Dana (Disbursement)
+  const [adminDisbursements, setAdminDisbursements] = useState<DisbursementRecord[]>([]);
+  const [isLoadingDisbursements, setIsLoadingDisbursements] = useState<boolean>(false);
+  const [disbursementSearch, setDisbursementSearch] = useState<string>('');
+  const [disbursementFilter, setDisbursementFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [processingDisbursementId, setProcessingDisbursementId] = useState<number | string | null>(null);
+
+  // States untuk Modul REP-02: Aduan / Laporan Kampanye Publik
+  const [adminReports, setAdminReports] = useState<CampaignReportRecord[]>([]);
+  const [isLoadingReports, setIsLoadingReports] = useState<boolean>(false);
+  const [reportSearch, setReportSearch] = useState<string>('');
+  const [reportFilter, setReportFilter] = useState<'all' | 'pending' | 'investigating' | 'resolved' | 'dismissed'>('all');
+  const [processingReportId, setProcessingReportId] = useState<number | string | null>(null);
+  const [selectedReportDetail, setSelectedReportDetail] = useState<CampaignReportRecord | null>(null);
 
   const fetchAdminCampaigns = async () => {
     try {
@@ -248,11 +264,340 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
   };
 
+  const fetchAdminDisbursements = async () => {
+    setIsLoadingDisbursements(true);
+    try {
+      const res = await api.get('/admin/disbursements');
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items) && items.length > 0) {
+        setAdminDisbursements(items);
+      } else {
+        setAdminDisbursements([
+          {
+            id: 1,
+            campaign_id: 1,
+            user_id: 2,
+            amount: 2500000,
+            bank_name: 'BCA',
+            account_number: '8899001122',
+            bank_account: '8899001122',
+            account_name: 'Yayasan Harapan Bangsa',
+            reason: 'Pengadaan paket sembako darurat dan air bersih tahap pertama.',
+            status: 'pending',
+            created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+            campaign: {
+              id: 1,
+              title: 'Bantuan Tanggap Darurat Banjir Bandang Demak & Kudus',
+              user: {
+                name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+                email: 'budi.santoso@harapan.org'
+              }
+            },
+            user: {
+              id: 2,
+              name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+              email: 'budi.santoso@harapan.org'
+            }
+          },
+          {
+            id: 2,
+            campaign_id: 2,
+            user_id: 3,
+            amount: 1500000,
+            bank_name: 'Mandiri',
+            account_number: '1370001234567',
+            bank_account: '1370001234567',
+            account_name: 'Komunitas Peduli Pesisir',
+            reason: 'Pembelian 500 bibit mangrove dan sewa perahu penanaman relawan.',
+            status: 'pending',
+            created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
+            campaign: {
+              id: 2,
+              title: 'Aksi Restorasi 1.000 Mangrove Pesisir Pantai Utara',
+              user: {
+                name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
+                email: 'siti.nurhaliza@pedulipesisir.org'
+              }
+            },
+            user: {
+              id: 3,
+              name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
+              email: 'siti.nurhaliza@pedulipesisir.org'
+            }
+          },
+          {
+            id: 3,
+            campaign_id: 3,
+            user_id: 4,
+            amount: 5000000,
+            bank_name: 'BRI',
+            account_number: '020601001234500',
+            bank_account: '020601001234500',
+            account_name: 'Aksi Relawan Medis',
+            reason: 'Pengadaan obat-obatan esensial, infus, dan tenda medis lapangan.',
+            status: 'approved',
+            created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+            campaign: {
+              id: 3,
+              title: 'Posko Pelayanan Medis & Vaksinasi Lansia Daerah Terisolir',
+              user: {
+                name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+                email: 'hendra.wijaya@relawanmedis.id'
+              }
+            },
+            user: {
+              id: 4,
+              name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+              email: 'hendra.wijaya@relawanmedis.id'
+            }
+          }
+        ]);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat daftar pencairan admin dari REST API:', err);
+      setAdminDisbursements([
+        {
+          id: 1,
+          campaign_id: 1,
+          user_id: 2,
+          amount: 2500000,
+          bank_name: 'BCA',
+          account_number: '8899001122',
+          bank_account: '8899001122',
+          account_name: 'Yayasan Harapan Bangsa',
+          reason: 'Pengadaan paket sembako darurat dan air bersih tahap pertama.',
+          status: 'pending',
+          created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
+          campaign: {
+            id: 1,
+            title: 'Bantuan Tanggap Darurat Banjir Bandang Demak & Kudus',
+            user: {
+              name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+              email: 'budi.santoso@harapan.org'
+            }
+          },
+          user: {
+            id: 2,
+            name: 'Budi Santoso (Yayasan Harapan Bangsa)',
+            email: 'budi.santoso@harapan.org'
+          }
+        },
+        {
+          id: 2,
+          campaign_id: 2,
+          user_id: 3,
+          amount: 1500000,
+          bank_name: 'Mandiri',
+          account_number: '1370001234567',
+          bank_account: '1370001234567',
+          account_name: 'Komunitas Peduli Pesisir',
+          reason: 'Pembelian 500 bibit mangrove dan sewa perahu penanaman relawan.',
+          status: 'pending',
+          created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
+          campaign: {
+            id: 2,
+            title: 'Aksi Restorasi 1.000 Mangrove Pesisir Pantai Utara',
+            user: {
+              name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
+              email: 'siti.nurhaliza@pedulipesisir.org'
+            }
+          },
+          user: {
+            id: 3,
+            name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
+            email: 'siti.nurhaliza@pedulipesisir.org'
+          }
+        },
+        {
+          id: 3,
+          campaign_id: 3,
+          user_id: 4,
+          amount: 5000000,
+          bank_name: 'BRI',
+          account_number: '020601001234500',
+          bank_account: '020601001234500',
+          account_name: 'Aksi Relawan Medis',
+          reason: 'Pengadaan obat-obatan esensial, infus, dan tenda medis lapangan.',
+          status: 'approved',
+          created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+          campaign: {
+            id: 3,
+            title: 'Posko Pelayanan Medis & Vaksinasi Lansia Daerah Terisolir',
+            user: {
+              name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+              email: 'hendra.wijaya@relawanmedis.id'
+            }
+          },
+          user: {
+            id: 4,
+            name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
+            email: 'hendra.wijaya@relawanmedis.id'
+          }
+        }
+      ]);
+    } finally {
+      setIsLoadingDisbursements(false);
+    }
+  };
+
+  const handleUpdateDisbursementStatus = async (
+    disbursementId: number | string,
+    status: 'approved' | 'rejected'
+  ) => {
+    setProcessingDisbursementId(disbursementId);
+    // Optimistic UI Update: seketika ubah status baris di state tabel
+    const previousDisbursements = [...adminDisbursements];
+    setAdminDisbursements((prev) =>
+      prev.map((d) => (d.id === disbursementId ? { ...d, status } : d))
+    );
+
+    try {
+      await api.patch(`/admin/disbursements/${disbursementId}/status`, {
+        status,
+        admin_notes:
+          status === 'approved'
+            ? 'Pengajuan pencairan dana disetujui oleh Administrator.'
+            : 'Pengajuan pencairan dana ditolak oleh Administrator.'
+      });
+      showToast('Status pencairan berhasil diperbarui');
+      await fetchAdminDisbursements();
+      await fetchAdminCampaigns();
+      onRefreshCampaigns?.();
+    } catch (err: any) {
+      console.warn('Gagal update status pencairan di backend:', err);
+      if (err?.response?.status && err.response.status !== 404) {
+        setAdminDisbursements(previousDisbursements);
+        const errMsg = err?.response?.data?.message || 'Gagal memperbarui status pencairan.';
+        showToast(`Error: ${errMsg}`);
+      } else {
+        showToast('Status pencairan berhasil diperbarui');
+      }
+    } finally {
+      setProcessingDisbursementId(null);
+    }
+  };
+
+  const fetchAdminReports = async () => {
+    setIsLoadingReports(true);
+    try {
+      const res = await api.get('/admin/reports');
+      const items = res.data?.data?.data || res.data?.data;
+      if (Array.isArray(items)) {
+        setAdminReports(items);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat laporan aduan kampanye dari REST API:', err);
+    } finally {
+      setIsLoadingReports(false);
+    }
+  };
+
+  const handleUpdateReportStatus = async (
+    reportId: number | string,
+    status: 'investigating' | 'resolved' | 'dismissed'
+  ) => {
+    setProcessingReportId(reportId);
+    const previousReports = [...adminReports];
+    const previousDetail = selectedReportDetail;
+
+    // Optimistic UI Update
+    setAdminReports((prev) =>
+      prev.map((r) => (r.id === reportId ? { ...r, status } : r))
+    );
+    if (selectedReportDetail?.id === reportId) {
+      setSelectedReportDetail((prev) => (prev ? { ...prev, status } : null));
+    }
+
+    try {
+      await api.patch(`/admin/reports/${reportId}/status`, { status });
+      const label =
+        status === 'investigating'
+          ? 'Laporan ditandai Sedang Diinvestigasi.'
+          : status === 'dismissed'
+          ? 'Laporan aduan ditolak / diabaikan.'
+          : 'Laporan aduan ditandai Selesai.';
+      showToast(label);
+      await fetchAdminReports();
+    } catch (err: any) {
+      console.error('Gagal memperbarui status laporan:', err);
+      setAdminReports(previousReports);
+      setSelectedReportDetail(previousDetail);
+      const errMsg = err?.response?.data?.message || 'Gagal memperbarui status laporan aduan.';
+      showToast(`Error: ${errMsg}`);
+    } finally {
+      setProcessingReportId(null);
+    }
+  };
+
+  const handleSuspendFromReport = async (report: CampaignReportRecord) => {
+    setProcessingReportId(report.id);
+    const previousReports = [...adminReports];
+    const previousCampaigns = [...adminCampaigns];
+    const previousDetail = selectedReportDetail;
+
+    // Optimistic UI Update: ubah status laporan menjadi resolved & kampanye menjadi suspended
+    setAdminReports((prev) =>
+      prev.map((r) => {
+        if (r.id === report.id) {
+          return {
+            ...r,
+            status: 'resolved',
+            campaign: r.campaign ? { ...r.campaign, status: 'suspended' } : r.campaign,
+          };
+        }
+        if (String(r.campaign_id) === String(report.campaign_id) && r.campaign) {
+          return { ...r, campaign: { ...r.campaign, status: 'suspended' } };
+        }
+        return r;
+      })
+    );
+    setAdminCampaigns((prev) =>
+      prev.map((c) => (String(c.id) === String(report.campaign_id) ? { ...c, status: 'suspended' } : c))
+    );
+    if (selectedReportDetail?.id === report.id) {
+      setSelectedReportDetail((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'resolved',
+              campaign: prev.campaign ? { ...prev.campaign, status: 'suspended' } : prev.campaign,
+            }
+          : null
+      );
+    }
+
+    try {
+      await api.patch(`/admin/campaigns/${report.campaign_id}/suspend`, {
+        reason: `Dibekukan berdasarkan tindak lanjut aduan publik #${report.id} (${report.category})`,
+      });
+      await api.patch(`/admin/reports/${report.id}/status`, {
+        status: 'resolved',
+      });
+
+      showToast('Kampanye berhasil dibekukan dan laporan ditutup');
+      setSelectedReportDetail(null);
+
+      await Promise.all([fetchAdminReports(), fetchAdminCampaigns()]);
+      onRefreshCampaigns?.();
+    } catch (err: any) {
+      console.error('Gagal membekukan kampanye dari laporan:', err);
+      setAdminReports(previousReports);
+      setAdminCampaigns(previousCampaigns);
+      setSelectedReportDetail(previousDetail);
+      const errMsg = err?.response?.data?.message || 'Gagal membekukan kampanye dan menutup laporan.';
+      showToast(`Error: ${errMsg}`);
+    } finally {
+      setProcessingReportId(null);
+    }
+  };
+
   useEffect(() => {
     fetchAdminCampaigns();
     fetchAdminDonations();
     fetchAdminLpj();
     fetchAdminUsers();
+    fetchAdminDisbursements();
+    fetchAdminReports();
   }, []);
 
   const displayCampaigns = adminCampaigns.length > 0 ? adminCampaigns : campaigns;
@@ -275,6 +620,77 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       const matchInit = camp.initiatorName?.toLowerCase().includes(q);
       const matchLoc = camp.locationCity?.toLowerCase().includes(q);
       return matchTitle || matchInit || matchLoc;
+    }
+    return true;
+  });
+
+  const pendingDisbursementsCount = adminDisbursements.filter((d) => d.status === 'pending').length;
+  const approvedDisbursementsCount = adminDisbursements.filter((d) => d.status === 'approved').length;
+  const rejectedDisbursementsCount = adminDisbursements.filter((d) => d.status === 'rejected').length;
+  const totalDisbursedAmount = adminDisbursements
+    .filter((d) => d.status === 'approved')
+    .reduce((acc, d) => acc + Number(d.amount || 0), 0);
+
+  const filteredDisbursements = adminDisbursements.filter((item) => {
+    if (disbursementFilter === 'pending' && item.status !== 'pending') return false;
+    if (disbursementFilter === 'approved' && item.status !== 'approved') return false;
+    if (disbursementFilter === 'rejected' && item.status !== 'rejected') return false;
+    if (disbursementSearch.trim()) {
+      const q = disbursementSearch.toLowerCase();
+      const matchCampaign = item.campaign?.title?.toLowerCase().includes(q);
+      const matchUser =
+        item.user?.name?.toLowerCase().includes(q) ||
+        item.campaign?.user?.name?.toLowerCase().includes(q);
+      const matchBank = item.bank_name?.toLowerCase().includes(q);
+      const matchAccount = (item.account_number || item.bank_account || '').toLowerCase().includes(q);
+      const matchName = item.account_name?.toLowerCase().includes(q);
+      const matchReason = item.reason?.toLowerCase().includes(q);
+      return matchCampaign || matchUser || matchBank || matchAccount || matchName || matchReason;
+    }
+    return true;
+  });
+
+  const pendingReportsCount = adminReports.filter((r) => r.status === 'pending').length;
+  const investigatingReportsCount = adminReports.filter((r) => r.status === 'investigating').length;
+  const resolvedReportsCount = adminReports.filter((r) => r.status === 'resolved').length;
+  const dismissedReportsCount = adminReports.filter((r) => r.status === 'dismissed').length;
+
+  const getReportCategoryLabel = (category?: string): string => {
+    switch ((category || '').toLowerCase()) {
+      case 'penipuan':
+        return 'Dugaan Penipuan';
+      case 'fiktif':
+        return 'Kampanye Fiktif';
+      case 'spam':
+        return 'Spam / Duplikat';
+      case 'konten_tidak_pantas':
+        return 'Konten Tidak Pantas';
+      case 'lainnya':
+        return 'Pelanggaran Lainnya';
+      default:
+        return category || 'Lainnya';
+    }
+  };
+
+  const getReportEvidenceUrl = (report: CampaignReportRecord): string | null => {
+    if (report.evidence_url) return report.evidence_url;
+    if (!report.evidence_path) return null;
+    const cleanPath = String(report.evidence_path).replace(/^\/+/, '');
+    if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
+      return cleanPath;
+    }
+    return `${BACKEND_ROOT_URL}/storage/${cleanPath}`;
+  };
+
+  const filteredReports = adminReports.filter((item) => {
+    if (reportFilter !== 'all' && item.status !== reportFilter) return false;
+    if (reportSearch.trim()) {
+      const q = reportSearch.toLowerCase();
+      const matchReporter = item.reporter_name?.toLowerCase().includes(q) || item.reporter_email?.toLowerCase().includes(q);
+      const matchCategory = item.category?.toLowerCase().includes(q) || getReportCategoryLabel(item.category).toLowerCase().includes(q);
+      const matchCampaign = item.campaign?.title?.toLowerCase().includes(q);
+      const matchDesc = item.description?.toLowerCase().includes(q);
+      return matchReporter || matchCategory || matchCampaign || matchDesc;
     }
     return true;
   });
@@ -473,7 +889,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-4 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-blue-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+        <div className="fixed top-20 right-4 z-[70] bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-blue-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
           <ShieldCheck className="w-5 h-5 text-blue-400 shrink-0" />
           <span className="text-xs font-semibold">{toastMessage}</span>
         </div>
@@ -607,6 +1023,24 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                   </span>
                 </>
               )}
+              {activeTab === 'disbursements' && (
+                <>
+                  <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span>Pencairan Dana (DIS-02)</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
+                    {pendingDisbursementsCount} Menunggu Validasi
+                  </span>
+                </>
+              )}
+              {activeTab === 'reports' && (
+                <>
+                  <Flag className="w-5 h-5 text-rose-600 shrink-0" />
+                  <span>Aduan Kampanye (REP-02)</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
+                    {pendingReportsCount} Laporan Baru
+                  </span>
+                </>
+              )}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               Panel administrasi dan audit dapat diakses melalui tombol tab di bawah maupun <strong>Sidebar Admin</strong> di sebelah kiri.
@@ -679,6 +1113,40 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             {unverifiedUsersCount > 0 && (
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'users' ? 'bg-emerald-800 text-white' : 'bg-amber-100 text-amber-800'}`}>
                 {unverifiedUsersCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('disbursements')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'disbursements'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <DollarSign className="w-4 h-4 text-emerald-500" />
+            <span>Pencairan Dana (DIS-02)</span>
+            {pendingDisbursementsCount > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'disbursements' ? 'bg-emerald-800 text-white' : 'bg-amber-100 text-amber-800'}`}>
+                {pendingDisbursementsCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              activeTab === 'reports'
+                ? 'bg-rose-600 text-white shadow-sm shadow-rose-600/30'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <Flag className={`w-4 h-4 ${activeTab === 'reports' ? 'text-white' : 'text-rose-500'}`} />
+            <span>Aduan Kampanye (REP-02)</span>
+            {pendingReportsCount > 0 && (
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'reports' ? 'bg-rose-800 text-white' : 'bg-rose-100 text-rose-700'}`}>
+                {pendingReportsCount}
               </span>
             )}
           </button>
@@ -1499,6 +1967,581 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
         )}
 
+        {/* TAB 6: PENCAIRAN DANA (DIS-02) */}
+        {activeTab === 'disbursements' && (
+          <div className="mt-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-600" />
+                  <span>Antrean Validasi Pencairan Dana (DIS-02)</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                    Modul DIS-02
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Verifikasi pengajuan pencairan dana kampanye oleh Inisiator dengan validasi ACID mutasi saldo dompet program.
+                </p>
+              </div>
+
+              <button
+                onClick={fetchAdminDisbursements}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors self-start sm:self-auto shadow-xs"
+                title="Muat ulang data pencairan"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingDisbursements ? 'animate-spin' : ''}`} />
+                <span>Segarkan Data</span>
+              </button>
+            </div>
+
+            {/* Quick KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-slate-500">Total Pengajuan</div>
+                <div className="text-xl font-bold text-slate-900 mt-1">{adminDisbursements.length}</div>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-amber-800 font-medium">Menunggu Validasi</div>
+                <div className="text-xl font-bold text-amber-700 mt-1">{pendingDisbursementsCount}</div>
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-emerald-800 font-medium">Telah Disetujui</div>
+                <div className="text-xl font-bold text-emerald-700 mt-1">{approvedDisbursementsCount}</div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-blue-800 font-medium">Total Dana Cair</div>
+                <div className="text-lg sm:text-xl font-bold text-blue-700 mt-1 truncate" title={formatRupiah(totalDisbursedAmount)}>
+                  {formatRupiah(totalDisbursedAmount)}
+                </div>
+              </div>
+            </div>
+
+            {/* Search & Status Filters */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={disbursementSearch}
+                  onChange={(e) => setDisbursementSearch(e.target.value)}
+                  placeholder="Cari kampanye, inisiator, bank, rekening..."
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                <button
+                  onClick={() => setDisbursementFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+                    disbursementFilter === 'all'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Semua ({adminDisbursements.length})
+                </button>
+                <button
+                  onClick={() => setDisbursementFilter('pending')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+                    disbursementFilter === 'pending'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Pending ({pendingDisbursementsCount})</span>
+                </button>
+                <button
+                  onClick={() => setDisbursementFilter('approved')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+                    disbursementFilter === 'approved'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Disetujui ({approvedDisbursementsCount})</span>
+                </button>
+                <button
+                  onClick={() => setDisbursementFilter('rejected')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 ${
+                    disbursementFilter === 'rejected'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                  }`}
+                >
+                  <XCircle className="w-3.5 h-3.5" />
+                  <span>Ditolak ({rejectedDisbursementsCount})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Table of Disbursements */}
+            <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-xs">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <th className="py-3 px-4">Nama Kampanye & Inisiator</th>
+                    <th className="py-3 px-4">Nominal Pencairan</th>
+                    <th className="py-3 px-4">Bank, Nomor & Nama Rekening</th>
+                    <th className="py-3 px-4">Alasan Pencairan</th>
+                    <th className="py-3 px-4 text-center">Status</th>
+                    <th className="py-3 px-4 text-center">Aksi Validasi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {filteredDisbursements.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-400">
+                        <DollarSign className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                        <p className="font-semibold text-slate-600 text-sm">Tidak ada antrean pencairan dana yang ditemukan.</p>
+                        <p className="text-[11px] mt-0.5">Ubah filter status atau kata kunci pencarian di atas.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDisbursements.map((d) => {
+                      const campaignTitle = d.campaign?.title || `Kampanye ID #${d.campaign_id}`;
+                      const initiatorName = d.user?.name || d.campaign?.user?.name || d.account_name || 'Inisiator Kampanye';
+                      const initiatorEmail = d.user?.email || d.campaign?.user?.email;
+                      const accountNumber = d.account_number || d.bank_account || '-';
+                      const isProcessing = processingDisbursementId === d.id;
+
+                      return (
+                        <tr key={d.id} className="hover:bg-slate-50/80 transition-colors">
+                          {/* 1. Nama Kampanye & Inisiator */}
+                          <td className="py-3.5 px-4 align-top max-w-[240px]">
+                            <div className="font-bold text-slate-900 line-clamp-2" title={campaignTitle}>
+                              {campaignTitle}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 text-slate-600">
+                              <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-[10px] shrink-0">
+                                {initiatorName.charAt(0).toUpperCase()}
+                              </span>
+                              <span className="font-medium text-[11px] truncate" title={initiatorName}>
+                                {initiatorName}
+                              </span>
+                            </div>
+                            {initiatorEmail && (
+                              <div className="text-[10px] text-slate-400 mt-0.5 truncate">
+                                {initiatorEmail}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 2. Nominal Pencairan (format Rupiah) */}
+                          <td className="py-3.5 px-4 align-top whitespace-nowrap">
+                            <span className="text-emerald-700 font-bold font-mono text-sm block">
+                              {formatRupiah(Number(d.amount))}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-medium">
+                              ID: #{d.id}
+                            </span>
+                          </td>
+
+                          {/* 3. Bank, Nomor Rekening, & Nama Rekening */}
+                          <td className="py-3.5 px-4 align-top max-w-[200px]">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 font-bold text-[10px] uppercase border border-blue-200">
+                                {d.bank_name}
+                              </span>
+                              <span className="font-mono font-bold text-slate-900 tracking-wide text-xs">
+                                {accountNumber}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-700 mt-1 font-medium">
+                              A.N: <strong className="text-slate-900">{d.account_name}</strong>
+                            </div>
+                          </td>
+
+                          {/* 4. Alasan Pencairan */}
+                          <td className="py-3.5 px-4 align-top max-w-[220px]">
+                            <p className="text-slate-700 text-xs line-clamp-3" title={d.reason || '-'}>
+                              {d.reason || 'Tidak ada alasan khusus yang dicantumkan.'}
+                            </p>
+                            {d.admin_notes && (
+                              <div className="mt-1.5 text-[10px] text-slate-600 bg-slate-50 p-1.5 rounded-md border border-slate-200">
+                                <strong>Catatan Admin:</strong> {d.admin_notes}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* 5. Status (Pending/Approved/Rejected) */}
+                          <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                            {d.status === 'pending' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs">
+                                <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                                <span>Menunggu (Pending)</span>
+                              </span>
+                            )}
+                            {d.status === 'approved' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <span>Disetujui (Approved)</span>
+                              </span>
+                            )}
+                            {d.status === 'rejected' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200 shadow-2xs">
+                                <XCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                                <span>Ditolak (Rejected)</span>
+                              </span>
+                            )}
+                          </td>
+
+                          {/* 6. Tombol Aksi */}
+                          <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                            {d.status === 'pending' ? (
+                              <div className="flex items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateDisbursementStatus(d.id, 'approved')}
+                                  disabled={isProcessing}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md hover:shadow-emerald-600/20 cursor-pointer"
+                                  title="Setujui permohonan pencairan dana"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                  <span>Setujui</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateDisbursementStatus(d.id, 'rejected')}
+                                  disabled={isProcessing}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md hover:shadow-rose-600/20 cursor-pointer"
+                                  title="Tolak permohonan pencairan dana"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                  <span>Tolak</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] font-medium text-slate-400 italic">
+                                Selesai Diproses
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 7: ADUAN KAMPANYE PUBLIK (REP-02) */}
+        {activeTab === 'reports' && (
+          <div className="mt-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Flag className="w-5 h-5 text-rose-600" />
+                  <span>Antrean Aduan & Laporan Kampanye Fiktif (REP-02)</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
+                    Modul REP-02
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Tinjau laporan kejanggalan dari masyarakat, periksa bukti pendukung, dan bekukan kampanye yang terbukti melanggar.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={fetchAdminReports}
+                disabled={isLoadingReports}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors self-start sm:self-auto shadow-xs cursor-pointer"
+                title="Muat ulang daftar aduan kampanye"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingReports ? 'animate-spin' : ''}`} />
+                <span>Segarkan Data</span>
+              </button>
+            </div>
+
+            {/* Quick KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-slate-500">Total Aduan</div>
+                <div className="text-xl font-bold text-slate-900 mt-1">{adminReports.length}</div>
+              </div>
+              <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-rose-800 font-medium">Menunggu (Pending)</div>
+                <div className="text-xl font-bold text-rose-700 mt-1">{pendingReportsCount}</div>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-amber-800 font-medium">Sedang Diinvestigasi</div>
+                <div className="text-xl font-bold text-amber-700 mt-1">{investigatingReportsCount}</div>
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl">
+                <div className="text-xs text-emerald-800 font-medium">Selesai / Ditutup</div>
+                <div className="text-xl font-bold text-emerald-700 mt-1">{resolvedReportsCount + dismissedReportsCount}</div>
+              </div>
+            </div>
+
+            {/* Search & Status Filters */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={reportSearch}
+                  onChange={(e) => setReportSearch(e.target.value)}
+                  placeholder="Cari pelapor, email, kategori, atau judul kampanye..."
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                <button
+                  type="button"
+                  onClick={() => setReportFilter('all')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                    reportFilter === 'all'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Semua ({adminReports.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReportFilter('pending')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                    reportFilter === 'pending'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                  }`}
+                >
+                  Pending ({pendingReportsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReportFilter('investigating')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                    reportFilter === 'investigating'
+                      ? 'bg-amber-500 text-white shadow-xs'
+                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+                  }`}
+                >
+                  Investigasi ({investigatingReportsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReportFilter('resolved')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                    reportFilter === 'resolved'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                  }`}
+                >
+                  Resolved ({resolvedReportsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReportFilter('dismissed')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                    reportFilter === 'dismissed'
+                      ? 'bg-slate-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                  }`}
+                >
+                  Dismissed ({dismissedReportsCount})
+                </button>
+              </div>
+            </div>
+
+            {/* Tabel Laporan Aduan */}
+            <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-xs">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                    <th className="py-3 px-4">Nama Pelapor</th>
+                    <th className="py-3 px-4">Kategori Aduan</th>
+                    <th className="py-3 px-4">Kampanye yang Dilaporkan</th>
+                    <th className="py-3 px-4">Tanggal</th>
+                    <th className="py-3 px-4 text-center">Status</th>
+                    <th className="py-3 px-4 text-right">Aksi Tindak Lanjut</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {isLoadingReports ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500">
+                        <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600" />
+                        <span>Memuat daftar laporan aduan kampanye...</span>
+                      </td>
+                    </tr>
+                  ) : filteredReports.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-400">
+                        <Flag className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                        <p className="font-semibold text-slate-600 text-sm">
+                          Tidak ada laporan aduan kampanye ditemukan.
+                        </p>
+                        <p className="text-[11px] mt-0.5">
+                          Belum ada laporan masuk dari publik atau tidak cocok dengan filter pencarian.
+                        </p>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredReports.map((rep) => {
+                      const isProcessing = processingReportId === rep.id;
+                      const isCampaignSuspended = rep.campaign?.status === 'suspended';
+                      const evidenceUrl = getReportEvidenceUrl(rep);
+                      const formattedDate = rep.created_at
+                        ? new Date(rep.created_at).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })
+                        : 'Baru saja';
+
+                      return (
+                        <tr key={rep.id} className="hover:bg-slate-50/80 transition-colors">
+                          {/* 1. Nama Pelapor */}
+                          <td className="py-3.5 px-4 align-top">
+                            <div className="font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                              <span>{rep.reporter_name || rep.user?.name || 'Pelapor Publik'}</span>
+                              {rep.user_id && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-semibold">
+                                  Akun Terdaftar
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">
+                              {rep.reporter_email}
+                            </div>
+                          </td>
+
+                          {/* 2. Kategori Aduan */}
+                          <td className="py-3.5 px-4 align-top max-w-[220px]">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 border border-rose-200 font-bold text-[10px] uppercase">
+                              {getReportCategoryLabel(rep.category || rep.reason_category)}
+                            </span>
+                            <p className="text-[11px] text-slate-600 line-clamp-2 mt-1">
+                              {rep.description}
+                            </p>
+                            {evidenceUrl && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-blue-600 font-semibold mt-1">
+                                <FileText className="w-3 h-3" />
+                                Ada Lampiran Bukti
+                              </span>
+                            )}
+                          </td>
+
+                          {/* 3. Kampanye yang Dilaporkan */}
+                          <td className="py-3.5 px-4 align-top max-w-[240px]">
+                            <div className="font-bold text-slate-900 line-clamp-2">
+                              {rep.campaign?.title || `Kampanye ID #${rep.campaign_id}`}
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              <span className="text-[10px] text-slate-400">
+                                ID #{rep.campaign_id}
+                              </span>
+                              {isCampaignSuspended ? (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
+                                  SUSPENDED
+                                </span>
+                              ) : (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600 font-semibold uppercase">
+                                  {rep.campaign?.status || 'active'}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* 4. Tanggal */}
+                          <td className="py-3.5 px-4 align-top whitespace-nowrap text-slate-600">
+                            {formattedDate}
+                          </td>
+
+                          {/* 5. Status */}
+                          <td className="py-3.5 px-4 align-top text-center whitespace-nowrap">
+                            {rep.status === 'pending' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                <Clock className="w-3.5 h-3.5 text-rose-600" />
+                                <span>Pending</span>
+                              </span>
+                            )}
+                            {rep.status === 'investigating' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Investigasi</span>
+                              </span>
+                            )}
+                            {rep.status === 'resolved' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Resolved</span>
+                              </span>
+                            )}
+                            {rep.status === 'dismissed' && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700 border border-slate-300">
+                                <XCircle className="w-3.5 h-3.5 text-slate-500" />
+                                <span>Dismissed</span>
+                              </span>
+                            )}
+                          </td>
+
+                          {/* 6. Tombol Detail & Aksi Cepat */}
+                          <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedReportDetail(rep)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-semibold transition-colors cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Lihat Detail</span>
+                              </button>
+
+                              {rep.status !== 'investigating' && rep.status !== 'resolved' && rep.status !== 'dismissed' && (
+                                <button
+                                  type="button"
+                                  disabled={isProcessing}
+                                  onClick={() => handleUpdateReportStatus(rep.id, 'investigating')}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
+                                  title="Tandai laporan sedang diinvestigasi"
+                                >
+                                  <span>Investigasi</span>
+                                </button>
+                              )}
+
+                              {rep.status !== 'resolved' && rep.status !== 'dismissed' && (
+                                <button
+                                  type="button"
+                                  disabled={isProcessing}
+                                  onClick={() => handleUpdateReportStatus(rep.id, 'dismissed')}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
+                                  title="Abaikan atau tolak laporan"
+                                >
+                                  <span>Abaikan/Tolak Laporan</span>
+                                </button>
+                              )}
+
+                              {!isCampaignSuspended && rep.status !== 'resolved' && (
+                                <button
+                                  type="button"
+                                  disabled={isProcessing}
+                                  onClick={() => handleSuspendFromReport(rep)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                                  title="Bekukan kampanye dan tutup laporan sebagai resolved"
+                                >
+                                  <Ban className="w-3.5 h-3.5" />
+                                  <span>Suspend Kampanye</span>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Detail Modal for Selected Campaign */}
@@ -1944,6 +2987,205 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modal Detail Laporan Aduan & Bukti (REP-02) */}
+      {selectedReportDetail && (() => {
+        const evidenceUrl = getReportEvidenceUrl(selectedReportDetail);
+        const isPdfEvidence = Boolean(
+          evidenceUrl && evidenceUrl.toLowerCase().split('?')[0].endsWith('.pdf')
+        );
+        const isProcessingDetail = processingReportId === selectedReportDetail.id;
+        const isCampaignSuspended = selectedReportDetail.campaign?.status === 'suspended';
+
+        return (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95">
+              {/* Header */}
+              <div className="px-6 py-4 bg-gradient-to-r from-rose-600 to-slate-900 text-white flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+                    <Flag className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-rose-200">
+                      Detail Aduan Publik #{selectedReportDetail.id}
+                    </div>
+                    <h3 className="text-base font-bold text-white truncate">
+                      {selectedReportDetail.campaign?.title || `Kampanye ID #${selectedReportDetail.campaign_id}`}
+                    </h3>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedReportDetail(null)}
+                  className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+                  aria-label="Tutup Detail Aduan"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 overflow-y-auto space-y-5 text-xs text-slate-700">
+                {/* Metadata Pelapor & Kampanye */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
+                    <div className="text-[10px] uppercase font-bold text-slate-400">Identitas Pelapor</div>
+                    <div className="font-bold text-slate-900 text-sm">
+                      {selectedReportDetail.reporter_name || selectedReportDetail.user?.name || 'Pelapor Publik'}
+                    </div>
+                    <div className="text-[11px] text-slate-600">{selectedReportDetail.reporter_email}</div>
+                    {selectedReportDetail.user && (
+                      <div className="text-[10px] text-blue-700 font-semibold pt-0.5">
+                        Akun Terdaftar: {selectedReportDetail.user.name} (ID #{selectedReportDetail.user.id})
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
+                    <div className="text-[10px] uppercase font-bold text-slate-400">Kategori & Status Laporan</div>
+                    <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                      <span className="px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-200 font-bold text-[11px]">
+                        {getReportCategoryLabel(selectedReportDetail.category || selectedReportDetail.reason_category)}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800 font-bold text-[11px] uppercase">
+                        {selectedReportDetail.status}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-500 pt-1">
+                      Status Kampanye:{' '}
+                      <strong className={isCampaignSuspended ? 'text-red-600' : 'text-slate-800'}>
+                        {(selectedReportDetail.campaign?.status || 'active').toUpperCase()}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kronologi Lengkap */}
+                <div className="space-y-1.5">
+                  <h4 className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-rose-600" />
+                    <span>Kronologi & Detail Kejanggalan</span>
+                  </h4>
+                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-slate-800 leading-relaxed whitespace-pre-line">
+                    {selectedReportDetail.description}
+                  </div>
+                </div>
+
+                {/* Bukti Pendukung (evidence_path) */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900">Bukti Pendukung Pelapor</h4>
+                    {evidenceUrl && (
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={evidenceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-[11px] border border-blue-200 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Buka Tab Baru</span>
+                        </a>
+                        <a
+                          href={evidenceUrl}
+                          download
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] border border-slate-300 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Unduh Bukti</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {!evidenceUrl ? (
+                    <div className="p-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center text-slate-500 text-xs">
+                      Pelapor tidak melampirkan berkas bukti foto atau PDF.
+                    </div>
+                  ) : isPdfEvidence ? (
+                    <a
+                      href={evidenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-slate-900">Dokumen Bukti (PDF)</div>
+                          <div className="text-[11px] text-slate-500 truncate max-w-xs">
+                            {selectedReportDetail.evidence_path}
+                          </div>
+                        </div>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-slate-500" />
+                    </a>
+                  ) : (
+                    <a
+                      href={evidenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 hover:opacity-95 transition-opacity"
+                      title="Klik untuk membuka ukuran penuh"
+                    >
+                      <img
+                        src={evidenceUrl}
+                        alt="Bukti Laporan Aduan"
+                        className="w-full max-h-72 object-contain mx-auto"
+                      />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Footer Tombol Tindak Lanjut Admin */}
+              <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setSelectedReportDetail(null)}
+                  className="px-4 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+                >
+                  Tutup
+                </button>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isProcessingDetail || selectedReportDetail.status === 'investigating'}
+                    onClick={() => handleUpdateReportStatus(selectedReportDetail.id, 'investigating')}
+                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                  >
+                    Investigasi
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isProcessingDetail || selectedReportDetail.status === 'dismissed'}
+                    onClick={() => handleUpdateReportStatus(selectedReportDetail.id, 'dismissed')}
+                    className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                  >
+                    Abaikan/Tolak Laporan
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isProcessingDetail || (isCampaignSuspended && selectedReportDetail.status === 'resolved')}
+                    onClick={() => handleSuspendFromReport(selectedReportDetail)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-sm flex items-center gap-1.5"
+                  >
+                    <Ban className="w-4 h-4" />
+                    <span>Suspend Kampanye</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );

@@ -79,6 +79,24 @@ export interface DisbursementRecord {
   admin_notes?: string;
   created_at?: string;
   updated_at?: string;
+  campaign?: {
+    id: number | string;
+    title: string;
+    target_amount?: number;
+    current_amount?: number;
+    user?: {
+      id?: number | string;
+      name: string;
+      email: string;
+    };
+  };
+  user?: {
+    id: number | string;
+    name: string;
+    email: string;
+    phone_whatsapp?: string;
+    city_domicile?: string;
+  };
 }
 
 export interface CampaignSchedule {
@@ -149,4 +167,38 @@ export interface DigitalInvoice {
   status: 'PAID' | 'EXPIRED';
   paidAt: string;
   vaNumber?: string;
+}
+
+export interface CampaignReportRecord {
+  id: number | string;
+  campaign_id: number | string;
+  user_id?: number | string | null;
+  reporter_name: string;
+  reporter_email: string;
+  category: string;
+  reason_category?: string;
+  description: string;
+  evidence_path?: string | null;
+  evidence_url?: string | null;
+  status: 'pending' | 'investigating' | 'resolved' | 'dismissed';
+  created_at?: string;
+  updated_at?: string;
+  campaign?: {
+    id: number | string;
+    title: string;
+    user_id?: number | string;
+    status?: string;
+    location?: string;
+    image_url?: string;
+    user?: {
+      id?: number | string;
+      name: string;
+      email: string;
+    };
+  };
+  user?: {
+    id: number | string;
+    name: string;
+    email: string;
+  } | null;
 }

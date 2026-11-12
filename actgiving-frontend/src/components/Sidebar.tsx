@@ -22,7 +22,8 @@ X,
   DollarSign,
   AlertCircle,
   QrCode,
-  UserCheck
+  UserCheck,
+  Flag
 } from 'lucide-react';
 import { Campaign, UserProfile, ActiveView } from '../types';
 
@@ -34,8 +35,8 @@ interface SidebarProps {
   onSelectRelawanTab: (tab: 'jadwal' | 'riwayat' | 'cari' | 'profil') => void;
   inisiatorTab: 'kampanye' | 'lpj' | 'relawan' | 'panduan';
   onSelectInisiatorTab: (tab: 'kampanye' | 'lpj' | 'relawan' | 'panduan') => void;
-  adminTab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users';
-  onSelectAdminTab: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => void;
+  adminTab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports';
+  onSelectAdminTab: (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports') => void;
   campaigns?: Campaign[];
   onOpenCreateCampaign: () => void;
   onOpenAuth: () => void;
@@ -99,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     onCloseMobile();
   };
 
-  const handleAdminItemClick = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users') => {
+  const handleAdminItemClick = (tab: 'moderasi' | 'audit_lpj' | 'transaksi' | 'sistem' | 'users' | 'disbursements' | 'reports') => {
     onSelectAdminTab(tab);
     onCloseMobile();
   };
@@ -562,7 +563,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     )}
                   </button>
 
-                  {/* 5. Verifikasi Akun Inisiator (AUTH-04) */}
+                  {/* 5. Verifikasi Akun Inisiator */}
                   <button
                     onClick={() => handleAdminItemClick('users')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
@@ -570,16 +571,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         ? theme.activeBg
                         : 'text-slate-300 ' + theme.hoverBg
                     } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
-                    title="Verifikasi Akun Inisiator (AUTH-04)"
+                    title="Verifikasi Akun Inisiator"
                   >
                     <UserCheck className="w-4 h-4 shrink-0 text-emerald-400" />
                     {(!isCollapsedDesktop || isOpenMobile) && (
-                      <div className="truncate flex-1 text-left flex items-center justify-between">
-                        <span className="truncate">Verifikasi Inisiator</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">
-                          AUTH-04
-                        </span>
-                      </div>
+                      <span className="truncate">Verifikasi Inisiator</span>
+                    )}
+                  </button>
+
+                  {/* 6. Pencairan Dana */}
+                  <button
+                    onClick={() => handleAdminItemClick('disbursements')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      activeView === 'admin_dashboard' && adminTab === 'disbursements'
+                        ? theme.activeBg
+                        : 'text-slate-300 ' + theme.hoverBg
+                    } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
+                    title="Pencairan Dana"
+                  >
+                    <DollarSign className="w-4 h-4 shrink-0 text-emerald-400" />
+                    {(!isCollapsedDesktop || isOpenMobile) && (
+                      <span className="truncate">Pencairan Dana</span>
+                    )}
+                  </button>
+
+                  {/* 7. Aduan Kampanye */}
+                  <button
+                    onClick={() => handleAdminItemClick('reports')}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                      activeView === 'admin_dashboard' && adminTab === 'reports'
+                        ? theme.activeBg
+                        : 'text-slate-300 ' + theme.hoverBg
+                    } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
+                    title="Aduan Kampanye"
+                  >
+                    <Flag className="w-4 h-4 shrink-0 text-rose-400" />
+                    {(!isCollapsedDesktop || isOpenMobile) && (
+                      <span className="truncate">Aduan Kampanye</span>
                     )}
                   </button>
                 </nav>

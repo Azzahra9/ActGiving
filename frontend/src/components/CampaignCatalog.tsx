@@ -12,6 +12,8 @@ interface CampaignCatalogProps {
   onDonateClick: (campaign: Campaign) => void;
   onVolunteerClick: (campaign: Campaign) => void;
   onViewLpjClick: (campaign: Campaign) => void;
+  onDetailClick?: (campaign: Campaign) => void;
+  onReportClick?: (campaign: Campaign) => void;
   onResetFilters: () => void;
   selectedCategory?: string;
   onSelectCategory?: (category: string) => void;
@@ -33,6 +35,8 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
   onDonateClick,
   onVolunteerClick,
   onViewLpjClick,
+  onDetailClick,
+  onReportClick,
   onResetFilters,
   selectedCategory: propCategory,
   onSelectCategory
@@ -217,6 +221,8 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
                 onDonateClick={onDonateClick}
                 onVolunteerClick={onVolunteerClick}
                 onViewLpjClick={onViewLpjClick}
+                onDetailClick={onDetailClick}
+                onReportClick={onReportClick}
               />
             ))}
           </div>

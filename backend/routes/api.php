@@ -99,11 +99,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports
     Route::prefix('admin')->middleware('admin')->group(function () {
-        // FR-11: Validasi Persetujuan Pencairan Dana
-        Route::patch('/disbursements/{id}/status', [DisbursementController::class, 'updateStatus']);
+        // DIS-02 / FR-11: Antrean & Validasi Persetujuan Pencairan Dana
+        Route::get('/disbursements', [AdminController::class, 'indexDisbursements']);
+        Route::patch('/disbursements/{id}/status', [AdminController::class, 'updateDisbursementStatus']);
 
-        // FR-13: Monitoring Aduan Kampanye Fiktif
-        Route::get('/reports', [CampaignReportController::class, 'indexAdmin']);
+        // FR-13 / REP-02: Monitoring & Tindak Lanjut Aduan Kampanye Fiktif
+        Route::get('/reports', [AdminController::class, 'indexReports']);
+        Route::patch('/reports/{id}/status', [AdminController::class, 'updateReportStatus']);
 
         // Verifikasi Inisiator / User
         Route::get('/users', [AdminController::class, 'indexUsers']);
