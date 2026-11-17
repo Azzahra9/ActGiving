@@ -1017,7 +1017,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               {activeTab === 'users' && (
                 <>
                   <UserCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <span>Verifikasi Akun Inisiator & Dokumen Legalitas (AUTH-04)</span>
+                  <span>Verifikasi Akun Inisiator & Dokumen Legalitas</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                     {unverifiedUsersCount} Menunggu Verifikasi
                   </span>
@@ -1026,7 +1026,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               {activeTab === 'disbursements' && (
                 <>
                   <DollarSign className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <span>Pencairan Dana (DIS-02)</span>
+                  <span>Pencairan Dana</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
                     {pendingDisbursementsCount} Menunggu Validasi
                   </span>
@@ -1035,7 +1035,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               {activeTab === 'reports' && (
                 <>
                   <Flag className="w-5 h-5 text-rose-600 shrink-0" />
-                  <span>Aduan Kampanye (REP-02)</span>
+                  <span>Aduan Kampanye</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
                     {pendingReportsCount} Laporan Baru
                   </span>
@@ -1107,9 +1107,6 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           >
             <UserCheck className="w-4 h-4 text-emerald-500" />
             <span>Verifikasi Inisiator</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'users' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'}`}>
-              AUTH-04
-            </span>
             {unverifiedUsersCount > 0 && (
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'users' ? 'bg-emerald-800 text-white' : 'bg-amber-100 text-amber-800'}`}>
                 {unverifiedUsersCount}
@@ -1126,7 +1123,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             }`}
           >
             <DollarSign className="w-4 h-4 text-emerald-500" />
-            <span>Pencairan Dana (DIS-02)</span>
+            <span>Pencairan Dana</span>
             {pendingDisbursementsCount > 0 && (
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'disbursements' ? 'bg-emerald-800 text-white' : 'bg-amber-100 text-amber-800'}`}>
                 {pendingDisbursementsCount}
@@ -1143,7 +1140,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             }`}
           >
             <Flag className={`w-4 h-4 ${activeTab === 'reports' ? 'text-white' : 'text-rose-500'}`} />
-            <span>Aduan Kampanye (REP-02)</span>
+            <span>Aduan Kampanye</span>
             {pendingReportsCount > 0 && (
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === 'reports' ? 'bg-rose-800 text-white' : 'bg-rose-100 text-rose-700'}`}>
                 {pendingReportsCount}
@@ -1974,10 +1971,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               <div>
                 <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-emerald-600" />
-                  <span>Antrean Validasi Pencairan Dana (DIS-02)</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-                    Modul DIS-02
-                  </span>
+                  <span>Antrean Validasi Pencairan Dana</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Verifikasi pengajuan pencairan dana kampanye oleh Inisiator dengan validasi ACID mutasi saldo dompet program.
@@ -2235,10 +2229,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               <div>
                 <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <Flag className="w-5 h-5 text-rose-600" />
-                  <span>Antrean Aduan & Laporan Kampanye Fiktif (REP-02)</span>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
-                    Modul REP-02
-                  </span>
+                  <span>Antrean Aduan & Laporan Kampanye Fiktif</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Tinjau laporan kejanggalan dari masyarakat, periksa bukti pendukung, dan bekukan kampanye yang terbukti melanggar.
