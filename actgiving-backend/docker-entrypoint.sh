@@ -18,4 +18,4 @@ php artisan route:cache || true
 php artisan view:cache || true
 
 echo "Starting FrankenPHP server on port ${PORT:-8080} with document root /app/public..."
-exec frankenphp run
+exec frankenphp run --config /etc/caddy/Caddyfile

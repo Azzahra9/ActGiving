@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1-php8.3
+FROM dunglas/frankenphp:1-php8.4
 
 # Install dependencies sistem dan ekstensi PHP yang dibutuhkan Laravel & Supabase PostgreSQL
 RUN install-php-extensions \
@@ -19,7 +19,7 @@ WORKDIR /app
 # Copy seluruh source code backend
 COPY . .
 
-# Install dependensi Laravel (production mode tanpa dev)
+# Install dependensi Laravel (production mode tanpa dev dependencies)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Berikan izin ke folder storage dan cache

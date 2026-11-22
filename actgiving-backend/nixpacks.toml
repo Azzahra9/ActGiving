@@ -1,17 +1,17 @@
-# Konfigurasi Nixpacks untuk Laravel di Railway
+# Konfigurasi Nixpacks untuk Laravel di Railway (PHP 8.4)
 
 [phases.setup]
 nixPkgs = [
-    'php83',
-    'php83Packages.composer',
-    'php83Extensions.pdo_pgsql',
-    'php83Extensions.mbstring',
-    'php83Extensions.openssl',
-    'php83Extensions.tokenizer',
-    'php83Extensions.xml',
-    'php83Extensions.ctype',
-    'php83Extensions.json',
-    'php83Extensions.bcmath',
+    'php84',
+    'php84Packages.composer',
+    'php84Extensions.pdo_pgsql',
+    'php84Extensions.mbstring',
+    'php84Extensions.openssl',
+    'php84Extensions.tokenizer',
+    'php84Extensions.xml',
+    'php84Extensions.ctype',
+    'php84Extensions.json',
+    'php84Extensions.bcmath',
     'caddy'
 ]
 
