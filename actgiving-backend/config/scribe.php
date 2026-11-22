@@ -6,6 +6,11 @@ use Knuckles\Scribe\Extracting\Strategies;
 
 use function Knuckles\Scribe\Config\configureStrategy;
 
+// Pengaman jika Knuckles\Scribe tidak terpasang (misalnya saat composer install --no-dev di production Railway)
+if (! class_exists(AuthIn::class)) {
+    return [];
+}
+
 return [
     // Judul halaman HTML dokumentasi
     'title' => 'ActGiving API Documentation',
@@ -25,7 +30,7 @@ return [
         INTRO,
 
     // Base URL yang ditampilkan di dokumentasi
-    'base_url' => config('app.url'),
+    'base_url' => env('APP_URL', 'http://localhost:8000'),
 
     // Rute yang akan didokumentasikan
     'routes' => [
@@ -91,7 +96,7 @@ return [
         'default' => false,
 
         // Token Bearer dikirim via header "Authorization: Bearer {token}"
-        'in' => AuthIn::BEARER->value,
+        'in' => class_exists(AuthIn::class) ? AuthIn::BEARER->value : 'bearer',
 
         'name' => 'Authorization',
 
@@ -188,7 +193,7 @@ return [
         ],
     ],
 
-    'database_connections_to_transact' => [config('database.default')],
+    'database_connections_to_transact' => [env('DB_CONNECTION', 'pgsql')],
 
     'fractal' => [
         'serializer' => null,
