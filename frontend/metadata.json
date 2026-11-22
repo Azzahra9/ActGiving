@@ -1,6 +1,0 @@
-{
-  "name": "ActGiving - Donasi & Volunteering",
-  "description": "Platform informasi donasi cepat (Guest Checkout QRIS/VA) dan aksi kerelawanan berbasis lokasi terdekat sesuai dokumen SRS ActGiving.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

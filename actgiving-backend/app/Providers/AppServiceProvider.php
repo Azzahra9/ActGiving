@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         // 1. Rate Limiter khusus untuk Guest Checkout (Anti-Spam Donasi Fiktif: Maks 10 request/menit/IP)
         RateLimiter::for('guest-checkout-limit', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip())->response(function () {

@@ -1,11 +1,17 @@
-FROM php:8.2-cli
+FROM dunglas/frankenphp:1-php8.3
 
-# Install dependencies sistem dan ekstensi PostgreSQL
-RUN apt-get update -y && apt-get install -y libpq-dev unzip zip curl \
-    && docker-php-ext-install pdo pdo_pgsql
+# Install dependencies sistem dan ekstensi PHP yang dibutuhkan Laravel & Supabase PostgreSQL
+RUN install-php-extensions \
+    pdo_pgsql \
+    pgsql \
+    bcmath \
+    intl \
+    zip \
+    opcache \
+    pcntl
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer resmi
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
@@ -13,12 +19,17 @@ WORKDIR /app
 # Copy seluruh source code backend
 COPY . .
 
-# Install dependensi Laravel
-RUN composer install --no-dev --optimize-autoloader
+# Install dependensi Laravel (production mode tanpa dev)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Berikan akses write ke folder storage dan cache
-RUN chmod -R 777 storage bootstrap/cache
+# Berikan izin ke folder storage dan cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Jalankan migrasi dan nyalakan server
-# (Render otomatis menyuntikkan variabel $PORT)
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+# Setup entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Document root mengarah ke Laravel public
+ENV SERVER_ROOT=/app/public
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

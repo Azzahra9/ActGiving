@@ -1,0 +1,29 @@
+# Konfigurasi Nixpacks untuk Laravel di Railway
+
+[phases.setup]
+nixPkgs = [
+    'php83',
+    'php83Packages.composer',
+    'php83Extensions.pdo_pgsql',
+    'php83Extensions.mbstring',
+    'php83Extensions.openssl',
+    'php83Extensions.tokenizer',
+    'php83Extensions.xml',
+    'php83Extensions.ctype',
+    'php83Extensions.json',
+    'php83Extensions.bcmath',
+    'caddy'
+]
+
+[variables]
+NIXPACKS_PHP_ROOT_DIR = "/app/public"
+NIXPACKS_PHP_FALLBACK_PATH = "/index.php"
+
+[phases.build]
+cmds = [
+    'composer install --no-dev --optimize-autoloader --prefer-dist',
+    'chmod -R 775 storage bootstrap/cache'
+]
+
+[start]
+cmd = 'php artisan migrate --force && (php artisan storage:link || true) && (php-fpm -D || true) && caddy run --config /app/Caddyfile --adapter caddyfile'
