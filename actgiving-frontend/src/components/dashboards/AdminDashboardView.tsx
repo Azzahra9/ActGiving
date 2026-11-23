@@ -123,6 +123,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   // States untuk Modul DIS-02: Pencairan Dana (Disbursement)
   const [adminDisbursements, setAdminDisbursements] = useState<DisbursementRecord[]>([]);
   const [isLoadingDisbursements, setIsLoadingDisbursements] = useState<boolean>(false);
+  const [disbursementLoadError, setDisbursementLoadError] = useState<string | null>(null);
   const [disbursementSearch, setDisbursementSearch] = useState<string>('');
   const [disbursementFilter, setDisbursementFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [processingDisbursementId, setProcessingDisbursementId] = useState<number | string | null>(null);
@@ -266,175 +267,21 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
   const fetchAdminDisbursements = async () => {
     setIsLoadingDisbursements(true);
+    setDisbursementLoadError(null);
     try {
       const res = await api.get('/admin/disbursements');
       const items = res.data?.data?.data || res.data?.data;
-      if (Array.isArray(items) && items.length > 0) {
-        setAdminDisbursements(items);
-      } else {
-        setAdminDisbursements([
-          {
-            id: 1,
-            campaign_id: 1,
-            user_id: 2,
-            amount: 2500000,
-            bank_name: 'BCA',
-            account_number: '8899001122',
-            bank_account: '8899001122',
-            account_name: 'Yayasan Harapan Bangsa',
-            reason: 'Pengadaan paket sembako darurat dan air bersih tahap pertama.',
-            status: 'pending',
-            created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-            campaign: {
-              id: 1,
-              title: 'Bantuan Tanggap Darurat Banjir Bandang Demak & Kudus',
-              user: {
-                name: 'Budi Santoso (Yayasan Harapan Bangsa)',
-                email: 'budi.santoso@harapan.org'
-              }
-            },
-            user: {
-              id: 2,
-              name: 'Budi Santoso (Yayasan Harapan Bangsa)',
-              email: 'budi.santoso@harapan.org'
-            }
-          },
-          {
-            id: 2,
-            campaign_id: 2,
-            user_id: 3,
-            amount: 1500000,
-            bank_name: 'Mandiri',
-            account_number: '1370001234567',
-            bank_account: '1370001234567',
-            account_name: 'Komunitas Peduli Pesisir',
-            reason: 'Pembelian 500 bibit mangrove dan sewa perahu penanaman relawan.',
-            status: 'pending',
-            created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
-            campaign: {
-              id: 2,
-              title: 'Aksi Restorasi 1.000 Mangrove Pesisir Pantai Utara',
-              user: {
-                name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
-                email: 'siti.nurhaliza@pedulipesisir.org'
-              }
-            },
-            user: {
-              id: 3,
-              name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
-              email: 'siti.nurhaliza@pedulipesisir.org'
-            }
-          },
-          {
-            id: 3,
-            campaign_id: 3,
-            user_id: 4,
-            amount: 5000000,
-            bank_name: 'BRI',
-            account_number: '020601001234500',
-            bank_account: '020601001234500',
-            account_name: 'Aksi Relawan Medis',
-            reason: 'Pengadaan obat-obatan esensial, infus, dan tenda medis lapangan.',
-            status: 'approved',
-            created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-            campaign: {
-              id: 3,
-              title: 'Posko Pelayanan Medis & Vaksinasi Lansia Daerah Terisolir',
-              user: {
-                name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
-                email: 'hendra.wijaya@relawanmedis.id'
-              }
-            },
-            user: {
-              id: 4,
-              name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
-              email: 'hendra.wijaya@relawanmedis.id'
-            }
-          }
-        ]);
+      if (!Array.isArray(items)) {
+        throw new Error('Format data pengajuan pencairan dari server tidak valid.');
       }
-    } catch (err) {
+      setAdminDisbursements(items);
+    } catch (err: unknown) {
       console.warn('Gagal memuat daftar pencairan admin dari REST API:', err);
-      setAdminDisbursements([
-        {
-          id: 1,
-          campaign_id: 1,
-          user_id: 2,
-          amount: 2500000,
-          bank_name: 'BCA',
-          account_number: '8899001122',
-          bank_account: '8899001122',
-          account_name: 'Yayasan Harapan Bangsa',
-          reason: 'Pengadaan paket sembako darurat dan air bersih tahap pertama.',
-          status: 'pending',
-          created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
-          campaign: {
-            id: 1,
-            title: 'Bantuan Tanggap Darurat Banjir Bandang Demak & Kudus',
-            user: {
-              name: 'Budi Santoso (Yayasan Harapan Bangsa)',
-              email: 'budi.santoso@harapan.org'
-            }
-          },
-          user: {
-            id: 2,
-            name: 'Budi Santoso (Yayasan Harapan Bangsa)',
-            email: 'budi.santoso@harapan.org'
-          }
-        },
-        {
-          id: 2,
-          campaign_id: 2,
-          user_id: 3,
-          amount: 1500000,
-          bank_name: 'Mandiri',
-          account_number: '1370001234567',
-          bank_account: '1370001234567',
-          account_name: 'Komunitas Peduli Pesisir',
-          reason: 'Pembelian 500 bibit mangrove dan sewa perahu penanaman relawan.',
-          status: 'pending',
-          created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
-          campaign: {
-            id: 2,
-            title: 'Aksi Restorasi 1.000 Mangrove Pesisir Pantai Utara',
-            user: {
-              name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
-              email: 'siti.nurhaliza@pedulipesisir.org'
-            }
-          },
-          user: {
-            id: 3,
-            name: 'Siti Nurhaliza (Komunitas Peduli Pesisir)',
-            email: 'siti.nurhaliza@pedulipesisir.org'
-          }
-        },
-        {
-          id: 3,
-          campaign_id: 3,
-          user_id: 4,
-          amount: 5000000,
-          bank_name: 'BRI',
-          account_number: '020601001234500',
-          bank_account: '020601001234500',
-          account_name: 'Aksi Relawan Medis',
-          reason: 'Pengadaan obat-obatan esensial, infus, dan tenda medis lapangan.',
-          status: 'approved',
-          created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-          campaign: {
-            id: 3,
-            title: 'Posko Pelayanan Medis & Vaksinasi Lansia Daerah Terisolir',
-            user: {
-              name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
-              email: 'hendra.wijaya@relawanmedis.id'
-            }
-          },
-          user: {
-            id: 4,
-            name: 'Dr. Hendra Wijaya (Aksi Relawan Medis)',
-            email: 'hendra.wijaya@relawanmedis.id'
-          }
-        }
-      ]);
+      setDisbursementLoadError(
+        err instanceof Error
+          ? err.message
+          : 'Gagal memuat daftar pengajuan pencairan dana.'
+      );
     } finally {
       setIsLoadingDisbursements(false);
     }
@@ -535,24 +382,20 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     const previousCampaigns = [...adminCampaigns];
     const previousDetail = selectedReportDetail;
 
-    // Optimistic UI Update: ubah status laporan menjadi resolved & kampanye menjadi suspended
+    // Optimistic UI Update: ubah status laporan menjadi resolved & hapus kampanye dari daftar
     setAdminReports((prev) =>
       prev.map((r) => {
         if (r.id === report.id) {
           return {
             ...r,
             status: 'resolved',
-            campaign: r.campaign ? { ...r.campaign, status: 'suspended' } : r.campaign,
           };
-        }
-        if (String(r.campaign_id) === String(report.campaign_id) && r.campaign) {
-          return { ...r, campaign: { ...r.campaign, status: 'suspended' } };
         }
         return r;
       })
     );
     setAdminCampaigns((prev) =>
-      prev.map((c) => (String(c.id) === String(report.campaign_id) ? { ...c, status: 'suspended' } : c))
+      prev.filter((c) => String(c.id) !== String(report.campaign_id))
     );
     if (selectedReportDetail?.id === report.id) {
       setSelectedReportDetail((prev) =>
@@ -560,7 +403,6 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           ? {
               ...prev,
               status: 'resolved',
-              campaign: prev.campaign ? { ...prev.campaign, status: 'suspended' } : prev.campaign,
             }
           : null
       );
@@ -568,23 +410,23 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
     try {
       await api.patch(`/admin/campaigns/${report.campaign_id}/suspend`, {
-        reason: `Dibekukan berdasarkan tindak lanjut aduan publik #${report.id} (${report.category})`,
+        reason: `Dihapus berdasarkan tindak lanjut aduan publik #${report.id} (${report.category})`,
       });
       await api.patch(`/admin/reports/${report.id}/status`, {
         status: 'resolved',
       });
 
-      showToast('Kampanye berhasil dibekukan dan laporan ditutup');
+      showToast('Kampanye berhasil dihapus dan laporan ditutup');
       setSelectedReportDetail(null);
 
       await Promise.all([fetchAdminReports(), fetchAdminCampaigns()]);
       onRefreshCampaigns?.();
     } catch (err: any) {
-      console.error('Gagal membekukan kampanye dari laporan:', err);
+      console.error('Gagal menghapus kampanye dari laporan:', err);
       setAdminReports(previousReports);
       setAdminCampaigns(previousCampaigns);
       setSelectedReportDetail(previousDetail);
-      const errMsg = err?.response?.data?.message || 'Gagal membekukan kampanye dan menutup laporan.';
+      const errMsg = err?.response?.data?.message || 'Gagal menghapus kampanye dan menutup laporan.';
       showToast(`Error: ${errMsg}`);
     } finally {
       setProcessingReportId(null);
@@ -822,22 +664,18 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       await api.patch(`/admin/campaigns/${suspendTargetCampaign.id}/suspend`, {
         reason: suspendReason || 'Pelanggaran pedoman & integritas platform',
       }).catch(() =>
-        api.patch(`/admin/campaigns/${suspendTargetCampaign.id}/status`, {
-          status: 'suspended',
-        })
+        api.delete(`/admin/campaigns/${suspendTargetCampaign.id}`)
       );
 
-      // Optimistic update pada state admin lokal
+      // Hapus kampanye dari state admin lokal karena sudah dihapus di backend
       setAdminCampaigns((prev) =>
-        prev.map((c) =>
-          c.id === suspendTargetCampaign.id ? { ...c, status: 'suspended' } : c
-        )
+        prev.filter((c) => c.id !== suspendTargetCampaign.id)
       );
 
-      showToast(`Kampanye "${suspendTargetCampaign.title}" berhasil dihentikan/ditangguhkan.`);
+      showToast(`Kampanye "${suspendTargetCampaign.title}" berhasil dihentikan dan dihapus.`);
       setSuspendTargetCampaign(null);
       if (detailModalCampaign?.id === suspendTargetCampaign.id) {
-        setDetailModalCampaign((prev) => (prev ? { ...prev, status: 'suspended' } : null));
+        setDetailModalCampaign(null);
       }
 
       await fetchAdminCampaigns();
@@ -2010,6 +1848,18 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
               </div>
             </div>
 
+            {disbursementLoadError && (
+              <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-800">
+                <span>Data pengajuan pencairan tidak dapat dimuat: {disbursementLoadError}</span>
+                <button
+                  onClick={fetchAdminDisbursements}
+                  className="font-semibold underline underline-offset-2 self-start sm:self-auto"
+                >
+                  Coba lagi
+                </button>
+              </div>
+            )}
+
             {/* Search & Status Filters */}
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2">
               <div className="relative flex-1 max-w-md">
@@ -2084,12 +1934,30 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {filteredDisbursements.length === 0 ? (
+                  {isLoadingDisbursements && adminDisbursements.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500">
+                        Memuat data pengajuan pencairan...
+                      </td>
+                    </tr>
+                  ) : disbursementLoadError && adminDisbursements.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500">
+                        Data pengajuan belum tersedia karena gagal dimuat.
+                      </td>
+                    </tr>
+                  ) : filteredDisbursements.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-12 text-center text-slate-400">
                         <DollarSign className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-                        <p className="font-semibold text-slate-600 text-sm">Tidak ada antrean pencairan dana yang ditemukan.</p>
-                        <p className="text-[11px] mt-0.5">Ubah filter status atau kata kunci pencarian di atas.</p>
+                        <p className="font-semibold text-slate-600 text-sm">
+                          {adminDisbursements.length === 0
+                            ? 'Belum ada pengajuan pencairan dana.'
+                            : 'Tidak ada pengajuan yang sesuai dengan filter.'}
+                        </p>
+                        {adminDisbursements.length > 0 && (
+                          <p className="text-[11px] mt-0.5">Ubah filter status atau kata kunci pencarian di atas.</p>
+                        )}
                       </td>
                     </tr>
                   ) : (

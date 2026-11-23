@@ -18,7 +18,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { Campaign, CampaignMode, Category, UserProfile } from '../types';
-import api, { getAuthToken, setAuthToken } from '../lib/axios';
+import api, { getAuthToken } from '../lib/axios';
 import campaignService, { mapBackendCampaignToFrontend } from '../services/campaignService';
 
 interface CreateCampaignModalProps {
@@ -284,89 +284,23 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
           onUpdateCampaign?.(updatedLocal);
         }
       } else {
-        // Buat kampanye baru
-        // Pastikan token autentikasi backend tersedia jika pengguna menggunakan akun inisiator
         if (!getAuthToken()) {
-          try {
-            const loginRes = await api.post('/auth/login', {
-              email: 'inisiator@actgiving.com',
-              password: 'password123',
-            });
-            if (loginRes.data?.data?.token) {
-              setAuthToken(loginRes.data.data.token);
-            }
-          } catch (authErr) {
-            console.warn('Auto auth inisiator fallback gagal:', authErr);
-          }
+          throw new Error('Sesi login tidak ditemukan. Silakan masuk kembali dengan akun inisiator Anda.');
         }
 
-        let createdSuccessfully = false;
+        const response = await api.post('/campaigns', formData, {
+          headers: {
+            // Hapus Content-Type agar browser menetapkan multipart/form-data dengan boundary yang benar
+            'Content-Type': undefined as any,
+          },
+        });
 
-        try {
-          const response = await api.post('/campaigns', formData, {
-            headers: {
-              // Hapus Content-Type agar browser otomatis menetapkan multipart/form-data dengan boundary yang benar
-              'Content-Type': undefined as any,
-            },
-          });
-
-          if (response.data?.data) {
-            const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
-            onAddCampaign(createdCampaign);
-            createdSuccessfully = true;
-          }
-        } catch (apiErr: any) {
-          console.warn('REST API POST /campaigns error, mencoba auto-reauth:', apiErr);
-          if (apiErr.response?.status === 401) {
-            try {
-              const loginRes = await api.post('/auth/login', {
-                email: 'inisiator@actgiving.com',
-                password: 'password123',
-              });
-              if (loginRes.data?.data?.token) {
-                setAuthToken(loginRes.data.data.token);
-                const retryRes = await api.post('/campaigns', formData, {
-                  headers: {
-                    'Content-Type': undefined as any,
-                  },
-                });
-                if (retryRes.data?.data) {
-                  const createdCampaign = mapBackendCampaignToFrontend(retryRes.data.data);
-                  onAddCampaign(createdCampaign);
-                  createdSuccessfully = true;
-                }
-              }
-            } catch (retryErr) {
-              console.warn('Retry creation gagal:', retryErr);
-            }
-          }
+        if (!response.data?.success || !response.data?.data) {
+          throw new Error(response.data?.message || 'Kampanye tidak berhasil disimpan ke server.');
         }
 
-        // Fallback simpan lokal jika koneksi backend bermasalah sehingga input inisiator tidak hilang
-        if (!createdSuccessfully) {
-          const newLocalCamp: Campaign = {
-            id: `camp-${Date.now()}`,
-            title: title.trim(),
-            description: description.trim(),
-            initiatorName: initiatorName.trim() || currentUser?.name || 'Inisiator ActGiving',
-            initiatorAvatar: currentUser?.avatarUrl,
-            category: category,
-            locationCity: locationCity,
-            campaignMode: mode,
-            targetFunds: targetAmount,
-            collectedFunds: 0,
-            targetVolunteers: targetVolunteers,
-            filledVolunteers: 0,
-            daysLeft: 30,
-            status: 'pending_approval',
-            startDate: activityDate || new Date().toISOString(),
-            eventTime: eventTime || '08:00 - 16:00 WIB',
-            taskCriteria: tasksStr.split(',').map((s) => s.trim()).filter(Boolean),
-            imageUrl: imagePreview || 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-            lpjReports: [],
-          };
-          onAddCampaign(newLocalCamp);
-        }
+        const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
+        onAddCampaign(createdCampaign);
       }
 
       // Langsung tutup modal dan tampilkan halaman yang sudah terupdate
@@ -379,6 +313,8 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         setErrorMessage(errors[firstKey][0]);
       } else if (err.response?.data?.message) {
         setErrorMessage(err.response.data.message);
+      } else if (err instanceof Error) {
+        setErrorMessage(err.message);
       } else {
         setErrorMessage('Gagal menyimpan kampanye. Silakan periksa isian data Anda.');
       }

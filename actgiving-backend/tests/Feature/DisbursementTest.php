@@ -213,6 +213,25 @@ class DisbursementTest extends TestCase
         $this->assertEquals('Inisiator Kebaikan', $response->json('data.0.user.name'));
     }
 
+    public function test_admin_disbursement_list_is_empty_until_an_initiator_submits_a_request(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin System',
+            'email' => 'admin.empty@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/disbursements');
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'data' => [],
+            ]);
+        $this->assertDatabaseCount('disbursements', 0);
+    }
+
     public function test_admin_can_approve_disbursement_and_deduct_campaign_balance(): void
     {
         $admin = User::create([
