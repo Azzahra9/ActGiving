@@ -10,6 +10,16 @@
 # BACKEND - Laravel (actgiving-backend/)
 # ============================================================
 
+# Root environment
+.env
+.env.*
+!.env.example
+
+# Folder lama yang sudah dipindah ke actgiving-backend dan actgiving-frontend
+backend/
+frontend/
+package-lock.json
+
 # Dependency packages (di-generate ulang via: composer install)
 actgiving-backend/vendor/
 

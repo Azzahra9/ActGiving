@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
+import { getCategoryDefaultImage } from '../services/campaignService';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -36,6 +37,15 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
   onReportClick
 }) => {
   if (!campaign) return null;
+
+  // Fallback image jika gambar utama gagal dimuat (404, URL rusak, dsb.)
+  const fallbackImage = getCategoryDefaultImage(campaign.category);
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== fallbackImage) {
+      img.src = fallbackImage;
+    }
+  };
 
   // Mode-specific calculations
   const isDanaMode = campaign.mode === 'dana';
@@ -60,6 +70,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
           src={campaign.imageUrl}
           alt={campaign.title}
           referrerPolicy="no-referrer"
+          onError={handleImgError}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/60 via-transparent to-black/20 pointer-events-none" />

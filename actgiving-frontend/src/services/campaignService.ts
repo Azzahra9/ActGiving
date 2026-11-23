@@ -1,4 +1,4 @@
-import api from '../lib/axios';
+import api, { API_BASE_URL } from '../lib/axios';
 import { Campaign, CampaignMode, CampaignSchedule, Category, LpjItem } from '../types';
 
 export interface CampaignQueryParams {
@@ -7,6 +7,22 @@ export interface CampaignQueryParams {
   search?: string;
   page?: number;
 }
+
+// URL root backend (tanpa /api)
+const BACKEND_ROOT = API_BASE_URL.replace(/\/api\/?$/, '');
+
+/**
+ * Normalisasi URL gambar dari backend.
+ * Jika URL gambar merupakan path relatif (misal: "/storage/campaigns/xxx.jpg"),
+ * ubah menjadi URL absolut menggunakan BACKEND_ROOT.
+ * Jika sudah absolut (http/https), kembalikan apa adanya.
+ */
+export const resolveImageUrl = (url?: string | null): string | undefined => {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  // Path relatif – tambahkan domain backend
+  return `${BACKEND_ROOT}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 // Fallback images curated per category
 const CATEGORY_DEFAULT_IMAGES: Record<string, string> = {
@@ -125,7 +141,7 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
     mode: mode,
     locationCity: item.location || 'Indonesia',
     distanceKm: item.distance_km || 3.5,
-    imageUrl: item.image_url || getCategoryDefaultImage(categoryName),
+    imageUrl: resolveImageUrl(item.image_url) || getCategoryDefaultImage(categoryName),
     description: item.description || '',
     status: item.status === 'active' 
       ? 'active' 

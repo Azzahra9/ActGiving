@@ -7,7 +7,7 @@ import {
   X, XCircle, Clock, UserX, Phone, Mail
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem, DisbursementRecord } from '../../types';
-import api from '../../lib/axios';
+import api, { getAuthToken, setAuthToken } from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 import { CampaignScheduleModal } from '../CampaignScheduleModal';
@@ -128,14 +128,14 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     try {
       // 1. Coba ambil langsung dari endpoint dedicated inisiator
       const res = await api.get('/initiator/volunteers').catch(() => null);
-      const items = res?.data?.data;
-      if (Array.isArray(items) && items.length > 0) {
-        setVolunteersList(items);
+      if (res && res.data && Array.isArray(res.data.data)) {
+        setVolunteersList(res.data.data);
         return;
       }
 
-      // 2. Fallback: jika /initiator/volunteers kosong, ambil per kampanye
-      const sourceCampaigns = initiatorCampaigns.length > 0 ? initiatorCampaigns : (campaigns || []);
+      // 2. Fallback: hanya jika request /initiator/volunteers gagal (res === null)
+      // Gunakan HANYA kampanye milik inisiator sendiri (initiatorCampaigns), jangan ambil seluruh kampanye publik
+      const sourceCampaigns = initiatorCampaigns.length > 0 ? initiatorCampaigns : [];
       if (sourceCampaigns.length > 0) {
         const regPromises = sourceCampaigns.map((c: Campaign) =>
           api.get(`/campaigns/${c.id}/registrations`).catch(() => null)
@@ -156,13 +156,16 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
           }
         });
         setVolunteersList(allRegs);
+      } else {
+        setVolunteersList([]);
       }
     } catch (err) {
       console.warn('Gagal memuat daftar pendaftar relawan:', err);
+      setVolunteersList([]);
     } finally {
       setIsLoadingVolunteers(false);
     }
-  }, [initiatorCampaigns, campaigns]);
+  }, [initiatorCampaigns]);
 
   // Fetch real initiator campaigns from Laravel REST API
   // Fetch real initiator campaigns from Laravel REST API
@@ -195,6 +198,22 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const handleUpdateVolunteerStatus = async (regId: number, newStatus: 'accepted' | 'rejected' | 'pending') => {
     setUpdatingVolId(regId);
     try {
+      // Pastikan token autentikasi tersedia (jika akun demo inisiator, auto-auth fallback)
+      if (!getAuthToken()) {
+        try {
+          const emailToLogin = currentUser?.email || 'inisiator@actgiving.com';
+          const loginRes = await api.post('/auth/login', {
+            email: emailToLogin,
+            password: 'password123',
+          });
+          if (loginRes.data?.data?.token) {
+            setAuthToken(loginRes.data.data.token);
+          }
+        } catch (authErr) {
+          console.warn('Auto auth inisiator fallback notice:', authErr);
+        }
+      }
+
       await api.patch(`/volunteer-registrations/${regId}/status`, { status: newStatus });
       const statusLabel = newStatus === 'accepted' ? 'Diterima (Siap Bertugas)' : newStatus === 'rejected' ? 'Ditolak' : 'Menunggu Seleksi';
       showToast(`Status relawan berhasil diubah menjadi: ${statusLabel}.`);

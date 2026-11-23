@@ -24,6 +24,7 @@ import { WireframeHtmlModal } from './components/WireframeHtmlModal';
 import { AdminModerationModal } from './components/AdminModerationModal';
 import { RelawanActivityModal } from './components/RelawanActivityModal';
 import { InisiatorDashboardModal } from './components/InisiatorDashboardModal';
+import { VolunteerModal } from './components/VolunteerModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Footer } from './components/Footer';
 import { CampaignDetailModal } from './components/CampaignDetailModal';
@@ -112,6 +113,7 @@ export default function App() {
 
   // Modal Context States
   const [checkoutCampaign, setCheckoutCampaign] = useState<Campaign | null>(null);
+  const [volunteerCampaign, setVolunteerCampaign] = useState<Campaign | null>(null);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [lpjCampaign, setLpjCampaign] = useState<Campaign | null>(null);
   const [detailCampaign, setDetailCampaign] = useState<Campaign | null>(null);
@@ -429,7 +431,7 @@ export default function App() {
               currentUser={currentUser}
               campaigns={campaigns}
               onExplorePublic={() => setActiveView('public')}
-              onOpenVolunteerModal={() => setIsRegisterOpen(true)}
+              onOpenVolunteerModal={(camp) => setVolunteerCampaign(camp)}
               onOpenLpjModal={(camp) => setLpjCampaign(camp)}
               activeTab={relawanTab}
               onTabChange={setRelawanTab}
@@ -512,7 +514,7 @@ export default function App() {
                 error={campaignError}
                 onRetry={fetchCampaigns}
                 onDonateClick={(camp) => setCheckoutCampaign(camp)}
-                onVolunteerClick={() => setIsRegisterOpen(true)}
+                onVolunteerClick={(camp) => setVolunteerCampaign(camp)}
                 onViewLpjClick={(camp) => setLpjCampaign(camp)}
                 onDetailClick={(camp) => setDetailCampaign(camp)}
                 onReportClick={(camp) => setReportCampaign(camp)}
@@ -689,9 +691,23 @@ export default function App() {
         isOpen={!!detailCampaign}
         onClose={() => setDetailCampaign(null)}
         onDonateClick={(camp) => setCheckoutCampaign(camp)}
-        onVolunteerClick={() => setIsRegisterOpen(true)}
+        onVolunteerClick={(camp) => setVolunteerCampaign(camp)}
         onViewLpjClick={(camp) => setLpjCampaign(camp)}
         onReportClick={(camp) => setReportCampaign(camp)}
+      />
+
+      {/* MODAL PENDAFTARAN RELAWAN KAMPANYE (VOLUNTEER MODAL) */}
+      <VolunteerModal
+        campaign={volunteerCampaign}
+        isOpen={!!volunteerCampaign}
+        onClose={() => setVolunteerCampaign(null)}
+        onVolunteerSuccess={handleVolunteerSuccess}
+        currentUser={currentUser}
+        onNavigateToDashboard={() => {
+          setVolunteerCampaign(null);
+          setActiveView('relawan_dashboard');
+          setRelawanTab('jadwal');
+        }}
       />
 
       {/* MODAL 11: Laporan Pengaduan Kampanye Publik (REP-01) */}

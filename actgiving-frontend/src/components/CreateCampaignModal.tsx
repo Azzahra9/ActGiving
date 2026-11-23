@@ -254,7 +254,10 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         formData.append('_method', 'PUT');
         try {
           const response = await api.post(`/campaigns/${campaignToEdit.id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: {
+              // Hapus Content-Type agar browser otomatis menetapkan multipart/form-data dengan boundary yang benar
+              'Content-Type': undefined as any,
+            },
           });
 
           if (response.data?.data) {
@@ -301,7 +304,10 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
 
         try {
           const response = await api.post('/campaigns', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: {
+              // Hapus Content-Type agar browser otomatis menetapkan multipart/form-data dengan boundary yang benar
+              'Content-Type': undefined as any,
+            },
           });
 
           if (response.data?.data) {
@@ -320,7 +326,9 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
               if (loginRes.data?.data?.token) {
                 setAuthToken(loginRes.data.data.token);
                 const retryRes = await api.post('/campaigns', formData, {
-                  headers: { 'Content-Type': 'multipart/form-data' },
+                  headers: {
+                    'Content-Type': undefined as any,
+                  },
                 });
                 if (retryRes.data?.data) {
                   const createdCampaign = mapBackendCampaignToFrontend(retryRes.data.data);

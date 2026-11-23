@@ -200,6 +200,11 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
                     src={item.photoUrl}
                     alt={item.title}
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      const fallback = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
+                      if (img.src !== fallback) img.src = fallback;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />

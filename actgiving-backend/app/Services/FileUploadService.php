@@ -29,8 +29,9 @@ class FileUploadService
         // Simpan ke storage/app/public/{directory}
         $storedPath = $file->storeAs($directory, $filename, $this->disk);
 
-        // Ambil URL publik yang bisa diakses via browser/frontend
-        $publicUrl = asset('storage/'.$storedPath);
+        // Gunakan Storage::url() agar URL mengikuti konfigurasi disk 'public' di filesystems.php
+        // sehingga URL selalu sinkron dengan APP_URL dari .env
+        $publicUrl = Storage::disk($this->disk)->url($storedPath);
 
         return [
             'path' => $storedPath,

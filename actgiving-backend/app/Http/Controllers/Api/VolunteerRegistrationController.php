@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -180,35 +181,49 @@ class VolunteerRegistrationController extends Controller
     }
 
     /**
+     * Resolusi user terautentikasi (Sanctum / Bearer)
+     */
+    protected function resolveAuthUser(Request $request): ?User
+    {
+        // Utamakan resolusi dari Bearer Token spesifik pada request saat ini
+        if ($bearerToken = $request->bearerToken()) {
+            $pat = PersonalAccessToken::findToken($bearerToken);
+            if ($pat && (!$pat->expires_at || $pat->expires_at->isFuture())) {
+                return $pat->tokenable;
+            }
+        }
+
+        return $request->user('sanctum') ?? auth('sanctum')->user() ?? $request->user();
+    }
+
+    /**
      * Daftar Semua Pendaftar Relawan untuk Inisiator (FR Inisiator)
      *
      * Inisiator: Mendapatkan daftar seluruh relawan yang mendaftar ke kampanye miliknya.
      */
     public function initiatorVolunteers(Request $request): JsonResponse
     {
-        $user = $request->user('sanctum') ?? auth('sanctum')->user();
-        if (!$user && ($bearerToken = $request->bearerToken())) {
-            $pat = PersonalAccessToken::findToken($bearerToken);
-            if ($pat && (!$pat->expires_at || $pat->expires_at->isFuture())) {
-                $user = $pat->tokenable;
-            }
+        $user = $this->resolveAuthUser($request);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated. Silakan masuk terlebih dahulu.',
+            ], 401);
         }
 
-        // Resolusi ID kampanye milik inisiator
-        $campaignIds = collect();
-        if ($user) {
-            $campaignIds = Campaign::where('user_id', $user->id)->pluck('id');
-            // Jika akun demo inisiator belum memiliki kampanye terikat langsung
-            if ($campaignIds->isEmpty()) {
-                if ($user->email === 'inisiator@actgiving.com' || str_contains(strtolower($user->name), 'inisiator') || str_contains(strtolower($user->name), 'yayasan')) {
-                    $campaignIds = Campaign::where('user_id', 2)->orWhere('id', 1)->pluck('id');
-                }
-            }
-        }
-
-        // Jika kampanye masih kosong (misal request sesi demo inisiator), ambil kampanye aktif
-        if ($campaignIds->isEmpty()) {
+        // Resolusi ID kampanye milik inisiator yang sedang login
+        if ($user->role === 'admin') {
             $campaignIds = Campaign::pluck('id');
+        } else {
+            $campaignIds = Campaign::where('user_id', $user->id)->pluck('id');
+        }
+
+        if ($campaignIds->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'data' => [],
+            ]);
         }
 
         $registrations = VolunteerRegistration::with([
@@ -250,15 +265,24 @@ class VolunteerRegistrationController extends Controller
      */
     public function getCampaignRegistrations(Request $request, $campaign_id): JsonResponse
     {
-        $user = $request->user('sanctum') ?? auth('sanctum')->user();
-        if (!$user && ($bearerToken = $request->bearerToken())) {
-            $pat = PersonalAccessToken::findToken($bearerToken);
-            if ($pat && (!$pat->expires_at || $pat->expires_at->isFuture())) {
-                $user = $pat->tokenable;
-            }
+        $user = $this->resolveAuthUser($request);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated. Silakan masuk terlebih dahulu.',
+            ], 401);
         }
 
         $campaign = Campaign::findOrFail($campaign_id);
+
+        // Hanya pemilik kampanye atau admin yang berhak melihat daftar relawan kampanye ini
+        if ((int) $campaign->user_id !== (int) $user->id && $user->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak. Anda bukan inisiator kampanye ini.',
+            ], 403);
+        }
 
         $registrations = VolunteerRegistration::with('user:id,name,email,phone_whatsapp,city_domicile')
             ->where('campaign_id', $campaign->id)
@@ -304,13 +328,22 @@ class VolunteerRegistrationController extends Controller
      */
     public function updateStatus(Request $request, $id): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'status' => 'required|in:accepted,rejected,pending',
         ]);
 
-        return DB::transaction(function () use ($request, $id) {
+        $user = $this->resolveAuthUser($request);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated. Silakan masuk terlebih dahulu.',
+            ], 401);
+        }
+
+        return DB::transaction(function () use ($validated, $id, $user) {
             // Lock baris pendaftaran relawan
-            $registration = VolunteerRegistration::where('id', $id)
+            $registration = VolunteerRegistration::with('user')->where('id', $id)
                 ->lockForUpdate()
                 ->first();
 
@@ -326,28 +359,27 @@ class VolunteerRegistrationController extends Controller
                 ->lockForUpdate()
                 ->first();
 
-            $user = $request->user('sanctum') ?? auth('sanctum')->user();
-            if (!$user && ($bearerToken = $request->bearerToken())) {
-                $pat = PersonalAccessToken::findToken($bearerToken);
-                if ($pat && (!$pat->expires_at || $pat->expires_at->isFuture())) {
-                    $user = $pat->tokenable;
-                }
+            if (! $campaign) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data kampanye terkait pendaftaran relawan ini tidak ditemukan.',
+                ], 404);
             }
 
-            // Verifikasi otorisasi inisiator
-            if ($user && $campaign && $campaign->user_id !== $user->id && $user->role !== 'admin' && $user->email !== 'inisiator@actgiving.com') {
+            // Verifikasi otorisasi inisiator: hanya pemilik kampanye atau admin yang berhak
+            if ((int) $campaign->user_id !== (int) $user->id && $user->role !== 'admin') {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akses ditolak. Anda bukan inisiator kampanye ini.',
                 ], 403);
             }
 
-            $newStatus = $request->status;
+            $newStatus = $validated['status'];
 
             if ($newStatus === 'accepted') {
                 // Jika status sebelumnya bukan accepted, periksa ketersediaan kuota
                 if ($registration->status !== 'accepted') {
-                    if ($campaign->current_volunteers >= $campaign->target_volunteers) {
+                    if ($campaign->target_volunteers > 0 && $campaign->current_volunteers >= $campaign->target_volunteers) {
                         return response()->json([
                             'success' => false,
                             'message' => 'Kuota relawan untuk kampanye ini sudah penuh.',
@@ -368,11 +400,15 @@ class VolunteerRegistrationController extends Controller
             $registration->status = $newStatus;
             $registration->save();
 
-            // FR-14: Kirim email notifikasi status relawan via Queue (Async) agar response < 2 detik (NFR-01)
-            if ($registration->user && $registration->user->email) {
-                Mail::to($registration->user->email)->queue(
-                    (new VolunteerStatusMail($registration))->afterCommit()
-                );
+            // FR-14: Kirim email notifikasi status relawan (Non-blocking / Safe async)
+            try {
+                if ($registration->user && $registration->user->email) {
+                    Mail::to($registration->user->email)->queue(
+                        (new VolunteerStatusMail($registration))->afterCommit()
+                    );
+                }
+            } catch (\Throwable $mailErr) {
+                Log::warning("Gagal mengirim email notifikasi status relawan {$registration->id}: " . $mailErr->getMessage());
             }
 
             return response()->json([

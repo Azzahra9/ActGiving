@@ -92,6 +92,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // FR: Manajemen Izin Donasi oleh Inisiator (Approve/Reject)
     Route::patch('/donations/{id}/approval', [DonationController::class, 'updateApproval']);
 
+    // Seleksi & Persetujuan Relawan oleh Inisiator
+    Route::get('/initiator/volunteers', [VolunteerRegistrationController::class, 'initiatorVolunteers']);
+    Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']);
+
     // RELAWAN: Riwayat Pendaftaran & Jadwal Lapangan Terverifikasi
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
     Route::get('/my-volunteer-schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);

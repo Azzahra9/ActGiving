@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Campaign, LpjItem } from '../types';
 import { formatRupiah } from '../utils/format';
-import { campaignService } from '../services/campaignService';
+import { campaignService, getCategoryDefaultImage } from '../services/campaignService';
 import { LpjModal } from './LpjModal';
 
 export interface HeroSectionProps {
@@ -324,6 +324,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   <img
                     src={displayPhoto}
                     alt={displayTitle}
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      const fallback = latestCampaign?.category
+                        ? `https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80`
+                        : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
+                      if (img.src !== fallback) img.src = fallback;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/70 via-transparent to-transparent pointer-events-none" />
