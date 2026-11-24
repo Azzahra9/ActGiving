@@ -400,7 +400,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenCreateCampaign();
                   onCloseMobile();
                 }}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] ${
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] cursor-pointer ${
                   isCollapsedDesktop && !isOpenMobile ? 'px-0' : ''
                 }`}
                 title="Buka Galang Aksi Baru"
@@ -413,7 +413,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <div>
                 {(!isCollapsedDesktop || isOpenMobile) && (
-                  <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2 flex items-center justify-between">
+                  <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
                     <span>Manajemen Kampanye & LPJ</span>
                   </p>
                 )}
@@ -429,11 +429,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
                     title="Kampanye Kelolaan Saya"
                   >
-                    <Building2 className="w-4 h-4 shrink-0 text-sky-400" />
+                    <Building2 className="w-4 h-4 shrink-0 text-blue-400" />
                     {(!isCollapsedDesktop || isOpenMobile) && (
                       <div className="truncate flex-1 text-left flex items-center justify-between">
                         <span className="truncate">Kampanye Saya</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-sky-300 font-bold">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">
                           {myCampaignsCount}
                         </span>
                       </div>

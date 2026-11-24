@@ -650,7 +650,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
       {/* Hero Inisiator Profile Banner */}
       <div className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-600 border-2 border-blue-400 flex items-center justify-center text-white shadow-lg shrink-0">
               <Building2 className="w-9 h-9" />
@@ -680,67 +680,34 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Quick Action */}
-          <button
-            onClick={onOpenCreateCampaign}
-            className="px-5 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all shrink-0 hover:scale-105"
-          >
-            <PlusCircle className="w-5 h-5" />
-            <span>Buka Galang Aksi Baru</span>
-          </button>
-        </div>
+          {/* Quick Metrics (Format Persis dengan Halaman Relawan) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full xl:w-auto">
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(totalDanaTerkumpul)}>
+                {formatRupiah(totalDanaTerkumpul)}
+              </div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Total Donasi</div>
+            </div>
 
-        {/* Initiator Metrics Grid */}
-        <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300 truncate">Total Donasi Dikelola</span>
-              <DollarSign className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-sky-400 font-sans truncate">
+                {totalRelawanTerdaftar} Orang
+              </div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Relawan Terhimpun</div>
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate" title={formatRupiah(totalDanaTerkumpul)}>
-              {formatRupiah(totalDanaTerkumpul)}
-            </div>
-            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
-              Target Total: {formatRupiah(totalTargetDana)}
-            </div>
-          </div>
 
-          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300 truncate">Relawan Terhimpun</span>
-              <Users className="w-4 h-4 text-blue-400 shrink-0 ml-1" />
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-blue-300 font-sans truncate">
+                {myCampaigns.length}
+              </div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Kampanye Dikelola</div>
             </div>
-            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate">
-              {totalRelawanTerdaftar} Orang
-            </div>
-            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
-              Dari Target: {totalTargetRelawan} Personel
-            </div>
-          </div>
 
-          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300 truncate">Kampanye Dikelola</span>
-              <Building2 className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
-            </div>
-            <div className="text-xl lg:text-2xl font-bold text-white font-sans truncate">
-              {myCampaigns.length} Program
-            </div>
-            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
-              Status: Semua Disetujui & Aktif
-            </div>
-          </div>
-
-          <div className="flex-1 min-w-[160px] w-auto bg-blue-950/70 border border-blue-800/60 p-4 rounded-2xl shadow-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-blue-300 truncate">Akuntabilitas LPJ</span>
-              <FileText className="w-4 h-4 text-sky-400 shrink-0 ml-1" />
-            </div>
-            <div className="text-xl lg:text-2xl font-bold text-sky-400 font-sans truncate">
-              {totalLpjCount} Dokumen Sah
-            </div>
-            <div className="text-[11px] text-blue-300/80 mt-1 truncate">
-              {totalLpjCount > 0 ? 'Telah Terverifikasi Publik' : 'Belum Ada Laporan Terbit'}
+            <div className="flex-1 min-w-[160px] w-auto bg-blue-900/60 backdrop-blur-xs border border-blue-700/50 p-3.5 rounded-2xl text-center shadow-xs">
+              <div className="text-xl lg:text-2xl font-bold text-blue-200 font-sans truncate">
+                {totalLpjCount}
+              </div>
+              <div className="text-[11px] text-blue-200 mt-0.5 truncate">Akuntabilitas LPJ</div>
             </div>
           </div>
         </div>

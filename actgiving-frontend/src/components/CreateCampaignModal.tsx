@@ -403,6 +403,10 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
 
         if (response?.data?.data) {
           const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
+          // Jika backend belum mengembalikan URL gambar (atau path belum diset), fallback ke imagePreview lokal
+          if ((!createdCampaign.imageUrl || createdCampaign.imageUrl.includes('unsplash.com')) && imagePreview) {
+            createdCampaign.imageUrl = imagePreview;
+          }
           onAddCampaign(createdCampaign);
           handleResetAndClose();
         } else {
