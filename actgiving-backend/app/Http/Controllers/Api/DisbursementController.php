@@ -34,7 +34,7 @@ class DisbursementController extends Controller
         }
 
         // Pastikan user adalah inisiator pembuat kampanye atau admin
-        if ($campaign->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+        if ((int) $campaign->user_id !== (int) $request->user()->id && $request->user()->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki otorisasi untuk mengajukan pencairan pada kampanye ini.',
@@ -119,7 +119,7 @@ class DisbursementController extends Controller
             ], 404);
         }
 
-        if ($campaign->user_id !== $request->user()->id && $request->user()->role !== 'admin') {
+        if ((int) $campaign->user_id !== (int) $request->user()->id && $request->user()->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki hak akses untuk melihat riwayat pencairan kampanye ini.',

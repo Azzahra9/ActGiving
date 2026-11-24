@@ -173,7 +173,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     try {
       const response = await api.get('/my-campaigns').catch(() => null);
       const items = response?.data?.data?.data || response?.data?.data || [];
-      if (Array.isArray(items) && items.length > 0) {
+      if (Array.isArray(items)) {
         const mapped = items.map(mapBackendCampaignToFrontend);
         setInitiatorCampaigns(mapped);
       }
@@ -780,6 +780,8 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {myCampaigns.map((camp) => {
+                const canRequestDisbursement =
+                  camp.user_id != null && String(camp.user_id) === String(currentUser.id);
                 const percentDana = camp.targetFunds
                   ? Math.min(100, Math.round(((camp.collectedFunds || 0) / camp.targetFunds) * 100))
                   : 0;
@@ -898,7 +900,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
 
                       <div className="flex flex-wrap items-center gap-1.5">
                         {/* Tombol Ajukan Pencairan Dana (DIS-01) */}
-                        {(camp.mode === 'dana' || camp.mode === 'keduanya') && (
+                        {(camp.mode === 'dana' || camp.mode === 'keduanya') && canRequestDisbursement && (
                           <button
                             type="button"
                             onClick={() => handleOpenDisbursementModal(camp)}

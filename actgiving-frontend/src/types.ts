@@ -114,6 +114,7 @@ export interface CampaignSchedule {
 
 export interface Campaign {
   id: string;
+  user_id?: number | string;
   title: string;
   initiatorName: string;
   initiatorRole?: string;

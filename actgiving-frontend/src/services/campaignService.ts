@@ -134,6 +134,7 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
 
   return {
     id: String(item.id),
+    user_id: item.user_id ?? item.user?.id,
     title: item.title || 'Tanpa Judul Kampanye',
     initiatorName: item.user?.name || 'Inisiator Kemanusiaan',
     initiatorRole: item.user?.is_verified ? 'Inisiator Terverifikasi' : 'Komunitas Relawan',
