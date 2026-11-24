@@ -493,6 +493,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </p>
                 )}
 
+                {/* Navigasi Cepat: Kembali ke Portal Publik */}
+                <button
+                  onClick={() => handlePublicNavClick()}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/80 mb-2 border border-slate-800 ${
+                    isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''
+                  }`}
+                  title="Kembali ke Beranda & Katalog Publik"
+                >
+                  <Compass className="w-4 h-4 shrink-0 text-blue-400" />
+                  {(!isCollapsedDesktop || isOpenMobile) && (
+                    <span className="truncate">Lihat Portal Publik</span>
+                  )}
+                </button>
+
                 <nav className="space-y-1">
                   {/* 1. Antrean Moderasi Kampanye */}
                   <button

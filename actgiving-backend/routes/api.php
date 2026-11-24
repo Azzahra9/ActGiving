@@ -112,9 +112,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports', [AdminController::class, 'indexReports']);
         Route::patch('/reports/{id}/status', [AdminController::class, 'updateReportStatus']);
 
-        // Verifikasi Inisiator / User
+        // Verifikasi & Pengelolaan Role User
         Route::get('/users', [AdminController::class, 'indexUsers']);
         Route::patch('/users/{id}/verify', [AdminController::class, 'verifyUser']);
+        Route::patch('/users/{id}/role', [AdminController::class, 'updateUserRole']);
 
         // Manajemen Kategori
         Route::post('/categories', [CategoryController::class, 'store']);

@@ -204,6 +204,31 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="whitespace-nowrap">Donasi Sekarang</span>
             </button>
 
+            {/* Admin Quick Switch Pill Button (Desktop) */}
+            {effectiveUser.role === 'admin' && (
+              <button
+                onClick={() => onNavigateView(activeView === 'admin_dashboard' ? 'public' : 'admin_dashboard')}
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer ${
+                  activeView === 'admin_dashboard'
+                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                    : 'bg-slate-900 hover:bg-slate-800 text-white'
+                }`}
+                title={activeView === 'admin_dashboard' ? 'Lihat Beranda & Katalog Publik' : 'Buka Panel Dashboard Admin'}
+              >
+                {activeView === 'admin_dashboard' ? (
+                  <>
+                    <Compass className="w-3.5 h-3.5 text-brand-blue" />
+                    <span>Katalog Publik</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Panel Admin</span>
+                  </>
+                )}
+              </button>
+            )}
+
             {/* Profile Avatar / Login Icon */}
             {!isAuthenticated && (!effectiveUser || effectiveUser.role === 'guest') ? (
               <button
@@ -273,16 +298,33 @@ export const Header: React.FC<HeaderProps> = ({
                       )}
 
                       {effectiveUser.role === 'admin' && (
-                        <button
-                          onClick={() => {
-                            setUserDropdownOpen(false);
-                            onNavigateView('admin_dashboard');
-                          }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold text-slate-700 cursor-pointer"
-                        >
-                          <ShieldCheck className="w-4 h-4 text-brand-blue" />
-                          <span>Panel Admin</span>
-                        </button>
+                        <>
+                          <button
+                            onClick={() => {
+                              setUserDropdownOpen(false);
+                              onNavigateView('admin_dashboard');
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold cursor-pointer ${
+                              activeView === 'admin_dashboard' ? 'text-brand-blue bg-blue-50/60 font-bold' : 'text-slate-700'
+                            }`}
+                          >
+                            <ShieldCheck className="w-4 h-4 text-brand-blue" />
+                            <span>Panel Admin</span>
+                          </button>
+
+                          {activeView !== 'public' && (
+                            <button
+                              onClick={() => {
+                                setUserDropdownOpen(false);
+                                onNavigateView('public');
+                              }}
+                              className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold text-slate-700 cursor-pointer"
+                            >
+                              <Compass className="w-4 h-4 text-slate-500" />
+                              <span>Lihat Portal Publik</span>
+                            </button>
+                          )}
+                        </>
                       )}
 
                       <button
@@ -343,6 +385,31 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>Donasi Sekarang</span>
               </button>
             </div>
+
+            {/* Mobile Admin Quick Access Button */}
+            {effectiveUser.role === 'admin' && (
+              <div className="pt-1">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onNavigateView(activeView === 'admin_dashboard' ? 'public' : 'admin_dashboard');
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs text-center cursor-pointer flex items-center justify-center gap-2 transition-colors"
+                >
+                  {activeView === 'admin_dashboard' ? (
+                    <>
+                      <Compass className="w-4 h-4 text-blue-400" />
+                      <span>Lihat Portal Publik</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4 h-4 text-blue-400" />
+                      <span>Buka Panel Admin</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {!isAuthenticated && (!effectiveUser || effectiveUser.role === 'guest') && (
               <div className="pt-1">

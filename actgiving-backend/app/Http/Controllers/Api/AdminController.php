@@ -49,7 +49,7 @@ class AdminController extends Controller
         $campaign = Campaign::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:active,rejected,closed',
+            'status' => 'required|in:active,rejected,closed,suspended',
         ]);
 
         $campaign->status = $validated['status'];
@@ -63,9 +63,9 @@ class AdminController extends Controller
     }
 
     /**
-     * Hentikan / Hapus Kampanye (Admin)
+     * Hentikan Kampanye (Admin)
      *
-     * Admin: Menghentikan kampanye secara paksa dengan menghapusnya dari database.
+     * Admin: Menghentikan kampanye secara paksa dengan mengubah status menjadi 'suspended'.
      */
     public function suspendCampaign(Request $request, $id): JsonResponse
     {
@@ -76,12 +76,14 @@ class AdminController extends Controller
         ]);
 
         $campaignTitle = $campaign->title;
-        $campaign->delete();
+        $campaign->status = 'suspended';
+        $campaign->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Kampanye '{$campaignTitle}' berhasil dihentikan dan dihapus oleh Admin.",
+            'message' => "Kampanye '{$campaignTitle}' berhasil dihentikan (suspended) oleh Admin.",
             'reason' => $validated['reason'] ?? null,
+            'data' => $campaign,
         ]);
     }
 
@@ -146,6 +148,42 @@ class AdminController extends Controller
             'message' => $user->is_verified
                 ? "Pengguna {$user->name} berhasil diverifikasi sebagai Inisiator Terpercaya."
                 : "Status verifikasi pengguna {$user->name} berhasil dicabut.",
+            'data' => $user,
+        ]);
+    }
+
+    /**
+     * Ubah Role Pengguna (Admin)
+     *
+     * Admin: Menetapkan atau mencabut peran Administrator pada pengguna.
+     */
+    public function updateUserRole(Request $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'role' => 'required|in:admin,user',
+        ], [
+            'role.required' => 'Peran (role) wajib dipilih.',
+            'role.in' => 'Peran tidak valid. Pilihan yang tersedia: admin, user.',
+        ]);
+
+        if ($request->user() && $request->user()->id === $user->id && $validated['role'] !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak dapat mencabut peran admin dari akun Anda sendiri.',
+            ], 422);
+        }
+
+        $user->role = $validated['role'];
+        if ($user->role === 'admin') {
+            $user->is_verified = true;
+        }
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Peran pengguna {$user->name} berhasil diubah menjadi: {$user->role}.",
             'data' => $user,
         ]);
     }

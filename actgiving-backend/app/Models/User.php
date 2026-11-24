@@ -54,6 +54,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Cek apakah user memiliki peran Administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Cek apakah user adalah pengguna biasa.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
      * Kampanye yang dibuat oleh user (sebagai Inisiator).
      */
     public function campaigns(): HasMany

@@ -13,7 +13,9 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || $request->user()->role !== 'admin') {
+        $user = $request->user();
+
+        if (! $user || (method_exists($user, 'isAdmin') ? ! $user->isAdmin() : $user->role !== 'admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Akses ditolak. Endpoint ini hanya untuk Administrator.',
