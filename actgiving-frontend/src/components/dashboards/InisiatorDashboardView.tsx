@@ -71,15 +71,6 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Ambil data kampanye yang sedang dipilih pada formulir LPJ
-  const targetCampaignForLpj = React.useMemo(() => {
-    return myCampaigns.find((c) => c.id === selectedCampaignId) || myCampaigns[0] || null;
-  }, [myCampaigns, selectedCampaignId]);
-
-  const isSelectedVolunteerOnly = targetCampaignForLpj?.mode === 'relawan';
-  const isSelectedFundOnly = targetCampaignForLpj?.mode === 'dana';
-  const isSelectedBoth = !targetCampaignForLpj?.mode || targetCampaignForLpj?.mode === 'keduanya';
-
   // Calculate total from budget items if amount not manually specified
   const calculatedBudgetTotal = budgetItems.reduce((sum, item) => sum + item.amount, 0);
 
@@ -273,6 +264,15 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const totalRelawanTerdaftar = myCampaigns.reduce((acc, c) => acc + (c?.filledVolunteers || 0), 0);
   const totalTargetRelawan = myCampaigns.reduce((acc, c) => acc + (c?.targetVolunteers || 0), 0);
   const totalLpjCount = myCampaigns.reduce((acc, c) => acc + (Array.isArray(c?.lpjReports) ? c.lpjReports.length : 0), 0);
+
+  // Ambil data kampanye yang sedang dipilih pada formulir LPJ
+  const targetCampaignForLpj = React.useMemo(() => {
+    return myCampaigns.find((c) => c.id === selectedCampaignId) || myCampaigns[0] || null;
+  }, [myCampaigns, selectedCampaignId]);
+
+  const isSelectedVolunteerOnly = targetCampaignForLpj?.mode === 'relawan';
+  const isSelectedFundOnly = targetCampaignForLpj?.mode === 'dana';
+  const isSelectedBoth = !targetCampaignForLpj?.mode || targetCampaignForLpj?.mode === 'keduanya';
 
     const handleDeleteCampaign = async (camp: Campaign) => {
     const isConfirmed = window.confirm(
