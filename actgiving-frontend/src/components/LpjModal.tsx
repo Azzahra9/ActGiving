@@ -72,14 +72,22 @@ export const LpjModal: React.FC<LpjModalProps> = ({
 
               {/* Baris Ringkasan Metrik Dampak Utama (Header Modal) */}
               <div className="flex flex-wrap items-center gap-2 pt-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs font-bold shadow-2xs">
-                  <Coins className="w-3.5 h-3.5 text-blue-600" />
-                  <span>💰 Rp {formatRupiah(totalRealizedAmount > 0 ? totalRealizedAmount : (campaign.collectedFunds || 0))}</span>
-                </span>
+                {campaign.mode !== 'relawan' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs font-bold shadow-2xs">
+                    <Coins className="w-3.5 h-3.5 text-blue-600" />
+                    <span>💰 Rp {formatRupiah(totalRealizedAmount > 0 ? totalRealizedAmount : (campaign.collectedFunds || 0))}</span>
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-xs font-bold shadow-2xs">
                   <Users className="w-3.5 h-3.5 text-emerald-600" />
                   <span>👥 {totalBeneficiaries > 0 ? totalBeneficiaries : 100}+ Jiwa Penerima Manfaat</span>
                 </span>
+                {campaign.mode !== 'dana' && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 border border-sky-200/80 text-sky-900 text-xs font-bold shadow-2xs">
+                    <Heart className="w-3.5 h-3.5 text-sky-600" />
+                    <span>🤝 {totalVolunteers > 0 ? totalVolunteers : 10}+ Relawan Terlibat</span>
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-50 border border-purple-200/80 text-purple-900 text-xs font-bold shadow-2xs">
                   <MapPin className="w-3.5 h-3.5 text-purple-600" />
                   <span>📍 {campaign.locationCity || 'Posko Aksi Lapangan'}</span>
@@ -234,16 +242,18 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                     </div>
 
                     {/* Quick Impact Metrics Bar (Data Binding Dinamis) */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 text-xs">
-                      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
-                        <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
-                          <Coins className="w-3.5 h-3.5 text-blue-600" />
-                          Total Realisasi:
-                        </span>
-                        <span className="font-bold text-blue-700 text-sm">
-                          {formatRupiah(reportRealized)}
-                        </span>
-                      </div>
+                    <div className={`grid grid-cols-2 ${campaign.mode === 'both' ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 text-xs`}>
+                      {campaign.mode !== 'relawan' && (
+                        <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
+                            <Coins className="w-3.5 h-3.5 text-blue-600" />
+                            Total Realisasi:
+                          </span>
+                          <span className="font-bold text-blue-700 text-sm">
+                            {formatRupiah(reportRealized)}
+                          </span>
+                        </div>
+                      )}
 
                       <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
                         <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
@@ -255,15 +265,17 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                         </span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
-                        <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
-                          <Heart className="w-3.5 h-3.5 text-purple-600" />
-                          Relawan Lapangan:
-                        </span>
-                        <span className="font-bold text-slate-800 text-sm">
-                          {reportVolunteers > 0 ? reportVolunteers : (campaign.filledVolunteers || 8)} Relawan
-                        </span>
-                      </div>
+                      {campaign.mode !== 'dana' && (
+                        <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
+                            <Heart className="w-3.5 h-3.5 text-purple-600" />
+                            Relawan Lapangan:
+                          </span>
+                          <span className="font-bold text-slate-800 text-sm">
+                            {reportVolunteers > 0 ? reportVolunteers : (campaign.filledVolunteers || 8)} Relawan
+                          </span>
+                        </div>
+                      )}
 
                       <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
                         <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
@@ -289,8 +301,8 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                       </p>
                     </div>
 
-                    {/* Rincian Pos Belanja Terstruktur (Form Digital) */}
-                    {budgetItems.length > 0 && (
+                    {/* Rincian Pos Belanja Terstruktur (Form Digital) - Hanya untuk Kampanye yang membutuhkan dana */}
+                    {campaign.mode !== 'relawan' && budgetItems.length > 0 && (
                       <div className="space-y-2">
                         <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                           <ReceiptText className="w-4 h-4 text-blue-600" />

@@ -452,4 +452,110 @@ class LPJUploadTest extends TestCase
         // Pastikan hanya 1 foto tersimpan (tidak terduplikasi karena proof_image dan activity_photos)
         $this->assertCount(1, $lpjData['activity_photos']);
     }
+
+    /**
+     * Test formulir LPJ untuk kampanye Relawan (volunteer_only):
+     * Tidak memiliki pos belanja dan nominal pengeluaran diatur ke 0.
+     */
+    public function test_initiator_can_upload_lpj_for_volunteer_only_campaign(): void
+    {
+        Storage::fake('public');
+
+        $initiator = User::create([
+            'name' => 'Inisiator Relawan',
+            'email' => 'inisiator_relawan@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+        $category = Category::create(['category_name' => 'Lingkungan']);
+
+        $campaign = Campaign::create([
+            'user_id' => $initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Aksi Bersih Pantai & Edukasi Warga',
+            'description' => 'Aksi relawan membersihkan pesisir pantai.',
+            'target_amount' => 0,
+            'current_amount' => 0,
+            'target_volunteers' => 30,
+            'current_volunteers' => 25,
+            'location' => 'Pangandaran, Jawa Barat',
+            'status' => 'active',
+            'campaign_mode' => 'volunteer_only',
+        ]);
+
+        $photo = UploadedFile::fake()->image('dokumentasi_relawan.jpg', 600, 600)->size(500);
+
+        $response = $this->actingAs($initiator, 'sanctum')->postJson("/api/campaigns/{$campaign->id}/lpj", [
+            'title' => 'Laporan Aksi Bersih Pantai Bersama Relawan',
+            'description' => 'Aksi relawan berhasil membersihkan 500 meter garis pantai bersama 25 relawan aktif.',
+            'field_location' => 'Pantai Barat Pangandaran',
+            'beneficiaries_count' => 200,
+            'volunteers_involved' => 25,
+            'proof_image' => $photo,
+        ]);
+
+        $response->assertStatus(201);
+        $lpjData = $response->json('data.lpj_report');
+        $this->assertEquals(0, (float) $lpjData['amount_spent']);
+        $this->assertNull($lpjData['budget_items']);
+        $this->assertEquals('Pantai Barat Pangandaran', $lpjData['field_location']);
+        $this->assertEquals(200, $lpjData['beneficiaries_count']);
+        $this->assertEquals(25, $lpjData['volunteers_involved']);
+    }
+
+    /**
+     * Test formulir LPJ untuk kampanye Dana dan Relawan (both):
+     * Memiliki pos belanja, realisasi dana, dan metrik relawan.
+     */
+    public function test_initiator_can_upload_lpj_for_both_funds_and_volunteers_campaign(): void
+    {
+        Storage::fake('public');
+
+        $initiator = User::create([
+            'name' => 'Inisiator Gabungan',
+            'email' => 'inisiator_gabungan@actgiving.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'is_verified' => true,
+        ]);
+        $category = Category::create(['category_name' => 'Bencana']);
+
+        $campaign = Campaign::create([
+            'user_id' => $initiator->id,
+            'category_id' => $category->id,
+            'title' => 'Dapur Umum & Relawan Medis Banjir',
+            'description' => 'Penyaluran makanan dan layanan medis darurat.',
+            'target_amount' => 20000000,
+            'current_amount' => 20000000,
+            'target_volunteers' => 15,
+            'current_volunteers' => 12,
+            'location' => 'Semarang',
+            'status' => 'active',
+            'campaign_mode' => 'both',
+        ]);
+
+        $photo = UploadedFile::fake()->image('dapur_umum.jpg', 600, 600)->size(500);
+
+        $response = $this->actingAs($initiator, 'sanctum')->postJson("/api/campaigns/{$campaign->id}/lpj", [
+            'title' => 'Operasional Dapur Umum Tahap 1',
+            'description' => 'Relawan memasak dan menyalurkan 1.000 porsi makanan hangat untuk warga terdampak banjir.',
+            'field_location' => 'Posko Balai Kelurahan',
+            'beneficiaries_count' => 1000,
+            'volunteers_involved' => 12,
+            'total_realisasi' => 7500000,
+            'budget_items' => [
+                ['name' => 'Bahan Baku Makanan', 'amount' => 6000000],
+                ['name' => 'Kemasan & Gas', 'amount' => 1500000],
+            ],
+            'proof_image' => $photo,
+        ]);
+
+        $response->assertStatus(201);
+        $lpjData = $response->json('data.lpj_report');
+        $this->assertEquals(7500000, (float) $lpjData['amount_spent']);
+        $this->assertCount(2, $lpjData['budget_items']);
+        $this->assertEquals(1000, $lpjData['beneficiaries_count']);
+        $this->assertEquals(12, $lpjData['volunteers_involved']);
+    }
 }

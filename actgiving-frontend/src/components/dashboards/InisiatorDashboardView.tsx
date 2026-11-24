@@ -71,6 +71,15 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Ambil data kampanye yang sedang dipilih pada formulir LPJ
+  const targetCampaignForLpj = React.useMemo(() => {
+    return myCampaigns.find((c) => c.id === selectedCampaignId) || myCampaigns[0] || null;
+  }, [myCampaigns, selectedCampaignId]);
+
+  const isSelectedVolunteerOnly = targetCampaignForLpj?.mode === 'relawan';
+  const isSelectedFundOnly = targetCampaignForLpj?.mode === 'dana';
+  const isSelectedBoth = !targetCampaignForLpj?.mode || targetCampaignForLpj?.mode === 'keduanya';
+
   // Calculate total from budget items if amount not manually specified
   const calculatedBudgetTotal = budgetItems.reduce((sum, item) => sum + item.amount, 0);
 
@@ -459,26 +468,38 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     }
 
     const currentCampaign = myCampaigns.find(c => c.id === targetCampId);
-    // Prioritaskan total kalkulasi dari Rincian Pos Belanja, fallback ke manual lpjAmount jika ada
-    const totalRealisasi = calculatedBudgetTotal > 0 
-      ? calculatedBudgetTotal 
-      : (lpjAmount ? parseInt(lpjAmount, 10) : 0);
-    const finalAmount = totalRealisasi > 0 ? totalRealisasi : (lpjAmount ? parseInt(lpjAmount, 10) : 5000000);
-    const descriptionText = lpjDesc.trim() || 'Laporan pertanggungjawaban kegiatan penyaluran dan aksi lapangan.';
+    const isVolOnly = currentCampaign?.mode === 'relawan';
+
+    // Prioritaskan total kalkulasi dari Rincian Pos Belanja, fallback ke manual lpjAmount jika ada (hanya jika butuh dana)
+    let finalAmount = 0;
+    let finalBudgetItems: LpjBudgetItem[] = [];
+
+    if (!isVolOnly) {
+      const totalRealisasi = calculatedBudgetTotal > 0 
+        ? calculatedBudgetTotal 
+        : (lpjAmount ? parseInt(lpjAmount, 10) : 0);
+      finalAmount = totalRealisasi > 0 ? totalRealisasi : (lpjAmount ? parseInt(lpjAmount, 10) : 5000000);
+      finalBudgetItems = budgetItems.length > 0 ? budgetItems : [{ name: 'Distribusi Logistik Lapangan', amount: finalAmount }];
+    }
+
+    const defaultTitle = isVolOnly ? 'Laporan Kegiatan Relawan Lapangan' : 'Penyaluran Bantuan Lapangan';
+    const descriptionText = lpjDesc.trim() || (isVolOnly ? 'Laporan dokumentasi dan aksi kegiatan relawan di lapangan.' : 'Laporan pertanggungjawaban kegiatan penyaluran dan aksi lapangan.');
 
     setIsSubmittingLpj(true);
 
     // Siapkan FormData untuk mengirim file asli ke backend Laravel
     const formData = new FormData();
     formData.append('description', descriptionText);
-    formData.append('title', lpjTitle || 'Penyaluran Bantuan Lapangan');
+    formData.append('title', lpjTitle || defaultTitle);
     formData.append('total_realisasi', finalAmount.toString());
     formData.append('amount_spent', finalAmount.toString());
     formData.append('realized_amount', finalAmount.toString());
     formData.append('field_location', fieldLocation.trim() || currentCampaign?.locationCity || 'Posko Aksi Lapangan');
     formData.append('beneficiaries_count', (parseInt(beneficiariesCount) || 0).toString());
     formData.append('volunteers_involved', (parseInt(volunteersInvolved) || 0).toString());
-    formData.append('budget_items', JSON.stringify(budgetItems));
+    if (!isVolOnly) {
+      formData.append('budget_items', JSON.stringify(finalBudgetItems));
+    }
     formData.append('is_final', isFinalReport ? '1' : '0');
     formData.append('report_type', isFinalReport ? 'final' : 'progress');
 
@@ -521,11 +542,11 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
       const updatedLpj: LpjItem = {
         id: editingLpjId,
         digitalRegNumber: `LPJ-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-        title: lpjTitle || 'Penyaluran Bantuan Lapangan',
+        title: lpjTitle || defaultTitle,
         date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
         realizedAmount: finalAmount,
         description: descriptionText,
-        budgetItems: budgetItems.length > 0 ? budgetItems : [{ name: 'Distribusi Logistik Lapangan', amount: finalAmount }],
+        budgetItems: isVolOnly ? [] : finalBudgetItems,
         activityPhotos: finalPhotos.length > 0 ? finalPhotos : (primaryPhoto ? [primaryPhoto] : []),
         photoUrl: primaryPhoto,
         beneficiariesCount: parseInt(beneficiariesCount) || 120,
@@ -557,11 +578,11 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
     const newLpj: LpjItem = {
       id: `lpj-custom-${Date.now()}`,
       digitalRegNumber: `LPJ-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
-      title: lpjTitle || 'Penyaluran Bantuan Lapangan',
+      title: lpjTitle || defaultTitle,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
       realizedAmount: finalAmount,
       description: descriptionText,
-      budgetItems: budgetItems.length > 0 ? budgetItems : [{ name: 'Distribusi Logistik Lapangan', amount: finalAmount }],
+      budgetItems: isVolOnly ? [] : finalBudgetItems,
       activityPhotos: finalPhotos.length > 0 ? finalPhotos : (primaryPhoto ? [primaryPhoto] : []),
       photoUrl: primaryPhoto,
       beneficiariesCount: parseInt(beneficiariesCount) || 120,
@@ -1013,14 +1034,32 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                   <span>Koneksi Otomatis ke Galeri Landing Page:</span>
                 </div>
                 <p className="text-blue-800 text-[11px] leading-relaxed">
-                  Laporan pertanggungjawaban diisi langsung di form web ini tanpa memerlukan berkas kertas. 
-                  Foto-foto kegiatan yang Anda masukkan di bawah akan langsung muncul di halaman depan (landing page) agar publik dan donatur melihat realisasi aksi nyata.
+                  {isSelectedVolunteerOnly
+                    ? 'Laporan kegiatan relawan diisi langsung di form web ini. Dokumentasi foto aksi lapangan yang Anda sertakan akan langsung dipublikasikan ke linimasa dan landing page platform.'
+                    : 'Laporan pertanggungjawaban diisi langsung di form web ini tanpa memerlukan berkas kertas. Foto-foto kegiatan yang Anda masukkan di bawah akan langsung muncul di halaman depan (landing page) agar publik dan donatur melihat realisasi aksi nyata.'}
                 </p>
               </div>
 
               <form onSubmit={handleUploadSubmit} className="space-y-4 text-xs">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Pilih Target Kampanye</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-semibold text-slate-700 block">Pilih Target Kampanye</label>
+                    {targetCampaignForLpj && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                        isSelectedVolunteerOnly 
+                          ? 'bg-purple-100 text-purple-800 border border-purple-200' 
+                          : isSelectedFundOnly 
+                          ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                          : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                      }`}>
+                        {isSelectedVolunteerOnly 
+                          ? '🤝 Mode Relawan' 
+                          : isSelectedFundOnly 
+                          ? '💰 Mode Dana' 
+                          : '🌟 Mode Dana & Relawan'}
+                      </span>
+                    )}
+                  </div>
                   <select
                     value={selectedCampaignId}
                     onChange={(e) => setSelectedCampaignId(e.target.value)}
@@ -1028,7 +1067,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                   >
                     {myCampaigns.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {c.title}
+                        {c.title} ({c.mode === 'relawan' ? 'Relawan' : c.mode === 'dana' ? 'Dana' : 'Dana & Relawan'})
                       </option>
                     ))}
                   </select>
@@ -1117,18 +1156,24 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Judul Kegiatan / Realisasi Lapangan</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {isSelectedVolunteerOnly ? 'Judul Kegiatan Relawan' : 'Judul Kegiatan / Realisasi Lapangan'}
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Distribusi Paket Logistik & Obat Tahap 1"
+                    placeholder={
+                      isSelectedVolunteerOnly
+                        ? 'Contoh: Aksi Bersih Lingkungan & Edukasi Warga Bersama Relawan'
+                        : 'Contoh: Distribusi Paket Logistik & Obat Tahap 1'
+                    }
                     value={lpjTitle}
                     onChange={(e) => setLpjTitle(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className={`grid grid-cols-1 ${isSelectedFundOnly ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-3`}>
                   <div>
                     <label className="font-semibold text-slate-700 block mb-1">Lokasi Titik Aksi</label>
                     <input
@@ -1149,74 +1194,78 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                       className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <div>
-                    <label className="font-semibold text-slate-700 block mb-1">Relawan Terlibat</label>
-                    <input
-                      type="number"
-                      placeholder="Contoh: 12"
-                      value={volunteersInvolved}
-                      onChange={(e) => setVolunteersInvolved(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Pos Belanja Anggaran Terstruktur */}
-                <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                      <ReceiptText className="w-4 h-4 text-blue-600" />
-                      Rincian Pos Belanja (Form Web)
-                    </span>
-                    <span className="text-[11px] font-bold text-blue-700">
-                      Total: {formatRupiah(calculatedBudgetTotal)}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
-                    {budgetItems.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
-                        <span className="text-slate-800 font-medium truncate max-w-[65%]">{item.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900">{formatRupiah(item.amount)}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveBudgetItem(idx)}
-                            className="p-1 text-slate-400 hover:text-red-600 rounded-md transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                    <input
-                      type="text"
-                      placeholder="Nama pos barang/jasa"
-                      value={newItemName}
-                      onChange={(e) => setNewItemName(e.target.value)}
-                      className="sm:col-span-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
-                    />
-                    <div className="flex items-center gap-1">
+                  {!isSelectedFundOnly && (
+                    <div>
+                      <label className="font-semibold text-slate-700 block mb-1">Relawan Terlibat</label>
                       <input
                         type="number"
-                        placeholder="Nominal (Rp)"
-                        value={newItemAmount}
-                        onChange={(e) => setNewItemAmount(e.target.value)}
-                        className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                        placeholder="Contoh: 12"
+                        value={volunteersInvolved}
+                        onChange={(e) => setVolunteersInvolved(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
                       />
-                      <button
-                        type="button"
-                        onClick={handleAddBudgetItem}
-                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shrink-0 transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pos Belanja Anggaran Terstruktur - Khusus Kampanye yang Membutuhkan Dana (Dana & Keduanya) */}
+                {!isSelectedVolunteerOnly && (
+                  <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <ReceiptText className="w-4 h-4 text-blue-600" />
+                        Rincian Pos Belanja (Form Web)
+                      </span>
+                      <span className="text-[11px] font-bold text-blue-700">
+                        Total: {formatRupiah(calculatedBudgetTotal)}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+                      {budgetItems.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
+                          <span className="text-slate-800 font-medium truncate max-w-[65%]">{item.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-900">{formatRupiah(item.amount)}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveBudgetItem(idx)}
+                              className="p-1 text-slate-400 hover:text-red-600 rounded-md transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                      <input
+                        type="text"
+                        placeholder="Nama pos barang/jasa"
+                        value={newItemName}
+                        onChange={(e) => setNewItemName(e.target.value)}
+                        className="sm:col-span-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                      />
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          placeholder="Nominal (Rp)"
+                          value={newItemAmount}
+                          onChange={(e) => setNewItemAmount(e.target.value)}
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddBudgetItem}
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shrink-0 transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* Foto-Foto Kegiatan Lapangan yang Berlangsung */}
                 <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
@@ -1409,16 +1458,24 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                           <span className="text-[11px] text-slate-500">{lpj.date}</span>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-white p-2.5 rounded-xl border border-slate-100 text-[11px]">
-                          <div>
-                            <span className="text-slate-400 block text-[10px]">Realisasi:</span>
-                            <strong className="text-blue-700 font-bold">{formatRupiah(lpj.realizedAmount)}</strong>
-                          </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-white p-2.5 rounded-xl border border-slate-100 text-[11px]">
+                          {c.mode !== 'relawan' && (
+                            <div>
+                              <span className="text-slate-400 block text-[10px]">Realisasi Dana:</span>
+                              <strong className="text-blue-700 font-bold">{formatRupiah(lpj.realizedAmount)}</strong>
+                            </div>
+                          )}
                           <div>
                             <span className="text-slate-400 block text-[10px]">Penerima:</span>
                             <strong className="text-slate-800">{lpj.beneficiariesCount || 100}+ Jiwa</strong>
                           </div>
-                          <div className="col-span-2 sm:col-span-1">
+                          {c.mode !== 'dana' && (
+                            <div>
+                              <span className="text-slate-400 block text-[10px]">Relawan:</span>
+                              <strong className="text-slate-800">{lpj.volunteersInvolved || c.filledVolunteers || 0} Orang</strong>
+                            </div>
+                          )}
+                          <div className={c.mode === 'relawan' ? 'col-span-2' : c.mode === 'dana' ? 'col-span-2 sm:col-span-1' : 'col-span-2 sm:col-span-1'}>
                             <span className="text-slate-400 block text-[10px]">Lokasi Aksi:</span>
                             <strong className="text-slate-800 truncate block">{lpj.fieldLocation || c.locationCity}</strong>
                           </div>
