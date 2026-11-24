@@ -26,4 +26,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'php artisan migrate --force && (php artisan storage:link || true) && (php-fpm -D || true) && caddy run --config /app/Caddyfile --adapter caddyfile'
+cmd = 'php artisan migrate --force && (php artisan make:admin admin@actgiving.com --name="Admin ActGiving" --password="adminactgiving" --no-interaction || true) && (php artisan storage:link || true) && (php-fpm -D || true) && caddy run --config /app/Caddyfile --adapter caddyfile'

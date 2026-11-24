@@ -320,36 +320,42 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </>
                 )}
 
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Aktivitas Utama Saat Ini</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRoleType('relawan')}
-                      className={`p-2 rounded-xl border text-center font-bold text-xs transition-colors cursor-pointer ${
-                        selectedRoleType === 'relawan'
-                          ? 'border-sky-600 bg-sky-50 text-sky-800 ring-1 ring-sky-600'
-                          : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      Fokus Jadi Relawan
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRoleType('inisiator')}
-                      className={`p-2 rounded-xl border text-center font-bold text-xs transition-colors cursor-pointer ${
-                        selectedRoleType === 'inisiator'
-                          ? 'border-blue-600 bg-blue-50 text-blue-800 ring-1 ring-blue-600'
-                          : 'border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      Fokus Buka Kampanye
-                    </button>
+                {tab === 'register' ? (
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Aktivitas Utama Saat Ini</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRoleType('relawan')}
+                        className={`p-2 rounded-xl border text-center font-bold text-xs transition-colors cursor-pointer ${
+                          selectedRoleType === 'relawan'
+                            ? 'border-sky-600 bg-sky-50 text-sky-800 ring-1 ring-sky-600'
+                            : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                        }`}
+                      >
+                        Fokus Jadi Relawan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRoleType('inisiator')}
+                        className={`p-2 rounded-xl border text-center font-bold text-xs transition-colors cursor-pointer ${
+                          selectedRoleType === 'inisiator'
+                            ? 'border-blue-600 bg-blue-50 text-blue-800 ring-1 ring-blue-600'
+                            : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                        }`}
+                      >
+                        Fokus Buka Kampanye
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      *Akun ActGiving bersifat Dual-Role: bisa menggalang donasi/relawan dan mendaftar kegiatan aksi.
+                    </p>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    *Akun ActGiving bersifat Dual-Role: bisa menggalang donasi/relawan dan mendaftar kegiatan aksi.
-                  </p>
-                </div>
+                ) : (
+                  <div className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] text-slate-500 leading-relaxed">
+                    Akun ActGiving mendukung <strong>Dual-Role (Relawan & Inisiator)</strong> serta <strong>Administrator</strong>. Sistem otomatis mendeteksi peran akun Anda dan mengarahkan ke antarmuka yang sesuai tanpa pembatasan.
+                  </div>
+                )}
 
                 <button
                   type="submit"

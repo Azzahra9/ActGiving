@@ -236,6 +236,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <p className="text-[10px] text-slate-400 truncate">{currentUser.city || 'Indonesia'}</p>
                 </div>
               </div>
+
+              {/* Dual-Role Switcher for Regular Users */}
+              {currentRole === 'relawan' && (
+                <button
+                  onClick={() => {
+                    onSelectUser({ ...currentUser, role: 'inisiator' });
+                    onNavigateView('inisiator_dashboard');
+                  }}
+                  className="w-full mt-2.5 py-1.5 px-2 rounded-lg bg-sky-950/60 hover:bg-sky-900/60 text-sky-200 border border-sky-800/60 text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  title="Ganti persona ke Inisiator"
+                >
+                  <Building2 className="w-3 h-3 text-sky-400" />
+                  <span>Beralih ke Workspace Inisiator ⇄</span>
+                </button>
+              )}
+
+              {currentRole === 'inisiator' && (
+                <button
+                  onClick={() => {
+                    onSelectUser({ ...currentUser, role: 'relawan' });
+                    onNavigateView('relawan_dashboard');
+                  }}
+                  className="w-full mt-2.5 py-1.5 px-2 rounded-lg bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 border border-blue-800/60 text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  title="Ganti persona ke Relawan"
+                >
+                  <Award className="w-3 h-3 text-blue-400" />
+                  <span>Beralih ke Workspace Relawan ⇄</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1 pb-3 border-b border-slate-800">

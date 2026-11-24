@@ -166,6 +166,15 @@ export default function App() {
       });
       setIsResetPasswordOpen(true);
     }
+
+    const viewParam = urlParams.get('view');
+    if (viewParam === 'admin' || viewParam === 'admin_dashboard') {
+      setActiveView('admin_dashboard');
+    } else if (viewParam === 'inisiator' || viewParam === 'inisiator_dashboard') {
+      setActiveView('inisiator_dashboard');
+    } else if (viewParam === 'relawan' || viewParam === 'relawan_dashboard') {
+      setActiveView('relawan_dashboard');
+    }
   }, []);
   const [isSourceOpen, setIsSourceOpen] = useState(false);
   const [sourceModalMode, setSourceModalMode] = useState<'hifi' | 'wireframe'>('hifi');

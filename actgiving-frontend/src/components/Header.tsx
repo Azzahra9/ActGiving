@@ -271,30 +271,63 @@ export const Header: React.FC<HeaderProps> = ({
                     </div>
 
                     <div className="space-y-1 text-xs">
-                      {effectiveUser.role === 'inisiator' && (
-                        <button
-                          onClick={() => {
-                            setUserDropdownOpen(false);
-                            onNavigateView('inisiator_dashboard');
-                          }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold text-slate-700 cursor-pointer"
-                        >
-                          <Building2 className="w-4 h-4 text-brand-blue" />
-                          <span>Workspace Inisiator</span>
-                        </button>
-                      )}
+                      {effectiveUser.role !== 'admin' && effectiveUser.role !== 'guest' && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setUserDropdownOpen(false);
+                              if (onSelectUser) {
+                                onSelectUser({ ...effectiveUser, role: 'inisiator' });
+                              }
+                              onNavigateView('inisiator_dashboard');
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center justify-between font-semibold cursor-pointer ${
+                              activeView === 'inisiator_dashboard' ? 'text-brand-blue bg-blue-50/60 font-bold' : 'text-slate-700'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Building2 className="w-4 h-4 text-brand-blue" />
+                              <span>Workspace Inisiator</span>
+                            </span>
+                            {effectiveUser.role === 'inisiator' && (
+                              <span className="text-[9px] bg-blue-100 text-brand-blue px-1.5 py-0.2 rounded-full font-bold">Aktif</span>
+                            )}
+                          </button>
 
-                      {effectiveUser.role === 'relawan' && (
-                        <button
-                          onClick={() => {
-                            setUserDropdownOpen(false);
-                            onNavigateView('relawan_dashboard');
-                          }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold text-slate-700 cursor-pointer"
-                        >
-                          <Award className="w-4 h-4 text-brand-blue" />
-                          <span>Workspace Relawan</span>
-                        </button>
+                          <button
+                            onClick={() => {
+                              setUserDropdownOpen(false);
+                              if (onSelectUser) {
+                                onSelectUser({ ...effectiveUser, role: 'relawan' });
+                              }
+                              onNavigateView('relawan_dashboard');
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center justify-between font-semibold cursor-pointer ${
+                              activeView === 'relawan_dashboard' ? 'text-brand-blue bg-blue-50/60 font-bold' : 'text-slate-700'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Award className="w-4 h-4 text-brand-blue" />
+                              <span>Workspace Relawan</span>
+                            </span>
+                            {effectiveUser.role === 'relawan' && (
+                              <span className="text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.2 rounded-full font-bold">Aktif</span>
+                            )}
+                          </button>
+
+                          {activeView !== 'public' && (
+                            <button
+                              onClick={() => {
+                                setUserDropdownOpen(false);
+                                onNavigateView('public');
+                              }}
+                              className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded-xl flex items-center gap-2 font-semibold text-slate-700 cursor-pointer"
+                            >
+                              <Compass className="w-4 h-4 text-slate-500" />
+                              <span>Lihat Portal Publik</span>
+                            </button>
+                          )}
+                        </>
                       )}
 
                       {effectiveUser.role === 'admin' && (
