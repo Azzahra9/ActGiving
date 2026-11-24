@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Models\Category;
 use App\Models\LpjReport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -108,8 +109,29 @@ class CampaignController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // Resolusi Kategori Otomatis: jika user mengetik nama kategori baru atau mengirim category_name
+        if ($request->filled('category_name') && ! $request->filled('category_id')) {
+            $categoryName = trim($request->category_name);
+            $cat = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first()
+                ?? Category::create(['category_name' => $categoryName]);
+            $request->merge(['category_id' => $cat->id]);
+        } elseif ($request->filled('category_id') && ! is_numeric($request->category_id)) {
+            $categoryName = trim($request->category_id);
+            $cat = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first()
+                ?? Category::create(['category_name' => $categoryName]);
+            $request->merge(['category_id' => $cat->id]);
+        } elseif ($request->filled('category_id') && $request->filled('category_name')) {
+            if (! Category::where('id', $request->category_id)->exists()) {
+                $categoryName = trim($request->category_name);
+                $cat = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first()
+                    ?? Category::create(['category_name' => $categoryName]);
+                $request->merge(['category_id' => $cat->id]);
+            }
+        }
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
+            'category_name' => 'nullable|string|max:100',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'campaign_mode' => 'required|in:fund_only,volunteer_only,both',
@@ -118,6 +140,21 @@ class CampaignController extends Controller
             'location' => 'required|string|max:255',
             'activity_date' => 'nullable|date',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'image_url' => 'nullable|string|max:500',
+        ], [
+            'category_id.required' => 'Kategori kampanye wajib dipilih atau diisi.',
+            'category_id.exists' => 'Kategori yang dipilih tidak valid atau belum terdaftar di database.',
+            'title.required' => 'Judul kampanye aksi wajib diisi.',
+            'description.required' => 'Deskripsi urgensi lapangan kampanye wajib diisi.',
+            'campaign_mode.required' => 'Mode kampanye wajib dipilih.',
+            'campaign_mode.in' => 'Mode kampanye harus salah satu dari: fund_only, volunteer_only, both.',
+            'target_amount.required_if' => 'Target nominal donasi wajib diisi untuk mode donasi.',
+            'target_volunteers.required_if' => 'Target kuota relawan wajib diisi untuk mode relawan.',
+            'location.required' => 'Kota/lokasi kegiatan wajib diisi.',
+            'activity_date.date' => 'Format tanggal kegiatan tidak valid.',
+            'image.image' => 'Berkas banner harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WebP.',
+            'image.max' => 'Ukuran gambar maksimal 5 MB.',
         ]);
 
         $imageUrl = null;
@@ -125,6 +162,8 @@ class CampaignController extends Controller
             $uploader = app(\App\Services\FileUploadService::class);
             $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
             $imageUrl = $uploadResult['url'];
+        } elseif ($request->filled('image_url')) {
+            $imageUrl = $request->image_url;
         }
 
         $campaign = Campaign::create([
@@ -179,8 +218,22 @@ class CampaignController extends Controller
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
+        // Resolusi Kategori Otomatis jika memperbarui kategori
+        if ($request->filled('category_name') && ! $request->filled('category_id')) {
+            $categoryName = trim($request->category_name);
+            $cat = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first()
+                ?? Category::create(['category_name' => $categoryName]);
+            $request->merge(['category_id' => $cat->id]);
+        } elseif ($request->filled('category_id') && ! is_numeric($request->category_id)) {
+            $categoryName = trim($request->category_id);
+            $cat = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first()
+                ?? Category::create(['category_name' => $categoryName]);
+            $request->merge(['category_id' => $cat->id]);
+        }
+
         $validated = $request->validate([
             'category_id' => 'sometimes|exists:categories,id',
+            'category_name' => 'nullable|string|max:100',
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'campaign_mode' => 'sometimes|in:fund_only,volunteer_only,both',
@@ -189,6 +242,14 @@ class CampaignController extends Controller
             'target_amount' => 'sometimes|numeric|min:0',
             'target_volunteers' => 'sometimes|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'image_url' => 'nullable|string|max:500',
+        ], [
+            'category_id.exists' => 'Kategori yang dipilih tidak valid atau belum terdaftar di database.',
+            'campaign_mode.in' => 'Mode kampanye harus salah satu dari: fund_only, volunteer_only, both.',
+            'activity_date.date' => 'Format tanggal kegiatan tidak valid.',
+            'image.image' => 'Berkas banner harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WebP.',
+            'image.max' => 'Ukuran gambar maksimal 5 MB.',
         ]);
 
         if ($request->hasFile('image')) {
@@ -198,6 +259,8 @@ class CampaignController extends Controller
             }
             $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
             $validated['image_url'] = $uploadResult['url'];
+        } elseif ($request->filled('image_url')) {
+            $validated['image_url'] = $request->image_url;
         }
 
         $campaign->update($validated);

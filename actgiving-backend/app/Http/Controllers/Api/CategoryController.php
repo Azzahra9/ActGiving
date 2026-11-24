@@ -32,23 +32,43 @@ class CategoryController extends Controller
     }
 
     /**
-     * Tambah Kategori (Admin)
+     * Tambah Kategori
      *
-     * Buat kategori baru (Admin).
+     * Buat kategori baru jika belum ada, atau kembalikan kategori yang sudah ada.
+     *
+     * @unauthenticated
      */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'category_name' => 'required|string|max:100|unique:categories,category_name',
+            'category_name' => 'required|string|max:100',
+        ], [
+            'category_name.required' => 'Nama kategori wajib diisi.',
+            'category_name.string' => 'Nama kategori harus berupa teks.',
+            'category_name.max' => 'Nama kategori maksimal 100 karakter.',
         ]);
 
-        $category = Category::create($validated);
+        $categoryName = trim($validated['category_name']);
+
+        // Cari kategori yang sudah ada tanpa memedulikan huruf besar/kecil (case-insensitive)
+        $category = Category::whereRaw('LOWER(category_name) = ?', [strtolower($categoryName)])->first();
+
+        if (! $category) {
+            $category = Category::create([
+                'category_name' => $categoryName,
+            ]);
+            $statusCode = 201;
+            $message = 'Kategori baru berhasil dibuat';
+        } else {
+            $statusCode = 200;
+            $message = 'Kategori sudah tersedia';
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Kategori berhasil dibuat',
+            'message' => $message,
             'data' => $category,
-        ], 201);
+        ], $statusCode);
     }
 
     /**

@@ -6,7 +6,8 @@ export type Category =
   | 'Lingkungan Hidup' 
   | 'Kesehatan' 
   | 'Panti Asuhan' 
-  | 'Sosial & Kemanusiaan';
+  | 'Sosial & Kemanusiaan'
+  | (string & {});
 
 export interface LpjBudgetItem {
   name: string;
