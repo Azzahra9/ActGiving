@@ -49,7 +49,7 @@ class AdminController extends Controller
         $campaign = Campaign::findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:active,rejected,closed',
+            'status' => 'required|in:active,rejected,closed,suspended',
         ]);
 
         $campaign->status = $validated['status'];
@@ -63,9 +63,9 @@ class AdminController extends Controller
     }
 
     /**
-     * Hentikan / Hapus Kampanye (Admin)
+     * Hentikan / Suspend Kampanye (Admin)
      *
-     * Admin: Menghentikan kampanye secara paksa dengan menghapusnya dari database.
+     * Admin: Menghentikan/menangguhkan kampanye secara paksa jika ada pelanggaran.
      */
     public function suspendCampaign(Request $request, $id): JsonResponse
     {
@@ -75,12 +75,13 @@ class AdminController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        $campaignTitle = $campaign->title;
-        $campaign->delete();
+        $campaign->status = 'suspended';
+        $campaign->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Kampanye '{$campaignTitle}' berhasil dihentikan dan dihapus oleh Admin.",
+            'message' => "Kampanye '{$campaign->title}' berhasil dihentikan/ditangguhkan oleh Admin.",
+            'data' => $campaign,
             'reason' => $validated['reason'] ?? null,
         ]);
     }
