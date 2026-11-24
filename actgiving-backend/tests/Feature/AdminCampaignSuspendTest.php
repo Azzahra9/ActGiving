@@ -15,6 +15,7 @@ class AdminCampaignSuspendTest extends TestCase
     public function test_admin_can_suspend_campaign_via_suspend_endpoint(): void
     {
         $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $cat = Category::firstOrCreate(['category_name' => 'Kemanusiaan']);
         $camp = Campaign::create([
             'user_id' => $user->id,
@@ -26,7 +27,7 @@ class AdminCampaignSuspendTest extends TestCase
             'campaign_mode' => 'both',
         ]);
 
-        $response = $this->patchJson("/api/admin/campaigns/{$camp->id}/suspend", [
+        $response = $this->actingAs($admin, 'sanctum')->patchJson("/api/admin/campaigns/{$camp->id}/suspend", [
             'reason' => 'Ditemukan indikasi penipuan dan data fiktif',
         ]);
 
@@ -41,6 +42,7 @@ class AdminCampaignSuspendTest extends TestCase
     public function test_admin_can_set_status_to_suspended_via_status_endpoint(): void
     {
         $user = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $cat = Category::firstOrCreate(['category_name' => 'Kemanusiaan']);
         $camp = Campaign::create([
             'user_id' => $user->id,
@@ -52,7 +54,7 @@ class AdminCampaignSuspendTest extends TestCase
             'campaign_mode' => 'both',
         ]);
 
-        $response = $this->patchJson("/api/admin/campaigns/{$camp->id}/status", [
+        $response = $this->actingAs($admin, 'sanctum')->patchJson("/api/admin/campaigns/{$camp->id}/status", [
             'status' => 'suspended',
         ]);
 

@@ -42,16 +42,8 @@ class CampaignScheduleController extends Controller
             return false;
         }
 
-        if ($user->role === 'admin' || $user->email === 'inisiator@actgiving.com' || $campaign->user_id === $user->id) {
-            return true;
-        }
-
-        // Akun demo inisiator
-        if (str_contains(strtolower($user->name), 'inisiator') || str_contains(strtolower($user->name), 'yayasan')) {
-            return true;
-        }
-
-        return false;
+        // Hanya admin atau pemilik kampanye (tidak ada lagi pengecualian berdasarkan nama/email akun demo)
+        return $user->role === 'admin' || (int) $campaign->user_id === (int) $user->id;
     }
 
     /**

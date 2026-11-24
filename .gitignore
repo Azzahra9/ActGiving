@@ -15,10 +15,15 @@
 .env.*
 !.env.example
 
+# Sisa composer/vendor di root (backend ada di actgiving-backend/)
+/vendor/
+/composer.json
+/composer.lock
+
 # Folder lama yang sudah dipindah ke actgiving-backend dan actgiving-frontend
 backend/
 frontend/
-package-lock.json
+/package-lock.json
 
 # Dependency packages (di-generate ulang via: composer install)
 actgiving-backend/vendor/
