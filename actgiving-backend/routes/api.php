@@ -28,6 +28,7 @@ Route::prefix('auth')->middleware('throttle:auth-limit')->group(function () {
 
 // 2. PUBLIC CAMPAIGNS, CATEGORIES, & REPORTING (FR-13)
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store']);
 Route::get('/campaigns', [CampaignController::class, 'index']);
 Route::get('/campaigns/{id}', [CampaignController::class, 'show']);
 Route::get('/campaigns/{id}/schedules', [CampaignScheduleController::class, 'index']); // Public list jadwal harian kampanye

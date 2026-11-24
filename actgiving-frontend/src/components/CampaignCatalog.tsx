@@ -112,17 +112,16 @@ export const CampaignCatalog: React.FC<CampaignCatalogProps> = ({
             >
               Semua
             </button>
-            {(apiCategories.length > 0 ? apiCategories : [
-              { id: 1, category_name: 'Bencana Alam' },
-              { id: 2, category_name: 'Pendidikan' },
-              { id: 3, category_name: 'Kesehatan' },
-              { id: 4, category_name: 'Lingkungan Hidup' },
-              { id: 5, category_name: 'Sosial Kemanusiaan' }
-            ]).map((cat) => {
+            {(apiCategories.length > 0
+              ? apiCategories
+              : Array.from(new Set(approvedCampaigns.map((c) => c.category).filter(Boolean))).map((name) => ({
+                  category_name: name,
+                }))
+            ).map((cat, idx) => {
               const isActive = currentCategory === cat.category_name;
               return (
                 <button
-                  key={cat.id}
+                  key={cat.category_name || idx}
                   onClick={() => handleCategoryClick(cat.category_name)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
                     isActive

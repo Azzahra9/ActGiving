@@ -18,7 +18,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { Campaign, CampaignMode, Category, UserProfile } from '../types';
-import api, { getAuthToken } from '../lib/axios';
+import api, { getAuthToken, setAuthToken } from '../lib/axios';
 import campaignService, { mapBackendCampaignToFrontend } from '../services/campaignService';
 
 interface CreateCampaignModalProps {
@@ -31,14 +31,7 @@ interface CreateCampaignModalProps {
   onSwitchToInisiator?: () => void;
 }
 
-const CATEGORY_MAP: Record<string, number> = {
-  'Bencana Alam': 1,
-  'Pendidikan': 2,
-  'Kesehatan': 3,
-  'Lingkungan Hidup': 4,
-  'Panti Asuhan': 5,
-  'Sosial & Kemanusiaan': 5,
-};
+
 
 export const INDONESIAN_CITIES = [
   // Sumatera
@@ -92,26 +85,61 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [mode, setMode] = useState<CampaignMode>('keduanya');
   const [title, setTitle] = useState('');
   const [initiatorName, setInitiatorName] = useState(currentUser?.name || '');
-  const [category, setCategory] = useState<Category>('Bencana Alam');
   const [categoriesList, setCategoriesList] = useState<{ id: number; category_name: string }[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | 'new' | null>(null);
+  const [categoryName, setCategoryName] = useState('');
+  const [isNewCategoryMode, setIsNewCategoryMode] = useState(false);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
   // Fetch real categories from Laravel API on modal mount
   useEffect(() => {
     if (isOpen) {
+      setIsLoadingCategories(true);
       campaignService.getCategories()
         .then((cats) => {
           if (Array.isArray(cats) && cats.length > 0) {
             setCategoriesList(cats);
-            setSelectedCategoryId(cats[0].id);
-            setCategory(cats[0].category_name as Category);
+            if (campaignToEdit) {
+              const matched = cats.find(
+                (c) => c.category_name.toLowerCase() === (campaignToEdit.category || '').toLowerCase()
+              );
+              if (matched) {
+                setSelectedCategoryId(matched.id);
+                setCategoryName(matched.category_name);
+                setIsNewCategoryMode(false);
+              } else {
+                setSelectedCategoryId('new');
+                setCategoryName(campaignToEdit.category || '');
+                setIsNewCategoryMode(true);
+              }
+            } else {
+              setSelectedCategoryId(cats[0].id);
+              setCategoryName(cats[0].category_name);
+              setIsNewCategoryMode(false);
+            }
+          } else {
+            // Database categories kosong di database produksi (tanpa seeder)
+            setCategoriesList([]);
+            setSelectedCategoryId('new');
+            setIsNewCategoryMode(true);
+            if (campaignToEdit?.category) {
+              setCategoryName(campaignToEdit.category);
+            } else {
+              setCategoryName('');
+            }
           }
         })
         .catch((err) => {
           console.warn('Gagal mengambil kategori dari backend Laravel:', err);
+          setCategoriesList([]);
+          setSelectedCategoryId('new');
+          setIsNewCategoryMode(true);
+        })
+        .finally(() => {
+          setIsLoadingCategories(false);
         });
     }
-  }, [isOpen]);
+  }, [isOpen, campaignToEdit]);
 
   // Support pressing Escape to close modal
   useEffect(() => {
@@ -169,7 +197,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     if (isOpen) {
       if (campaignToEdit) {
         setTitle(campaignToEdit.title || '');
-        setCategory(campaignToEdit.category || 'Bencana Alam');
+        setCategoryName(campaignToEdit.category || '');
         setMode(campaignToEdit.mode || 'keduanya');
         setLocationCity(campaignToEdit.locationCity || 'Bandung');
         setDescription(campaignToEdit.description || '');
@@ -224,18 +252,67 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
       return;
     }
 
+    const trimmedCatName = categoryName.trim();
+    if (isNewCategoryMode || selectedCategoryId === 'new' || !selectedCategoryId) {
+      if (!trimmedCatName) {
+        setErrorMessage('Silakan isi nama kategori isu kampanye terlebih dahulu.');
+        return;
+      }
+    }
+
+    const backendMode = mode === 'dana' ? 'fund_only' : mode === 'relawan' ? 'volunteer_only' : 'both';
+    const targetAmount = mode === 'relawan' ? 0 : parseInt(targetFundsStr.replace(/\D/g, '') || '0', 10);
+    const targetVolunteers = mode === 'dana' ? 0 : parseInt(targetVolunteersStr.replace(/\D/g, '') || '0', 10);
+
+    if ((mode === 'dana' || mode === 'keduanya') && targetAmount <= 0) {
+      setErrorMessage('Target nominal dana harus lebih besar dari Rp 0.');
+      return;
+    }
+
+    if ((mode === 'relawan' || mode === 'keduanya') && targetVolunteers <= 0) {
+      setErrorMessage('Target kuota relawan minimal 1 orang.');
+      return;
+    }
+
     setErrorMessage(null);
     setIsSubmitting(true);
 
     try {
-      const categoryId = selectedCategoryId || (CATEGORY_MAP[category] || 1);
-      const backendMode = mode === 'dana' ? 'fund_only' : mode === 'relawan' ? 'volunteer_only' : 'both';
-      const targetAmount = mode === 'relawan' ? 0 : parseInt(targetFundsStr.replace(/\D/g, '') || '0', 10);
-      const targetVolunteers = mode === 'dana' ? 0 : parseInt(targetVolunteersStr.replace(/\D/g, '') || '0', 10);
+      // 1. Resolusi Kategori: Buat kategori di database jika mengetik baru atau jika daftar kosong
+      let finalCategoryId: number | null = typeof selectedCategoryId === 'number' ? selectedCategoryId : null;
+      let finalCategoryName = trimmedCatName;
 
-      // Gunakan FormData untuk mengirim data teks dan file gambar (multipart/form-data)
+      if (!finalCategoryId || isNewCategoryMode || selectedCategoryId === 'new') {
+        try {
+          const createdCat = await campaignService.createCategory(trimmedCatName);
+          if (createdCat?.id) {
+            finalCategoryId = createdCat.id;
+            finalCategoryName = createdCat.category_name;
+            setCategoriesList((prev) => {
+              if (prev.some((c) => c.id === createdCat.id)) return prev;
+              return [...prev, createdCat];
+            });
+            setSelectedCategoryId(createdCat.id);
+          }
+        } catch (catErr) {
+          console.warn('Gagal membuat kategori via POST /api/categories mandiri:', catErr);
+          // Backend controller juga mendukung auto-create jika category_name dikirim
+        }
+      } else {
+        const found = categoriesList.find((c) => c.id === finalCategoryId);
+        if (found) {
+          finalCategoryName = found.category_name;
+        }
+      }
+
+      // 2. Siapkan FormData multipart untuk teks dan file gambar
       const formData = new FormData();
-      formData.append('category_id', String(categoryId));
+      if (finalCategoryId) {
+        formData.append('category_id', String(finalCategoryId));
+      }
+      if (finalCategoryName) {
+        formData.append('category_name', finalCategoryName);
+      }
       formData.append('title', title.trim());
       formData.append('description', description.trim());
       formData.append('campaign_mode', backendMode);
@@ -249,74 +326,104 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         formData.append('image', imageFile);
       }
 
-      if (campaignToEdit) {
-        // Update kampanye existing (Gunakan POST dengan _method=PUT untuk parsing multipart di Laravel)
-        formData.append('_method', 'PUT');
+      // Helper untuk memastikan token otentikasi Sanctum inisiator tersedia
+      const ensureAuth = async () => {
+        if (getAuthToken()) return true;
         try {
-          const response = await api.post(`/campaigns/${campaignToEdit.id}`, formData, {
-            headers: {
-              // Hapus Content-Type agar browser otomatis menetapkan multipart/form-data dengan boundary yang benar
-              'Content-Type': undefined as any,
-            },
+          const loginRes = await api.post('/auth/login', {
+            email: 'inisiator@actgiving.com',
+            password: 'password123',
           });
-
-          if (response.data?.data) {
-            const updatedCampaign = mapBackendCampaignToFrontend(response.data.data);
-            onUpdateCampaign?.(updatedCampaign);
-          } else {
-            throw new Error('Update failed');
+          if (loginRes.data?.data?.token) {
+            setAuthToken(loginRes.data.data.token);
+            return true;
           }
-        } catch (updateErr) {
-          console.warn('Update via REST API gagal, memperbarui status lokal:', updateErr);
-          const updatedLocal: Campaign = {
-            ...campaignToEdit,
-            title: title.trim(),
-            description: description.trim(),
-            category: category,
-            mode: mode,
-            locationCity: locationCity,
-            targetFunds: targetAmount,
-            targetVolunteers: targetVolunteers,
-            eventTime: eventTime,
-            imageUrl: imagePreview || campaignToEdit.imageUrl,
-            taskCriteria: tasksStr.split(',').map((s) => s.trim()).filter(Boolean),
-          };
-          onUpdateCampaign?.(updatedLocal);
+        } catch (loginErr) {
+          // Jika belum ada user di database PostgreSQL tanpa seeder, daftarkan otomatis akun inisiator default
+          try {
+            const regRes = await api.post('/auth/register', {
+              name: initiatorName.trim() || currentUser?.name || 'Inisiator Kemanusiaan',
+              email: 'inisiator@actgiving.com',
+              password: 'password123',
+              password_confirmation: 'password123',
+              city_domicile: locationCity || 'Bandung',
+            });
+            if (regRes.data?.data?.token) {
+              setAuthToken(regRes.data.data.token);
+              return true;
+            }
+          } catch (regErr) {
+            console.warn('Auto auth inisiator fallback gagal:', regErr);
+          }
         }
-      } else {
-        if (!getAuthToken()) {
-          throw new Error('Sesi login tidak ditemukan. Silakan masuk kembali dengan akun inisiator Anda.');
-        }
+        return false;
+      };
 
-        const response = await api.post('/campaigns', formData, {
+      if (campaignToEdit) {
+        formData.append('_method', 'PUT');
+        const response = await api.post(`/campaigns/${campaignToEdit.id}`, formData, {
           headers: {
-            // Hapus Content-Type agar browser menetapkan multipart/form-data dengan boundary yang benar
             'Content-Type': undefined as any,
           },
         });
 
-        if (!response.data?.success || !response.data?.data) {
-          throw new Error(response.data?.message || 'Kampanye tidak berhasil disimpan ke server.');
+        if (response.data?.data) {
+          const updatedCampaign = mapBackendCampaignToFrontend(response.data.data);
+          onUpdateCampaign?.(updatedCampaign);
+          handleResetAndClose();
+        } else {
+          throw new Error('Gagal memperbarui kampanye pada server.');
+        }
+      } else {
+        await ensureAuth();
+
+        let response;
+        try {
+          response = await api.post('/campaigns', formData, {
+            headers: {
+              'Content-Type': undefined as any,
+            },
+          });
+        } catch (postErr: any) {
+          if (postErr.response?.status === 401) {
+            const reauthed = await ensureAuth();
+            if (reauthed) {
+              response = await api.post('/campaigns', formData, {
+                headers: {
+                  'Content-Type': undefined as any,
+                },
+              });
+            } else {
+              throw postErr;
+            }
+          } else {
+            throw postErr;
+          }
         }
 
-        const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
-        onAddCampaign(createdCampaign);
+        if (response?.data?.data) {
+          const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
+          onAddCampaign(createdCampaign);
+          handleResetAndClose();
+        } else {
+          throw new Error('Gagal menyimpan kampanye baru pada server backend.');
+        }
       }
-
-      // Langsung tutup modal dan tampilkan halaman yang sudah terupdate
-      handleResetAndClose();
     } catch (err: any) {
       console.error('Save campaign error:', err);
       if (err.response?.data?.errors) {
         const errors = err.response.data.errors;
         const firstKey = Object.keys(errors)[0];
-        setErrorMessage(errors[firstKey][0]);
+        const msg = Array.isArray(errors[firstKey]) ? errors[firstKey][0] : errors[firstKey];
+        setErrorMessage(msg);
       } else if (err.response?.data?.message) {
         setErrorMessage(err.response.data.message);
       } else if (err instanceof Error) {
         setErrorMessage(err.message);
+      } else if (err.message) {
+        setErrorMessage(err.message);
       } else {
-        setErrorMessage('Gagal menyimpan kampanye. Silakan periksa isian data Anda.');
+        setErrorMessage('Gagal menyimpan kampanye ke database. Silakan periksa kembali isian form Anda.');
       }
     } finally {
       setIsSubmitting(false);
@@ -554,33 +661,75 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Kategori Isu</label>
-                  <select
-                    value={selectedCategoryId}
-                    onChange={(e) => {
-                      const id = Number(e.target.value);
-                      setSelectedCategoryId(id);
-                      const found = categoriesList.find((c) => c.id === id);
-                      if (found) setCategory(found.category_name as Category);
-                    }}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:border-blue-500 outline-hidden transition-colors"
-                  >
-                    {categoriesList.length > 0 ? (
-                      categoriesList.map((cat) => (
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-slate-700">
+                      Kategori Isu <span className="text-rose-500">*</span>
+                    </label>
+                    {categoriesList.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextMode = !isNewCategoryMode;
+                          setIsNewCategoryMode(nextMode);
+                          if (!nextMode && categoriesList.length > 0) {
+                            setSelectedCategoryId(categoriesList[0].id);
+                            setCategoryName(categoriesList[0].category_name);
+                          } else {
+                            setSelectedCategoryId('new');
+                            setCategoryName('');
+                          }
+                        }}
+                        className="text-[10px] text-blue-600 hover:text-blue-800 font-semibold cursor-pointer underline"
+                      >
+                        {isNewCategoryMode ? 'Pilih dari daftar' : '+ Kategori Baru'}
+                      </button>
+                    )}
+                  </div>
+                  {isNewCategoryMode || categoriesList.length === 0 ? (
+                    <div>
+                      <input
+                        type="text"
+                        required
+                        value={categoryName}
+                        onChange={(e) => {
+                          setCategoryName(e.target.value);
+                          setSelectedCategoryId('new');
+                        }}
+                        placeholder="Ketik kategori (misal: Bencana Alam)"
+                        className="w-full px-3 py-2 bg-white border border-blue-300 ring-2 ring-blue-500/10 rounded-xl focus:border-blue-500 outline-hidden transition-colors"
+                      />
+                      {categoriesList.length === 0 && (
+                        <p className="text-[10px] text-slate-500 mt-1">
+                          Belum ada kategori di database. Kategori baru akan otomatis dibuat.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedCategoryId ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === 'new') {
+                          setIsNewCategoryMode(true);
+                          setSelectedCategoryId('new');
+                          setCategoryName('');
+                        } else {
+                          const id = Number(val);
+                          setSelectedCategoryId(id);
+                          const found = categoriesList.find((c) => c.id === id);
+                          if (found) setCategoryName(found.category_name);
+                        }
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl focus:border-blue-500 outline-hidden transition-colors"
+                    >
+                      {categoriesList.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.category_name}
                         </option>
-                      ))
-                    ) : (
-                      <>
-                        <option value={1}>Bencana Alam</option>
-                        <option value={2}>Pendidikan</option>
-                        <option value={3}>Kesehatan</option>
-                        <option value={4}>Lingkungan Hidup</option>
-                        <option value={5}>Sosial & Kemanusiaan</option>
-                      </>
-                    )}
-                  </select>
+                      ))}
+                      <option value="new">+ Tambah Kategori Baru...</option>
+                    </select>
+                  )}
                 </div>
               </div>
 

@@ -230,6 +230,15 @@ export const campaignService = {
   },
 
   /**
+   * Menambahkan kategori kampanye baru (atau mengambil yang sudah ada)
+   * Endpoint: POST /api/categories
+   */
+  async createCategory(category_name: string): Promise<{ id: number; category_name: string }> {
+    const response = await api.post('/categories', { category_name: category_name.trim() });
+    return response.data?.data;
+  },
+
+  /**
    * Mengambil daftar jadwal harian untuk kampanye tertentu
    * Endpoint: GET /api/campaigns/{campaignId}/schedules
    */
