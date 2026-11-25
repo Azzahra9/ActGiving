@@ -81,15 +81,20 @@ class DonationController extends Controller
                 $campaign = Campaign::find($numId);
             }
         }
-        if (!$campaign) {
-            $campaign = Campaign::where('status', 'active')->first() ?? Campaign::first();
-        }
-
+        // UC-04: campaign_id tidak valid -> 404 (tanpa fallback diam-diam ke kampanye lain)
         if (!$campaign) {
             return response()->json([
                 'success' => false,
                 'message' => 'Kampanye tujuan donasi tidak ditemukan.',
             ], 404);
+        }
+
+        // UC-04 A2: kampanye yang dibekukan / belum aktif tidak menerima donasi
+        if ($campaign->status !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kampanye ini tidak sedang menerima donasi.',
+            ], 422);
         }
 
         $rawChannel = $validated['payment_channel'] ?? $validated['payment_method'] ?? 'qris';

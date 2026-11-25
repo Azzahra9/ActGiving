@@ -276,6 +276,14 @@ class AdminController extends Controller
 
             $newStatus = $request->status;
 
+            // UC-04 A2: dana kampanye yang dibekukan tidak boleh dicairkan
+            if ($newStatus === 'approved' && $campaign && $campaign->status === 'suspended') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kampanye sedang dibekukan. Pencairan tidak dapat disetujui.',
+                ], 422);
+            }
+
             if ($newStatus === 'approved' && $campaign) {
                 if ($campaign->current_amount < $disbursement->amount) {
                     return response()->json([

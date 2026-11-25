@@ -242,7 +242,7 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                     </div>
 
                     {/* Quick Impact Metrics Bar (Data Binding Dinamis) */}
-                    <div className={`grid grid-cols-2 ${campaign.mode === 'both' ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 text-xs`}>
+                    <div className={`grid grid-cols-2 ${campaign.mode === 'keduanya' ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-3 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/80 text-xs`}>
                       {campaign.mode !== 'relawan' && (
                         <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs flex flex-col justify-between">
                           <span className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">

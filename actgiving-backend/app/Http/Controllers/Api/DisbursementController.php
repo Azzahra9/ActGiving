@@ -41,6 +41,14 @@ class DisbursementController extends Controller
             ], 403);
         }
 
+        // UC-04 A2: dana kampanye yang dibekukan tidak dapat dicairkan
+        if ($campaign->status === 'suspended') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kampanye sedang dibekukan. Pencairan dana tidak dapat diajukan.',
+            ], 422);
+        }
+
         $validated = $request->validate([
             'amount' => 'required|numeric|min:10000',
             'bank_name' => 'required|string|max:100',
@@ -179,6 +187,13 @@ class DisbursementController extends Controller
                 ->first();
 
             $newStatus = $request->status;
+
+            if ($newStatus === 'approved' && $campaign->status === 'suspended') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kampanye sedang dibekukan. Pencairan tidak dapat disetujui.',
+                ], 422);
+            }
 
             if ($newStatus === 'approved') {
                 // Pastikan saldo mencukupi
