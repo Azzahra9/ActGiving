@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DisbursementController;
 use App\Http\Controllers\Api\DonationController;
 use App\Http\Controllers\Api\LPJController;
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\VolunteerAttendanceController;
 use App\Http\Controllers\Api\VolunteerRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,9 @@ use Illuminate\Support\Facades\Route;
 | RESTful API Routes - ActGiving Platform
 |--------------------------------------------------------------------------
 */
+
+// 0. PERSISTENT MEDIA SERVING ROUTE
+Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.*');
 
 // 1. PUBLIC AUTHENTICATION ROUTES (Including FR-05 Forgot & Reset Password)
 Route::prefix('auth')->middleware('throttle:auth-limit')->group(function () {

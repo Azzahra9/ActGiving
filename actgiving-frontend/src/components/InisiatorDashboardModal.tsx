@@ -3,6 +3,7 @@ import api from '../lib/axios';
 import { Building2, PlusCircle, Upload, CheckCircle2, DollarSign, Users, FileText, X, AlertCircle } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem } from '../types';
 import { formatRupiah } from '../utils/format';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface InisiatorDashboardModalProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [failedCampImgIds, setFailedCampImgIds] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cleanup object URL on unmount or preview change
@@ -129,7 +131,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       setIsSubmitting(false);
     }
 
-    const finalPhoto = uploadedUrl || proofPreview || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80';
+    const finalPhoto = resolveImageUrl(uploadedUrl) || proofPreview || undefined;
 
     const newLpj: LpjItem = {
       id: `lpj-custom-${Date.now()}`,
@@ -140,7 +142,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
       description: descText,
       receiptUrl: finalPhoto,
       photoUrl: finalPhoto,
-      activityPhotos: [finalPhoto],
+      activityPhotos: finalPhoto ? [finalPhoto] : [],
       status: 'pending',
       isFinal: isFinalReport,
       reportType: isFinalReport ? 'final' : 'progress'
@@ -490,11 +492,19 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
-                        <img
-                          src={camp.imageUrl || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80'}
-                          alt={camp.title || 'Kampanye'}
-                          className="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-200"
-                        />
+                        <div className="w-16 h-16 rounded-xl bg-slate-100 shrink-0 border border-slate-200 overflow-hidden">
+                          {resolveImageUrl(camp.imageUrl) && !failedCampImgIds[camp.id] && (
+                            <img
+                              src={resolveImageUrl(camp.imageUrl)}
+                              alt={camp.title || 'Kampanye'}
+                              referrerPolicy="no-referrer"
+                              onError={() =>
+                                setFailedCampImgIds((prev) => ({ ...prev, [camp.id]: true }))
+                              }
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${

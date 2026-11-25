@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, XCircle, AlertTriangle, FileText, Eye, Check, ExternalLink, Building2, MapPin } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface AdminModerationModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const AdminModerationModal: React.FC<AdminModerationModalProps> = ({
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [activeTab, setActiveTab] = useState<'campaigns' | 'lpj'>('campaigns');
   const [notification, setNotification] = useState<string | null>(null);
+  const [failedCampImgIds, setFailedCampImgIds] = useState<Record<string, boolean>>({});
 
   if (!isOpen) return null;
 
@@ -145,11 +147,19 @@ export const AdminModerationModal: React.FC<AdminModerationModalProps> = ({
                       className="border border-amber-200 bg-amber-50/40 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
                     >
                       <div className="flex items-start gap-4 flex-1">
-                        <img
-                          src={camp.imageUrl}
-                          alt={camp.title}
-                          className="w-20 h-20 rounded-xl object-cover shrink-0 border border-slate-200"
-                        />
+                        <div className="w-20 h-20 rounded-xl bg-slate-100 shrink-0 border border-slate-200 overflow-hidden">
+                          {resolveImageUrl(camp.imageUrl) && !failedCampImgIds[camp.id] && (
+                            <img
+                              src={resolveImageUrl(camp.imageUrl)}
+                              alt={camp.title}
+                              referrerPolicy="no-referrer"
+                              onError={() =>
+                                setFailedCampImgIds((prev) => ({ ...prev, [camp.id]: true }))
+                              }
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300">

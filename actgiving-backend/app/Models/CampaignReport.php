@@ -39,7 +39,13 @@ class CampaignReport extends Model
             return null;
         }
 
-        return asset('storage/' . ltrim($this->evidence_path, '/'));
+        if (str_starts_with($this->evidence_path, 'http://') || str_starts_with($this->evidence_path, 'https://')) {
+            return $this->evidence_path;
+        }
+
+        $baseUrl = rtrim((string) config('app.url', ''), '/');
+
+        return ($baseUrl !== '' ? $baseUrl : '').'/api/media/'.ltrim($this->evidence_path, '/');
     }
 
     /**

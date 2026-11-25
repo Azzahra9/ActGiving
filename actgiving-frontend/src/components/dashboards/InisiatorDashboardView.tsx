@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem, DisbursementRecord } from '../../types';
 import api, { getAuthToken } from '../../lib/axios';
-import { mapBackendCampaignToFrontend } from '../../services/campaignService';
+import { mapBackendCampaignToFrontend, resolveImageUrl } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 import { CampaignScheduleModal } from '../CampaignScheduleModal';
 import { DisbursementModal } from '../DisbursementModal';
@@ -70,6 +70,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const [editingLpjId, setEditingLpjId] = useState<string | null>(null);
   const [editingCampaignId, setEditingCampaignId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [failedImgMap, setFailedImgMap] = useState<Record<string, boolean>>({});
 
   // Calculate total from budget items if amount not manually specified
   const calculatedBudgetTotal = budgetItems.reduce((sum, item) => sum + item.amount, 0);
@@ -783,12 +784,18 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                     className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
                   >
                     <div className="flex flex-col sm:flex-row">
-                      <div className="sm:w-48 h-40 sm:h-auto relative shrink-0">
-                        <img
-                          src={camp.imageUrl}
-                          alt={camp.title}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="sm:w-48 h-40 sm:h-auto relative shrink-0 bg-slate-100 border-b sm:border-b-0 sm:border-r border-slate-200/70">
+                        {resolveImageUrl(camp.imageUrl) && !failedImgMap[`camp-${camp.id}`] && (
+                          <img
+                            src={resolveImageUrl(camp.imageUrl)}
+                            alt={camp.title}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedImgMap((prev) => ({ ...prev, [`camp-${camp.id}`]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                         <span className="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                           {camp.category}
                         </span>
@@ -1370,7 +1377,9 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                         lpj.photoUrl,
                         ...(Array.isArray(lpj.activityPhotos) ? lpj.activityPhotos : [])
                       ];
-                      const photos = Array.from(new Set(rawPhotos.filter(Boolean))) as string[];
+                      const photos = Array.from(
+                        new Set(rawPhotos.map((p) => resolveImageUrl(p)).filter((p): p is string => Boolean(p)))
+                      ).filter((p) => !failedImgMap[`lpj-${lpj.id}-${p}`]);
 
                       return (
                         <div
@@ -1466,6 +1475,9 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                                 src={ph}
                                 alt="Dokumentasi"
                                 referrerPolicy="no-referrer"
+                                onError={() =>
+                                  setFailedImgMap((prev) => ({ ...prev, [`lpj-${lpj.id}-${ph}`]: true }))
+                                }
                                 className="w-16 h-12 object-cover rounded-lg border border-slate-200 shrink-0"
                               />
                             ))}

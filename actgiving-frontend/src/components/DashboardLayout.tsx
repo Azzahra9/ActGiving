@@ -70,6 +70,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children
 }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const { logout } = useAuth();
 
   const currentRole = currentUser.role;
@@ -163,11 +164,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         <div className="p-4 border-b border-navy-border">
           <div className="bg-navy-card rounded-xl p-3 border border-navy-border shadow-xs">
             <div className="flex items-center gap-3 mb-2.5">
-              <img
-                src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                alt={currentUser.name}
-                className="w-10 h-10 rounded-full object-cover border-2 border-brand-blue shrink-0 shadow-xs"
-              />
+              {currentUser.avatarUrl && !avatarError ? (
+                <img
+                  src={currentUser.avatarUrl}
+                  alt={currentUser.name}
+                  onError={() => setAvatarError(true)}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-brand-blue shrink-0 shadow-xs"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-brand-blue text-white flex items-center justify-center font-bold text-sm border-2 border-brand-blue shrink-0 shadow-xs">
+                  {(currentUser.name || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <h4 className="text-xs font-bold text-white truncate">{currentUser.name}</h4>
@@ -292,11 +300,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               {/* Left Identity */}
               <div className="flex items-start sm:items-center gap-4">
                 <div className="relative">
-                  <img
-                    src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                    alt={currentUser.name}
-                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-brand-blue shadow-lg shadow-brand-blue/20 shrink-0"
-                  />
+                  {currentUser.avatarUrl && !avatarError ? (
+                    <img
+                      src={currentUser.avatarUrl}
+                      alt={currentUser.name}
+                      onError={() => setAvatarError(true)}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-brand-blue shadow-lg shadow-brand-blue/20 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-brand-blue text-white flex items-center justify-center font-bold text-2xl border-2 border-brand-blue shadow-lg shadow-brand-blue/20 shrink-0">
+                      {(currentUser.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <span className="absolute -bottom-1 -right-1 p-1 bg-brand-green rounded-full text-white shadow-xs" title="Terverifikasi">
                     <CheckCircle2 className="w-4 h-4" />
                   </span>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAuth } from './context/AuthContext';
-import campaignService from './services/campaignService';
+import campaignService, { isDummyImageUrl } from './services/campaignService';
 import { Campaign, DigitalInvoice, UserProfile, LpjItem, ActiveView, DEFAULT_GUEST_USER } from './types';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
@@ -72,15 +72,6 @@ export default function App() {
     try {
       const data = await campaignService.getCampaigns();
       const validCampaigns = Array.isArray(data) ? data : [];
-      
-      // Ambil cache gambar yang pernah diunggah inisiator dari laptop agar tetap bertahan setelah reload
-      let localImageMap: Record<string, string> = {};
-      try {
-        const stored = localStorage.getItem('actgiving_campaign_images');
-        if (stored) localImageMap = JSON.parse(stored);
-      } catch (e) {
-        console.warn('Gagal membaca actgiving_campaign_images:', e);
-      }
 
       setCampaigns((prev) => {
         // Pertahankan kampanye baru yang masih berstatus pending dari sesi lokal jika belum masuk di response active
@@ -89,12 +80,7 @@ export default function App() {
         );
         const validIds = new Set(validCampaigns.map((c) => c.id));
         const retained = pendingLocal.filter((c) => !validIds.has(c.id));
-        const merged = [...retained, ...validCampaigns].map((camp) => {
-          if (localImageMap[camp.id]) {
-            return { ...camp, imageUrl: localImageMap[camp.id] };
-          }
-          return camp;
-        });
+        const merged = [...retained, ...validCampaigns];
         // Filter unik agar tidak ada duplikasi ID kampanye
         return merged.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id));
       });
@@ -155,17 +141,11 @@ export default function App() {
   };
 
   const handleUpdateCampaign = (updated: Campaign) => {
-    if (updated.imageUrl && !updated.imageUrl.includes('unsplash.com')) {
-      try {
-        const stored = localStorage.getItem('actgiving_campaign_images');
-        const map = stored ? JSON.parse(stored) : {};
-        map[updated.id] = updated.imageUrl;
-        localStorage.setItem('actgiving_campaign_images', JSON.stringify(map));
-      } catch (e) {
-        console.warn('Gagal memperbarui gambar di localStorage:', e);
-      }
-    }
-    setCampaigns((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    const cleanUpdated =
+      updated.imageUrl && isDummyImageUrl(updated.imageUrl)
+        ? { ...updated, imageUrl: undefined }
+        : updated;
+    setCampaigns((prev) => prev.map((c) => (c.id === cleanUpdated.id ? cleanUpdated : c)));
   };
 
   const handleDeleteCampaign = (campaignId: string) => {
@@ -319,19 +299,12 @@ export default function App() {
 
   // Inisiasi Kampanye Baru (FR-06)
   const handleAddCampaign = (newCamp: Campaign) => {
-    // Simpan gambar kampanye jika tersedia agar tetap tampil setelah reload
-    if (newCamp.imageUrl && !newCamp.imageUrl.includes('unsplash.com')) {
-      try {
-        const stored = localStorage.getItem('actgiving_campaign_images');
-        const map = stored ? JSON.parse(stored) : {};
-        map[newCamp.id] = newCamp.imageUrl;
-        localStorage.setItem('actgiving_campaign_images', JSON.stringify(map));
-      } catch (e) {
-        console.warn('Gagal menyimpan gambar ke localStorage:', e);
-      }
-    }
+    const cleanCamp =
+      newCamp.imageUrl && isDummyImageUrl(newCamp.imageUrl)
+        ? { ...newCamp, imageUrl: undefined }
+        : newCamp;
 
-    setCampaigns((prev) => [newCamp, ...prev]);
+    setCampaigns((prev) => [cleanCamp, ...prev]);
     setCurrentUser((prev) => ({
       ...prev,
       managedCampaignIds: Array.from(new Set([...(prev.managedCampaignIds || []), newCamp.id]))

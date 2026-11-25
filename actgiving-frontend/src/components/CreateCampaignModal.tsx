@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Campaign, CampaignMode, Category, UserProfile } from '../types';
 import api, { getAuthToken, setAuthToken } from '../lib/axios';
-import campaignService, { mapBackendCampaignToFrontend } from '../services/campaignService';
+import campaignService, { isDummyImageUrl, mapBackendCampaignToFrontend } from '../services/campaignService';
 
 interface CreateCampaignModalProps {
   isOpen: boolean;
@@ -156,6 +156,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -165,6 +166,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         return;
       }
       setImageFile(file);
+      setRemoveExistingImage(false);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -211,6 +213,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         );
         setImagePreview(campaignToEdit.imageUrl || null);
         setImageFile(null);
+        setRemoveExistingImage(false);
       } else {
         if (currentUser && currentUser.role !== 'guest') {
           setInitiatorName(currentUser.name);
@@ -220,6 +223,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
         setDescription('');
         setImageFile(null);
         setImagePreview(null);
+        setRemoveExistingImage(false);
       }
       setErrorMessage(null);
       setIsSubmitting(false);
@@ -232,6 +236,7 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
     setDescription('');
     setImageFile(null);
     setImagePreview(null);
+    setRemoveExistingImage(false);
     setIsSubmitting(false);
     onClose();
   };
@@ -324,6 +329,8 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
       }
       if (imageFile) {
         formData.append('image', imageFile);
+      } else if (campaignToEdit && removeExistingImage) {
+        formData.append('remove_image', '1');
       }
 
       // Helper untuk memastikan token otentikasi Sanctum inisiator tersedia
@@ -403,8 +410,8 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
 
         if (response?.data?.data) {
           const createdCampaign = mapBackendCampaignToFrontend(response.data.data);
-          // Jika backend belum mengembalikan URL gambar (atau path belum diset), fallback ke imagePreview lokal
-          if ((!createdCampaign.imageUrl || createdCampaign.imageUrl.includes('unsplash.com')) && imagePreview) {
+          // Jika backend belum mengembalikan URL gambar saat file baru dipilih, gunakan preview lokal sementara
+          if ((!createdCampaign.imageUrl || isDummyImageUrl(createdCampaign.imageUrl)) && imageFile && imagePreview) {
             createdCampaign.imageUrl = imagePreview;
           }
           onAddCampaign(createdCampaign);
@@ -598,12 +605,20 @@ export const CreateCampaignModal: React.FC<CreateCampaignModalProps> = ({
                 <div className="flex items-center gap-3">
                   {imagePreview ? (
                     <div className="relative w-28 h-20 rounded-xl overflow-hidden border border-slate-200 shrink-0 group shadow-xs">
-                      <img src={imagePreview} alt="Preview Banner" className="w-full h-full object-cover" />
+                      <img
+                        src={imagePreview}
+                        alt="Preview Banner"
+                        onError={() => setImagePreview(null)}
+                        className="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         onClick={() => {
                           setImageFile(null);
                           setImagePreview(null);
+                          if (campaignToEdit?.imageUrl) {
+                            setRemoveExistingImage(true);
+                          }
                         }}
                         className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-rose-600 text-white rounded-md transition-colors cursor-pointer"
                         title="Hapus / Ganti Foto"

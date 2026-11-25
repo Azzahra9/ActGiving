@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
-import campaignService from '../services/campaignService';
+import campaignService, { resolveImageUrl } from '../services/campaignService';
 
 interface CampaignDetailModalProps {
   campaign: Campaign | null;
@@ -39,15 +39,18 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({
 }) => {
   const [detailedCampaign, setDetailedCampaign] = useState<Campaign | null>(null);
   const [isCopiedShare, setIsCopiedShare] = useState<boolean>(false);
+  const [imgError, setImgError] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isOpen || !campaign) {
       setDetailedCampaign(null);
+      setImgError(false);
       return;
     }
 
     setDetailedCampaign(campaign);
     setIsCopiedShare(false);
+    setImgError(false);
 
     // Muat detail lengkap (termasuk schedules/LPJ) dari backend secara non-blocking
     campaignService
@@ -63,6 +66,8 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({
   if (!isOpen || !campaign) return null;
 
   const active = detailedCampaign || campaign;
+  const resolvedImageUrl = resolveImageUrl(active.imageUrl);
+  const hasImage = Boolean(resolvedImageUrl && !imgError);
   const isDanaMode = active.mode === 'dana';
   const isRelawanMode = active.mode === 'relawan';
   const isKeduanyaMode = active.mode === 'keduanya';
@@ -109,14 +114,23 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({
       <div className="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden relative animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
         
         {/* Header Image */}
-        <div className="relative h-56 sm:h-64 w-full bg-slate-100 shrink-0">
-          <img
-            src={active.imageUrl}
-            alt={active.title}
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-black/30 pointer-events-none" />
+        <div
+          className={`relative w-full shrink-0 ${
+            hasImage ? 'h-56 sm:h-64 bg-slate-100' : 'pt-14 pb-5 bg-slate-100 border-b border-slate-200'
+          }`}
+        >
+          {hasImage && (
+            <>
+              <img
+                src={resolvedImageUrl}
+                alt={active.title}
+                referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-black/30 pointer-events-none" />
+            </>
+          )}
 
           {/* Top Badges */}
           <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
@@ -148,8 +162,16 @@ export const CampaignDetailModal: React.FC<CampaignDetailModalProps> = ({
           </button>
 
           {/* Bottom Title on Hero Image */}
-          <div className="absolute bottom-4 inset-x-5 text-white">
-            <div className="flex items-center gap-1.5 text-xs text-sky-300 font-medium mb-1">
+          <div
+            className={`${
+              hasImage ? 'absolute bottom-4 inset-x-5 text-white' : 'px-5 pt-2 text-slate-900'
+            }`}
+          >
+            <div
+              className={`flex items-center gap-1.5 text-xs font-medium mb-1 ${
+                hasImage ? 'text-sky-300' : 'text-brand-blue'
+              }`}
+            >
               <MapPin className="w-3.5 h-3.5" />
               <span>{active.locationCity}, Indonesia</span>
             </div>

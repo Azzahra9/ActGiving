@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface ActivityPhotoGalleryProps {
   campaigns: Campaign[];
@@ -22,7 +23,7 @@ interface ActivityPhotoGalleryProps {
 export interface ActivityItem {
   id: string;
   lpjId: string;
-  photoUrl: string;
+  photoUrl?: string;
   allPhotos: string[];
   title: string;
   campaignId: string;
@@ -45,10 +46,11 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
   onViewLpj
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
+  const [failedPhotoIds, setFailedPhotoIds] = useState<Record<string, boolean>>({});
 
   // 1. Ekstrak seluruh laporan LPJ yang berstatus 'verified' atau 'sah'
   // 2. Mendukung kampanye 'active', 'closed', atau 'completed'
-  // 3. Fallback foto, judul, dan data lapangan yang tangguh agar kartu selalu muncul
+  // 3. Tanpa fallback gambar dummy: bila tidak ada foto, biarkan area foto bersih
   const activityItems: ActivityItem[] = (campaigns || [])
     .filter((campaign) => campaign && (campaign.status === 'active' || campaign.status === 'closed' || campaign.status === 'completed'))
     .flatMap((campaign) => {
@@ -62,10 +64,10 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
             ...(Array.isArray((lpj as any).photos) ? (lpj as any).photos : []),
             lpj.receiptUrl,
           ];
-          const photos = Array.from(new Set(rawPhotos.filter(Boolean))) as string[];
-          const primaryPhoto =
-            photos[0] ||
-            'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
+          const photos = Array.from(
+            new Set(rawPhotos.map((p) => resolveImageUrl(p)).filter((p): p is string => Boolean(p)))
+          );
+          const primaryPhoto = photos[0];
 
           const rawDate = lpj.date || lpj.createdAt || (lpj as any).created_at || (lpj as any).tanggal_kegiatan || (lpj as any).report_date;
           let formattedDate = 'Terbaru';
@@ -100,7 +102,7 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
             id: `lpj-${lpj.id}`,
             lpjId: String(lpj.id),
             photoUrl: primaryPhoto,
-            allPhotos: photos.length > 0 ? photos : [primaryPhoto],
+            allPhotos: photos,
             title: lpj.title || `Dokumentasi Aksi: ${campaign.title}`,
             campaignId: campaign.id,
             campaignTitle: campaign.title,
@@ -192,25 +194,26 @@ export const ActivityPhotoGallery: React.FC<ActivityPhotoGalleryProps> = ({
               >
                 {/* Image Container with Badges - Klik langsung membuka Modal LPJ */}
                 <div 
-                  className="relative aspect-16/10 bg-slate-100 overflow-hidden cursor-pointer group/img"
+                  className="relative aspect-16/10 bg-slate-100 border-b border-slate-200/70 overflow-hidden cursor-pointer group/img"
                   onClick={() => onViewLpj(item.campaign)}
                   title="Klik untuk membuka formulir LPJ digital lengkap"
                 >
-                  <img
-                    src={item.photoUrl}
-                    alt={item.title}
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      const fallback = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
-                      if (img.src !== fallback) img.src = fallback;
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  
-                  {/* Overlay Gradient on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-85 transition-opacity" />
+                  {item.photoUrl && !failedPhotoIds[item.id] && (
+                    <>
+                      <img
+                        src={item.photoUrl}
+                        alt={item.title}
+                        referrerPolicy="no-referrer"
+                        onError={() =>
+                          setFailedPhotoIds((prev) => ({ ...prev, [item.id]: true }))
+                        }
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      {/* Overlay Gradient on Hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-85 transition-opacity" />
+                    </>
+                  )}
 
                   {/* Hover Action Indicator */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">

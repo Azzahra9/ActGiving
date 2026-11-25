@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Campaign, LpjItem } from '../types';
 import { formatRupiah } from '../utils/format';
-import { campaignService, getCategoryDefaultImage } from '../services/campaignService';
+import { campaignService, resolveImageUrl } from '../services/campaignService';
 import { LpjModal } from './LpjModal';
 
 export interface HeroSectionProps {
@@ -34,6 +34,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   const [internalCampaigns, setInternalCampaigns] = useState<Campaign[]>([]);
   const [localModalCampaign, setLocalModalCampaign] = useState<Campaign | null>(null);
+  const [heroImgError, setHeroImgError] = useState(false);
 
   // Jika props.campaigns tidak disediakan dari parent, panggil langsung dari REST API
   useEffect(() => {
@@ -114,7 +115,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const latestCampaign = latestEntry?.campaign;
 
   // 2. Data Binding:
-  // a. Foto: foto pertama dari activity_photos, fallback ke photoUrl atau imageUrl kampanye
+  // a. Foto: foto pertama dari activity_photos atau imageUrl kampanye (tanpa fallback dummy)
   const rawPhotos = latestLpj
     ? [
         ...(Array.isArray((latestLpj as any).activity_photos) ? (latestLpj as any).activity_photos : []),
@@ -124,13 +125,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         (latestLpj as any).photo_url,
         latestLpj.receiptUrl,
         (latestLpj as any).proof_image_url,
-      ].filter(Boolean)
+      ]
+        .map((u) => resolveImageUrl(u))
+        .filter((u): u is string => Boolean(u))
     : [];
 
   const displayPhoto =
     rawPhotos[0] ||
-    latestCampaign?.imageUrl ||
-    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
+    resolveImageUrl(latestCampaign?.imageUrl) ||
+    undefined;
+
+  useEffect(() => {
+    setHeroImgError(false);
+  }, [displayPhoto]);
+
+  const hasHeroPhoto = Boolean(displayPhoto && !heroImgError);
 
   // b. Judul kegiatan atau judul kampanye terkait
   const displayTitle =
@@ -318,22 +327,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 {/* Photo Container with Location Pin */}
                 <div 
                   onClick={handleOpenLpjModal}
-                  className="relative h-48 sm:h-52 rounded-xl overflow-hidden bg-slate-100 group cursor-pointer"
+                  className="relative h-48 sm:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-200/70 group cursor-pointer"
                   title="Klik untuk melihat bukti foto & kuitansi LPJ digital"
                 >
-                  <img
-                    src={displayPhoto}
-                    alt={displayTitle}
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      const fallback = latestCampaign?.category
-                        ? `https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80`
-                        : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';
-                      if (img.src !== fallback) img.src = fallback;
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/70 via-transparent to-transparent pointer-events-none" />
+                  {hasHeroPhoto && (
+                    <>
+                      <img
+                        src={displayPhoto}
+                        alt={displayTitle}
+                        referrerPolicy="no-referrer"
+                        onError={() => setHeroImgError(true)}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/70 via-transparent to-transparent pointer-events-none" />
+                    </>
+                  )}
                   
                   {/* Location Overlay Pin on Photo */}
                   <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-darkest/80 backdrop-blur-xs text-white text-[11px] font-medium border border-white/10 shadow-xs max-w-[90%]">

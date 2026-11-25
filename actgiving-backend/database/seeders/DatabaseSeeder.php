@@ -83,7 +83,7 @@ class DatabaseSeeder extends Seeder
                 'activity_date' => now()->addDays(14)->toDateString(),
                 'status' => 'active',
                 'campaign_mode' => 'both',
-                'image_url' => 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+                'image_url' => null,
             ]
         );
 
@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder
                 'activity_date' => now()->addDays(20)->toDateString(),
                 'status' => 'active',
                 'campaign_mode' => 'both',
-                'image_url' => 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=800&q=80',
+                'image_url' => null,
             ]
         );
 
@@ -119,7 +119,7 @@ class DatabaseSeeder extends Seeder
                 'activity_date' => now()->addDays(10)->toDateString(),
                 'status' => 'active',
                 'campaign_mode' => 'both',
-                'image_url' => 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
+                'image_url' => null,
             ]
         );
 
@@ -137,7 +137,7 @@ class DatabaseSeeder extends Seeder
                 'activity_date' => now()->addDays(25)->toDateString(),
                 'status' => 'active',
                 'campaign_mode' => 'volunteer_only',
-                'image_url' => 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+                'image_url' => null,
             ]
         );
     }

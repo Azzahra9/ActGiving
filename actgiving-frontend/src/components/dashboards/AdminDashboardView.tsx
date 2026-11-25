@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, DisbursementRecord, CampaignReportRecord } from '../../types';
 import api, { BACKEND_ROOT_URL } from '../../lib/axios';
-import { mapBackendCampaignToFrontend } from '../../services/campaignService';
+import { mapBackendCampaignToFrontend, resolveImageUrl } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 
 export interface AdminUserRecord {
@@ -111,6 +111,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   const [isLoadingDonations, setIsLoadingDonations] = useState<boolean>(false);
   const [adminLpjReports, setAdminLpjReports] = useState<AdminLpjRecord[]>([]);
   const [isLoadingLpj, setIsLoadingLpj] = useState<boolean>(false);
+  const [failedImgMap, setFailedImgMap] = useState<Record<string, boolean>>({});
   
   // States untuk Modul AUTH-04: Verifikasi Akun Inisiator
   const [adminUsers, setAdminUsers] = useState<AdminUserRecord[]>([]);
@@ -194,7 +195,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             email: 'budi.santoso@harapan.org',
             phone_whatsapp: '081234567890',
             city_domicile: 'Bandung',
-            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            identity_doc_url: undefined,
             is_verified: false,
             role: 'user',
             created_at: new Date(Date.now() - 2 * 86400000).toISOString()
@@ -205,7 +206,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             email: 'siti.nurhaliza@pedulipesisir.org',
             phone_whatsapp: '082198765432',
             city_domicile: 'Surabaya',
-            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            identity_doc_url: undefined,
             is_verified: false,
             role: 'user',
             created_at: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -216,7 +217,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             email: 'hendra.wijaya@relawanmedis.id',
             phone_whatsapp: '085712345678',
             city_domicile: 'Yogyakarta',
-            identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+            identity_doc_url: undefined,
             is_verified: true,
             role: 'user',
             created_at: new Date(Date.now() - 7 * 86400000).toISOString()
@@ -232,7 +233,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           email: 'budi.santoso@harapan.org',
           phone_whatsapp: '081234567890',
           city_domicile: 'Bandung',
-          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          identity_doc_url: undefined,
           is_verified: false,
           role: 'user',
           created_at: new Date(Date.now() - 2 * 86400000).toISOString()
@@ -243,7 +244,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           email: 'siti.nurhaliza@pedulipesisir.org',
           phone_whatsapp: '082198765432',
           city_domicile: 'Surabaya',
-          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          identity_doc_url: undefined,
           is_verified: false,
           role: 'user',
           created_at: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -254,7 +255,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           email: 'hendra.wijaya@relawanmedis.id',
           phone_whatsapp: '085712345678',
           city_domicile: 'Yogyakarta',
-          identity_doc_url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
+          identity_doc_url: undefined,
           is_verified: true,
           role: 'user',
           created_at: new Date(Date.now() - 7 * 86400000).toISOString()
@@ -520,13 +521,13 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   };
 
   const getReportEvidenceUrl = (report: CampaignReportRecord): string | null => {
-    if (report.evidence_url) return report.evidence_url;
+    if (report.evidence_url) return resolveImageUrl(report.evidence_url) || null;
     if (!report.evidence_path) return null;
     const cleanPath = String(report.evidence_path).replace(/^\/+/, '');
     if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://')) {
-      return cleanPath;
+      return resolveImageUrl(cleanPath) || null;
     }
-    return `${BACKEND_ROOT_URL}/storage/${cleanPath}`;
+    return `${BACKEND_ROOT_URL}/api/media/${cleanPath}`;
   };
 
   const filteredReports = adminReports.filter((item) => {
@@ -1068,11 +1069,19 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                     className="bg-white rounded-3xl border-2 border-blue-200 shadow-xs p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
                   >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <img
-                        src={camp.imageUrl}
-                        alt={camp.title}
-                        className="w-24 h-24 rounded-2xl object-cover border border-slate-200 shrink-0"
-                      />
+                      <div className="w-24 h-24 rounded-2xl bg-slate-100 border border-slate-200 shrink-0 overflow-hidden">
+                        {resolveImageUrl(camp.imageUrl) && !failedImgMap[`pending-${camp.id}`] && (
+                          <img
+                            src={resolveImageUrl(camp.imageUrl)}
+                            alt={camp.title}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedImgMap((prev) => ({ ...prev, [`pending-${camp.id}`]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-900 border border-blue-200 px-2 py-0.5 rounded-full">
@@ -1226,11 +1235,19 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                         <tr key={camp.id} className="hover:bg-slate-50 transition-colors">
                           <td className="p-3 font-semibold text-slate-900 max-w-xs">
                             <div className="flex items-center gap-3">
-                              <img
-                                src={camp.imageUrl}
-                                alt={camp.title}
-                                className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
-                              />
+                              <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 shrink-0 overflow-hidden">
+                                {resolveImageUrl(camp.imageUrl) && !failedImgMap[`row-${camp.id}`] && (
+                                  <img
+                                    src={resolveImageUrl(camp.imageUrl)}
+                                    alt={camp.title}
+                                    referrerPolicy="no-referrer"
+                                    onError={() =>
+                                      setFailedImgMap((prev) => ({ ...prev, [`row-${camp.id}`]: true }))
+                                    }
+                                    className="w-full h-full object-cover"
+                                  />
+                                )}
+                              </div>
                               <div className="truncate">
                                 <span className="font-semibold text-slate-900 block truncate" title={camp.title}>
                                   {camp.title}
@@ -2486,11 +2503,17 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             <h3 className="text-base font-bold text-slate-900">
               Dokumen Proposal: {selectedCampaign.title}
             </h3>
-            <img
-              src={selectedCampaign.imageUrl}
-              alt={selectedCampaign.title}
-              className="w-full h-44 object-cover rounded-2xl border border-slate-200"
-            />
+            {resolveImageUrl(selectedCampaign.imageUrl) && !failedImgMap[`sel-${selectedCampaign.id}`] && (
+              <img
+                src={resolveImageUrl(selectedCampaign.imageUrl)}
+                alt={selectedCampaign.title}
+                referrerPolicy="no-referrer"
+                onError={() =>
+                  setFailedImgMap((prev) => ({ ...prev, [`sel-${selectedCampaign.id}`]: true }))
+                }
+                className="w-full h-44 object-cover rounded-2xl border border-slate-200"
+              />
+            )}
             <div className="text-xs space-y-2 text-slate-700">
               <p><strong>Inisiator:</strong> {selectedCampaign.initiatorName} ({selectedCampaign.initiatorRole})</p>
               <p><strong>Lokasi:</strong> {selectedCampaign.locationCity}</p>
@@ -2582,12 +2605,24 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
             {/* Modal Body - Scrollable */}
             <div className="p-6 overflow-y-auto space-y-5 text-xs text-slate-700">
               {/* Image & Quick Badges */}
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200">
-                <img
-                  src={detailModalCampaign.imageUrl}
-                  alt={detailModalCampaign.title}
-                  className="w-full h-48 sm:h-56 object-cover"
-                />
+              <div
+                className={`relative rounded-2xl overflow-hidden border border-slate-200 ${
+                  resolveImageUrl(detailModalCampaign.imageUrl) && !failedImgMap[`detail-${detailModalCampaign.id}`]
+                    ? ''
+                    : 'pt-14 pb-3 bg-slate-800'
+                }`}
+              >
+                {resolveImageUrl(detailModalCampaign.imageUrl) && !failedImgMap[`detail-${detailModalCampaign.id}`] && (
+                  <img
+                    src={resolveImageUrl(detailModalCampaign.imageUrl)}
+                    alt={detailModalCampaign.title}
+                    referrerPolicy="no-referrer"
+                    onError={() =>
+                      setFailedImgMap((prev) => ({ ...prev, [`detail-${detailModalCampaign.id}`]: true }))
+                    }
+                    className="w-full h-48 sm:h-56 object-cover"
+                  />
+                )}
                 <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                   <span className="bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/20">
                     {detailModalCampaign.category}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HeartHandshake, Calendar, Clock, MapPin, MessageSquare, Award, CheckCircle2, X, ExternalLink, Compass } from 'lucide-react';
 import { Campaign, UserProfile } from '../types';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface RelawanActivityModalProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export const RelawanActivityModal: React.FC<RelawanActivityModalProps> = ({
   onExploreCampaigns
 }) => {
   const [showCertificate, setShowCertificate] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
+  const [failedCampImgIds, setFailedCampImgIds] = useState<Record<string, boolean>>({});
 
   if (!isOpen) return null;
 
@@ -59,11 +62,18 @@ export const RelawanActivityModal: React.FC<RelawanActivityModalProps> = ({
         {/* User Info Bar */}
         <div className="bg-indigo-50 border-b border-indigo-100 px-6 py-3 flex items-center justify-between text-xs text-indigo-900">
           <div className="flex items-center gap-3">
-            <img
-              src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-              alt={currentUser.name}
-              className="w-8 h-8 rounded-full border border-indigo-200 object-cover"
-            />
+            {currentUser.avatarUrl && !avatarError ? (
+              <img
+                src={currentUser.avatarUrl}
+                alt={currentUser.name}
+                onError={() => setAvatarError(true)}
+                className="w-8 h-8 rounded-full border border-indigo-200 object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs border border-indigo-200 shrink-0">
+                {(currentUser.name || 'R').charAt(0).toUpperCase()}
+              </div>
+            )}
             <div>
               <p className="font-bold">{currentUser.name}</p>
               <p className="text-[11px] text-indigo-700">{currentUser.email} • {currentUser.city}</p>
@@ -110,11 +120,19 @@ export const RelawanActivityModal: React.FC<RelawanActivityModalProps> = ({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <img
-                        src={camp.imageUrl}
-                        alt={camp.title}
-                        className="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-200"
-                      />
+                      <div className="w-16 h-16 rounded-xl bg-slate-100 shrink-0 border border-slate-200 overflow-hidden">
+                        {resolveImageUrl(camp.imageUrl) && !failedCampImgIds[camp.id] && (
+                          <img
+                            src={resolveImageUrl(camp.imageUrl)}
+                            alt={camp.title}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedCampImgIds((prev) => ({ ...prev, [camp.id]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
                       <div>
                         <div className="flex items-center gap-1.5 mb-1">
                           <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">

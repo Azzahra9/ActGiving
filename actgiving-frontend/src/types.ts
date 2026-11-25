@@ -22,7 +22,7 @@ export interface LpjItem {
   realizedAmount: number;
   total_realisasi?: number;
   description: string;
-  photoUrl: string;
+  photoUrl?: string;
   activityPhotos?: string[];
   activity_photos?: string[];
   budgetItems?: LpjBudgetItem[];
@@ -124,7 +124,7 @@ export interface Campaign {
   campaignMode?: string;
   locationCity: string;
   distanceKm?: number;
-  imageUrl: string;
+  imageUrl?: string;
   description: string;
   initiatorAvatar?: string;
   status?: 'active' | 'pending' | 'pending_approval' | 'rejected' | 'completed' | 'closed' | 'suspended';

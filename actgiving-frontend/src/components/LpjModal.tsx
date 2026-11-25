@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface LpjModalProps {
   campaign: Campaign | null;
@@ -29,6 +30,7 @@ export const LpjModal: React.FC<LpjModalProps> = ({
   onClose
 }) => {
   const [selectedPhotoPreview, setSelectedPhotoPreview] = useState<string | null>(null);
+  const [failedPhotos, setFailedPhotos] = useState<Record<string, boolean>>({});
 
   if (!isOpen || !campaign) return null;
 
@@ -162,7 +164,9 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                   ...(Array.isArray((report as any).photos) ? (report as any).photos : []),
                   report.receiptUrl
                 ];
-                const photos = Array.from(new Set(rawPhotos.filter(Boolean))) as string[];
+                const photos = Array.from(
+                  new Set(rawPhotos.map((p) => resolveImageUrl(p)).filter((p): p is string => Boolean(p)))
+                ).filter((p) => !failedPhotos[p]);
                 const budgetItems = Array.isArray(report.budgetItems) ? report.budgetItems : [];
                 const totalCalculatedBudget = budgetItems.reduce((sum, item) => sum + (item?.amount || 0), 0);
 
@@ -362,6 +366,9 @@ export const LpjModal: React.FC<LpjModalProps> = ({
                                 src={photo}
                                 alt={`Dokumentasi Lapangan ${pIdx + 1}`}
                                 referrerPolicy="no-referrer"
+                                onError={() =>
+                                  setFailedPhotos((prev) => ({ ...prev, [photo]: true }))
+                                }
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5">

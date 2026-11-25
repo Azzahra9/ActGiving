@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Campaign, CampaignSchedule, UserProfile } from '../../types';
 import api from '../../lib/axios';
-import { mapBackendCampaignToFrontend } from '../../services/campaignService';
+import { mapBackendCampaignToFrontend, resolveImageUrl } from '../../services/campaignService';
 
 interface RelawanDashboardViewProps {
   currentUser: UserProfile;
@@ -37,6 +37,8 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
   const [showQrModal, setShowQrModal] = useState<Campaign | null>(null);
   const [checkedInIds, setCheckedInIds] = useState<string[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
+  const [failedCampImgMap, setFailedCampImgMap] = useState<Record<string, boolean>>({});
 
   const [registeredCampaigns, setRegisteredCampaigns] = useState<Campaign[]>([]);
   const [acceptedCampaigns, setAcceptedCampaigns] = useState<Campaign[]>([]);
@@ -239,11 +241,18 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
       <div className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-4">
-            <img
-              src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
-              alt={currentUser.name}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-blue-400 object-cover shadow-lg"
-            />
+            {currentUser.avatarUrl && !avatarError ? (
+              <img
+                src={currentUser.avatarUrl}
+                alt={currentUser.name}
+                onError={() => setAvatarError(true)}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-blue-400 object-cover shadow-lg shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-blue-400 bg-blue-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg shrink-0">
+                {(currentUser.name || 'R').charAt(0).toUpperCase()}
+              </div>
+            )}
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h1 className="text-xl sm:text-2xl font-bold font-sans text-white">
@@ -389,7 +398,8 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                   const campTitle = camp?.title || 'Kampanye Sosial';
                   const campCategory = camp?.category || 'Sosial & Kemanusiaan';
                   const campLocation = camp?.locationCity || camp?.location || 'Indonesia';
-                  const campImage = camp?.imageUrl || 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80';
+                  const campImage = resolveImageUrl(camp?.imageUrl);
+                  const schedImgKey = `sched-${sched.id || idx}`;
                   const initiatorName = camp?.initiatorName || camp?.user?.name || 'Inisiator Kampanye';
                   const initiatorPhone = camp?.user?.phone_whatsapp || camp?.initiatorPhone || '6281234567890';
                   const isCheckedIn = checkedInIds.includes(String(sched.id)) || (camp && checkedInIds.includes(camp.id));
@@ -400,12 +410,18 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                       key={sched.id || idx}
                       className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
                     >
-                      <div className="relative h-44 w-full">
-                        <img
-                          src={campImage}
-                          alt={campTitle}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="relative h-44 w-full bg-slate-800">
+                        {campImage && !failedCampImgMap[schedImgKey] && (
+                          <img
+                            src={campImage}
+                            alt={campTitle}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedCampImgMap((prev) => ({ ...prev, [schedImgKey]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
                         
                         <div className="absolute top-3 left-3 flex items-center gap-2">
@@ -582,12 +598,18 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                       key={camp.id}
                       className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden hover:border-blue-300 transition-all flex flex-col"
                     >
-                      <div className="relative h-44 w-full">
-                        <img
-                          src={camp.imageUrl}
-                          alt={camp.title}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="relative h-44 w-full bg-slate-800">
+                        {resolveImageUrl(camp.imageUrl) && !failedCampImgMap[`acc-${camp.id}`] && (
+                          <img
+                            src={resolveImageUrl(camp.imageUrl)}
+                            alt={camp.title}
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedCampImgMap((prev) => ({ ...prev, [`acc-${camp.id}`]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
                         
                         <div className="absolute top-3 left-3 flex items-center gap-2">
@@ -833,12 +855,18 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
                       className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:border-blue-400 transition-all flex flex-col justify-between"
                     >
                       <div>
-                        <div className="relative h-40">
-                          <img
-                            src={camp.imageUrl}
-                            alt={camp.title}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="relative h-40 bg-slate-100 border-b border-slate-200/70">
+                          {resolveImageUrl(camp.imageUrl) && !failedCampImgMap[`avail-${camp.id}`] && (
+                            <img
+                              src={resolveImageUrl(camp.imageUrl)}
+                              alt={camp.title}
+                              referrerPolicy="no-referrer"
+                              onError={() =>
+                                setFailedCampImgMap((prev) => ({ ...prev, [`avail-${camp.id}`]: true }))
+                              }
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                           <span className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                             {camp.category}
                           </span>

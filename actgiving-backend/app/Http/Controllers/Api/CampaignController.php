@@ -163,7 +163,8 @@ class CampaignController extends Controller
             $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
             $imageUrl = $uploadResult['url'];
         } elseif ($request->filled('image_url')) {
-            $imageUrl = $request->image_url;
+            $candidateUrl = trim((string) $request->image_url);
+            $imageUrl = \App\Services\FileUploadService::isDummyImageUrl($candidateUrl) ? null : $candidateUrl;
         }
 
         $campaign = Campaign::create([
@@ -243,6 +244,7 @@ class CampaignController extends Controller
             'target_volunteers' => 'sometimes|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'image_url' => 'nullable|string|max:500',
+            'remove_image' => 'nullable|boolean',
         ], [
             'category_id.exists' => 'Kategori yang dipilih tidak valid atau belum terdaftar di database.',
             'campaign_mode.in' => 'Mode kampanye harus salah satu dari: fund_only, volunteer_only, both.',
@@ -259,8 +261,16 @@ class CampaignController extends Controller
             }
             $uploadResult = $uploader->upload($request->file('image'), 'campaigns');
             $validated['image_url'] = $uploadResult['url'];
+        } elseif ($request->boolean('remove_image')) {
+            if ($campaign->image_url) {
+                app(\App\Services\FileUploadService::class)->delete($campaign->image_url);
+            }
+            $validated['image_url'] = null;
         } elseif ($request->filled('image_url')) {
-            $validated['image_url'] = $request->image_url;
+            $candidateUrl = trim((string) $request->image_url);
+            $validated['image_url'] = \App\Services\FileUploadService::isDummyImageUrl($candidateUrl) ? null : $candidateUrl;
+        } elseif ($request->has('image_url')) {
+            $validated['image_url'] = null;
         }
 
         $campaign->update($validated);

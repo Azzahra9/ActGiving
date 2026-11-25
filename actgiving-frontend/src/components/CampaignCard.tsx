@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, 
   MapPin, 
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Campaign } from '../types';
 import { formatRupiah } from '../utils/format';
-import { getCategoryDefaultImage } from '../services/campaignService';
+import { resolveImageUrl } from '../services/campaignService';
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -36,16 +36,16 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
   onDetailClick,
   onReportClick
 }) => {
+  const [imgError, setImgError] = useState(false);
+  const resolvedImageUrl = resolveImageUrl(campaign?.imageUrl);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [resolvedImageUrl]);
+
   if (!campaign) return null;
 
-  // Fallback image jika gambar utama gagal dimuat (404, URL rusak, dsb.)
-  const fallbackImage = getCategoryDefaultImage(campaign.category);
-  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget;
-    if (img.src !== fallbackImage) {
-      img.src = fallbackImage;
-    }
-  };
+  const hasImage = Boolean(resolvedImageUrl && !imgError);
 
   // Mode-specific calculations
   const isDanaMode = campaign.mode === 'dana';
@@ -65,15 +65,19 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
     <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-lg hover:border-slate-300 transition-all duration-300 flex flex-col group">
       
       {/* 1. Thumbnail Image & Floating Badges */}
-      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
-        <img
-          src={campaign.imageUrl}
-          alt={campaign.title}
-          referrerPolicy="no-referrer"
-          onError={handleImgError}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/60 via-transparent to-black/20 pointer-events-none" />
+      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100 border-b border-slate-200/70">
+        {hasImage && (
+          <>
+            <img
+              src={resolvedImageUrl}
+              alt={campaign.title}
+              referrerPolicy="no-referrer"
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-darkest/60 via-transparent to-black/20 pointer-events-none" />
+          </>
+        )}
 
         {/* Top-Left Category Badge (Dark Translucent Pill per Figma) */}
         <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">

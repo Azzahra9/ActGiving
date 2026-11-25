@@ -11,43 +11,50 @@ export interface CampaignQueryParams {
 // URL root backend (tanpa /api)
 const BACKEND_ROOT = API_BASE_URL.replace(/\/api\/?$/, '');
 
+const DUMMY_IMAGE_HOSTS = [
+  'images.unsplash.com',
+  'unsplash.com',
+  'picsum.photos',
+  'via.placeholder.com',
+  'placehold.co',
+  'placeholder.com',
+  'loremflickr.com',
+  'dummyimage.com',
+];
+
+export const isDummyImageUrl = (url?: string | null): boolean => {
+  if (!url) return false;
+  const normalized = url.trim().toLowerCase();
+  return DUMMY_IMAGE_HOSTS.some((host) => normalized.includes(host));
+};
+
 /**
  * Normalisasi URL gambar dari backend.
- * Jika URL gambar merupakan path relatif (misal: "/storage/campaigns/xxx.jpg"),
+ * Jika URL gambar merupakan path relatif (misal: "/api/media/campaigns/xxx.jpg"),
  * ubah menjadi URL absolut menggunakan BACKEND_ROOT.
- * Jika sudah absolut (http/https), kembalikan apa adanya.
+ * URL gambar dummy/stok dikembalikan sebagai undefined (tanpa fallback dummy).
  */
 export const resolveImageUrl = (url?: string | null): string | undefined => {
   if (!url) return undefined;
-  
-  // Jika URL mengarah ke localhost atau 127.0.0.1 tetapi aplikasi sedang berjalan di domain produksi (bukan localhost)
-  // ganti origin localhost dengan BACKEND_ROOT yang sesuai
-  if (url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1') || url.startsWith('https://localhost')) {
+  const trimmed = url.trim();
+  if (!trimmed || isDummyImageUrl(trimmed)) return undefined;
+
+  // Jika URL mengarah ke localhost atau 127.0.0.1 tetapi aplikasi sedang berjalan di domain produksi
+  if (
+    trimmed.startsWith('http://localhost') ||
+    trimmed.startsWith('http://127.0.0.1') ||
+    trimmed.startsWith('https://localhost')
+  ) {
     if (BACKEND_ROOT && !BACKEND_ROOT.includes('localhost') && !BACKEND_ROOT.includes('127.0.0.1')) {
-      const pathOnly = url.replace(/^https?:\/\/[^\/]+/, '');
+      const pathOnly = trimmed.replace(/^https?:\/\/[^/]+/, '');
       return `${BACKEND_ROOT}${pathOnly.startsWith('/') ? '' : '/'}${pathOnly}`;
     }
-    return url;
+    return trimmed;
   }
 
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
   // Path relatif – tambahkan domain backend
-  return `${BACKEND_ROOT}${url.startsWith('/') ? '' : '/'}${url}`;
-};
-
-// Fallback images curated per category
-const CATEGORY_DEFAULT_IMAGES: Record<string, string> = {
-  'Bencana Alam': 'https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=800&q=80',
-  'Pendidikan': 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
-  'Lingkungan Hidup': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=800&q=80',
-  'Kesehatan': 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
-  'Panti Asuhan': 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-  'Sosial & Kemanusiaan': 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80',
-};
-
-export const getCategoryDefaultImage = (categoryName?: string): string => {
-  if (!categoryName) return CATEGORY_DEFAULT_IMAGES['Sosial & Kemanusiaan'];
-  return CATEGORY_DEFAULT_IMAGES[categoryName] || CATEGORY_DEFAULT_IMAGES['Sosial & Kemanusiaan'];
+  return `${BACKEND_ROOT}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
 };
 
 // Konversi backend campaign_mode enum ke tipe CampaignMode frontend
@@ -72,15 +79,26 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
   const fieldLocation = lpj.field_location || lpj.fieldLocation || lpj.lokasi_aksi || lpj.location || undefined;
   const beneficiariesCount = lpj.beneficiaries_count || lpj.beneficiariesCount || lpj.penerima_manfaat || undefined;
   const volunteersInvolved = lpj.volunteers_involved || lpj.volunteersInvolved || lpj.relawan_terlibat || undefined;
-  const activityPhotos = Array.isArray(lpj.activity_photos)
-    ? lpj.activity_photos
-    : Array.isArray(lpj.activityPhotos)
-    ? lpj.activityPhotos
-    : Array.isArray(lpj.photos)
-    ? lpj.photos
-    : [
-        'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-      ];
+  const rawActivitySource = lpj.activity_photos ?? lpj.activityPhotos ?? lpj.photos;
+  let parsedActivityPhotos: string[] = [];
+  if (Array.isArray(rawActivitySource)) {
+    parsedActivityPhotos = rawActivitySource;
+  } else if (typeof rawActivitySource === 'string' && rawActivitySource.trim() !== '') {
+    try {
+      const decoded = JSON.parse(rawActivitySource);
+      parsedActivityPhotos = Array.isArray(decoded) ? decoded : [rawActivitySource];
+    } catch {
+      parsedActivityPhotos = [rawActivitySource];
+    }
+  }
+  const activityPhotos = Array.from(
+    new Set(parsedActivityPhotos.map((p) => resolveImageUrl(p)).filter((p): p is string => Boolean(p)))
+  );
+
+  const primaryPhoto =
+    resolveImageUrl(lpj.receipt_image_url || lpj.proof_image_url || lpj.photo_url || lpj.photoUrl) ||
+    activityPhotos[0] ||
+    undefined;
 
   return {
     id: String(lpj.id),
@@ -107,13 +125,7 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
     realizedAmount,
     total_realisasi: realizedAmount,
     description: lpj.description || '',
-    photoUrl:
-      lpj.receipt_image_url ||
-      lpj.proof_image_url ||
-      lpj.photo_url ||
-      lpj.photoUrl ||
-      activityPhotos[0] ||
-      'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
+    photoUrl: primaryPhoto,
     activityPhotos,
     activity_photos: activityPhotos,
     budgetItems: lpj.budget_items || lpj.budgetItems || [],
@@ -124,7 +136,7 @@ export const mapBackendLpjToFrontend = (lpj: any): LpjItem => {
     fieldLocation,
     lokasi_aksi: fieldLocation,
     digitalRegNumber: lpj.digital_reg_number || lpj.digitalRegNumber || undefined,
-    receiptUrl: lpj.receipt_image_url || lpj.proof_image_url || lpj.receiptUrl || undefined,
+    receiptUrl: resolveImageUrl(lpj.receipt_image_url || lpj.proof_image_url || lpj.receiptUrl),
     status: (lpj.status as 'pending' | 'verified' | 'sah' | 'rejected') || 'pending',
     isFinal: Boolean(lpj.is_final || lpj.isFinal || lpj.report_type === 'final' || lpj.reportType === 'final'),
     reportType: (lpj.report_type as 'progress' | 'final') || (lpj.reportType as 'progress' | 'final') || (lpj.is_final ? 'final' : 'progress'),
@@ -153,7 +165,7 @@ export const mapBackendCampaignToFrontend = (item: any): Campaign => {
     mode: mode,
     locationCity: item.location || 'Indonesia',
     distanceKm: item.distance_km || 3.5,
-    imageUrl: resolveImageUrl(item.image_url) || getCategoryDefaultImage(categoryName),
+    imageUrl: resolveImageUrl(item.image_url),
     description: item.description || '',
     status: item.status === 'active' 
       ? 'active' 
