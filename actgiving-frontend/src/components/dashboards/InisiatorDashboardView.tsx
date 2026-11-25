@@ -1643,6 +1643,18 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                                 <span>Menunggu Seleksi</span>
                               </span>
                             )}
+                            {vol.status === 'accepted' && (
+                              <div className="mt-1">
+                                {vol.attended ? (
+                                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 bg-sky-100 text-sky-800 border border-sky-200">
+                                    <CheckCircle2 className="w-3 h-3 text-sky-600" />
+                                    <span>Hadir{vol.checked_in_at ? ` · ${new Date(vol.checked_in_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-medium text-slate-400">Belum hadir</span>
+                                )}
+                              </div>
+                            )}
                           </td>
 
                           {/* Tindakan Dinamis Berdasarkan Status */}

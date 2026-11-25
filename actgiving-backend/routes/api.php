@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DisbursementController;
 use App\Http\Controllers\Api\DonationController;
 use App\Http\Controllers\Api\LPJController;
+use App\Http\Controllers\Api\VolunteerAttendanceController;
 use App\Http\Controllers\Api\VolunteerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // RELAWAN: Riwayat Pendaftaran & Jadwal Lapangan Terverifikasi
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
     Route::get('/my-volunteer-schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
+    // RELAWAN: Presensi kehadiran kegiatan (hanya relawan yang sudah diterima)
+    Route::post('/campaigns/{id}/attendance', [VolunteerAttendanceController::class, 'store']);
+    Route::get('/my-attendances', [VolunteerAttendanceController::class, 'mine']);
     Route::get('/volunteer/schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
 
     // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports
