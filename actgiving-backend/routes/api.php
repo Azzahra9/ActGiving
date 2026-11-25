@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DisbursementController;
 use App\Http\Controllers\Api\DonationController;
 use App\Http\Controllers\Api\LPJController;
+use App\Http\Controllers\Api\VolunteerAttendanceController;
 use App\Http\Controllers\Api\VolunteerRegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,22 +36,9 @@ Route::get('/campaigns/{id}/schedules', [CampaignScheduleController::class, 'ind
 Route::get('/campaigns/{id}/lpj', [LPJController::class, 'index']); // Public list LPJ
 Route::post('/campaigns/{id}/reports', [CampaignReportController::class, 'store']); // FR-13: Laporan Aduan Publik
 Route::post('/campaigns/{id}/volunteer-register', [VolunteerRegistrationController::class, 'register']); // Registrasi akun relawan baru & lamaran misi
-Route::get('/initiator/volunteers', [VolunteerRegistrationController::class, 'initiatorVolunteers']); // Daftar Pendaftar Relawan Inisiator
-Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']); // Daftar pendaftar per kampanye
-Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']); // Seleksi status pendaftar relawan (accept/reject)
 
 // 3. PUBLIC DONATIONS & SIMULATION WEBHOOK
 Route::post('/donations', [DonationController::class, 'store']); // Pencatatan Transaksi Donasi Nyata / QRIS
-Route::get('/donations', [DonationController::class, 'indexAdmin']); // Daftar Transaksi Donasi
-Route::get('/admin/donations', [DonationController::class, 'indexAdmin']); // Audit Transaksi Sandbox
-Route::get('/admin/campaigns', [AdminController::class, 'indexCampaigns']); // Antrean Moderasi Kampanye
-Route::patch('/admin/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
-Route::patch('/admin/campaigns/{id}/suspend', [AdminController::class, 'suspendCampaign']);
-Route::get('/admin/lpj', [LPJController::class, 'adminIndex']); // Antrean Audit LPJ
-Route::patch('/admin/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
-Route::patch('/admin/lpj/{id}/verify', [LPJController::class, 'adminVerify']);
-Route::patch('/admin/lpj/{id}/unverify', [LPJController::class, 'adminUnverify']);
-
 Route::prefix('donations')->group(function () {
     // Rate Limiting Khusus: Maksimal 10 request per menit per IP untuk mencegah spam donasi fiktif
     Route::post('/guest-checkout', [DonationController::class, 'guestCheckout'])->middleware('throttle:guest-checkout-limit');
@@ -95,15 +83,29 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Seleksi & Persetujuan Relawan oleh Inisiator
     Route::get('/initiator/volunteers', [VolunteerRegistrationController::class, 'initiatorVolunteers']);
+    Route::get('/campaigns/{id}/registrations', [VolunteerRegistrationController::class, 'getCampaignRegistrations']);
     Route::patch('/volunteer-registrations/{id}/status', [VolunteerRegistrationController::class, 'updateStatus']);
 
     // RELAWAN: Riwayat Pendaftaran & Jadwal Lapangan Terverifikasi
     Route::get('/my-volunteer-registrations', [VolunteerRegistrationController::class, 'myRegistrations']);
     Route::get('/my-volunteer-schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
+    // RELAWAN: Presensi kehadiran kegiatan (hanya relawan yang sudah diterima)
+    Route::post('/campaigns/{id}/attendance', [VolunteerAttendanceController::class, 'store']);
+    Route::get('/my-attendances', [VolunteerAttendanceController::class, 'mine']);
     Route::get('/volunteer/schedules', [CampaignScheduleController::class, 'myVolunteerSchedules']);
 
     // ADMINISTRATOR: Verifikasi User, Kelola Kategori, Disbursement & Reports
     Route::prefix('admin')->middleware('admin')->group(function () {
+        // Moderasi Kampanye, Audit Transaksi, & Audit LPJ (sebelumnya terbuka tanpa login)
+        Route::get('/donations', [DonationController::class, 'indexAdmin']); // Audit Transaksi Sandbox
+        Route::get('/campaigns', [AdminController::class, 'indexCampaigns']); // Antrean Moderasi Kampanye
+        Route::patch('/campaigns/{id}/status', [AdminController::class, 'updateCampaignStatus']);
+        Route::patch('/campaigns/{id}/suspend', [AdminController::class, 'suspendCampaign']);
+        Route::get('/lpj', [LPJController::class, 'adminIndex']); // Antrean Audit LPJ
+        Route::patch('/lpj/{id}/status', [LPJController::class, 'adminUpdateStatus']);
+        Route::patch('/lpj/{id}/verify', [LPJController::class, 'adminVerify']);
+        Route::patch('/lpj/{id}/unverify', [LPJController::class, 'adminUnverify']);
+
         // DIS-02 / FR-11: Antrean & Validasi Persetujuan Pencairan Dana
         Route::get('/disbursements', [AdminController::class, 'indexDisbursements']);
         Route::patch('/disbursements/{id}/status', [AdminController::class, 'updateDisbursementStatus']);

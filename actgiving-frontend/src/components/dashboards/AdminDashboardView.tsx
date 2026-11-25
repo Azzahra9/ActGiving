@@ -382,20 +382,24 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     const previousCampaigns = [...adminCampaigns];
     const previousDetail = selectedReportDetail;
 
-    // Optimistic UI Update: ubah status laporan menjadi resolved & hapus kampanye dari daftar
+    // Optimistic UI Update: ubah status laporan menjadi resolved & kampanye menjadi suspended
     setAdminReports((prev) =>
       prev.map((r) => {
         if (r.id === report.id) {
           return {
             ...r,
             status: 'resolved',
+            campaign: r.campaign ? { ...r.campaign, status: 'suspended' } : r.campaign,
           };
+        }
+        if (String(r.campaign_id) === String(report.campaign_id) && r.campaign) {
+          return { ...r, campaign: { ...r.campaign, status: 'suspended' } };
         }
         return r;
       })
     );
     setAdminCampaigns((prev) =>
-      prev.filter((c) => String(c.id) !== String(report.campaign_id))
+      prev.map((c) => (String(c.id) === String(report.campaign_id) ? { ...c, status: 'suspended' } : c))
     );
     if (selectedReportDetail?.id === report.id) {
       setSelectedReportDetail((prev) =>
@@ -403,6 +407,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           ? {
               ...prev,
               status: 'resolved',
+              campaign: prev.campaign ? { ...prev.campaign, status: 'suspended' } : prev.campaign,
             }
           : null
       );
@@ -410,23 +415,23 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
 
     try {
       await api.patch(`/admin/campaigns/${report.campaign_id}/suspend`, {
-        reason: `Dihapus berdasarkan tindak lanjut aduan publik #${report.id} (${report.category})`,
+        reason: `Dibekukan berdasarkan tindak lanjut aduan publik #${report.id} (${report.category})`,
       });
       await api.patch(`/admin/reports/${report.id}/status`, {
         status: 'resolved',
       });
 
-      showToast('Kampanye berhasil dihapus dan laporan ditutup');
+      showToast('Kampanye berhasil dibekukan dan laporan ditutup');
       setSelectedReportDetail(null);
 
       await Promise.all([fetchAdminReports(), fetchAdminCampaigns()]);
       onRefreshCampaigns?.();
     } catch (err: any) {
-      console.error('Gagal menghapus kampanye dari laporan:', err);
+      console.error('Gagal membekukan kampanye dari laporan:', err);
       setAdminReports(previousReports);
       setAdminCampaigns(previousCampaigns);
       setSelectedReportDetail(previousDetail);
-      const errMsg = err?.response?.data?.message || 'Gagal menghapus kampanye dan menutup laporan.';
+      const errMsg = err?.response?.data?.message || 'Gagal membekukan kampanye dan menutup laporan.';
       showToast(`Error: ${errMsg}`);
     } finally {
       setProcessingReportId(null);
@@ -692,18 +697,22 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       await api.patch(`/admin/campaigns/${suspendTargetCampaign.id}/suspend`, {
         reason: suspendReason || 'Pelanggaran pedoman & integritas platform',
       }).catch(() =>
-        api.delete(`/admin/campaigns/${suspendTargetCampaign.id}`)
+        api.patch(`/admin/campaigns/${suspendTargetCampaign.id}/status`, {
+          status: 'suspended',
+        })
       );
 
-      // Hapus kampanye dari state admin lokal karena sudah dihapus di backend
+      // Optimistic update pada state admin lokal
       setAdminCampaigns((prev) =>
-        prev.filter((c) => c.id !== suspendTargetCampaign.id)
+        prev.map((c) =>
+          c.id === suspendTargetCampaign.id ? { ...c, status: 'suspended' } : c
+        )
       );
 
-      showToast(`Kampanye "${suspendTargetCampaign.title}" berhasil dihentikan dan dihapus.`);
+      showToast(`Kampanye "${suspendTargetCampaign.title}" berhasil dihentikan/ditangguhkan.`);
       setSuspendTargetCampaign(null);
       if (detailModalCampaign?.id === suspendTargetCampaign.id) {
-        setDetailModalCampaign(null);
+        setDetailModalCampaign((prev) => (prev ? { ...prev, status: 'suspended' } : null));
       }
 
       await fetchAdminCampaigns();

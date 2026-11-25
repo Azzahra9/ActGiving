@@ -7,7 +7,7 @@ import {
   X, XCircle, Clock, UserX, Phone, Mail
 } from 'lucide-react';
 import { Campaign, UserProfile, LpjItem, LpjBudgetItem, DisbursementRecord } from '../../types';
-import api, { getAuthToken, setAuthToken } from '../../lib/axios';
+import api, { getAuthToken } from '../../lib/axios';
 import { mapBackendCampaignToFrontend } from '../../services/campaignService';
 import { formatRupiah } from '../../utils/format';
 import { CampaignScheduleModal } from '../CampaignScheduleModal';
@@ -198,20 +198,10 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   const handleUpdateVolunteerStatus = async (regId: number, newStatus: 'accepted' | 'rejected' | 'pending') => {
     setUpdatingVolId(regId);
     try {
-      // Pastikan token autentikasi tersedia (jika akun demo inisiator, auto-auth fallback)
+      // Sesi login wajib ada; tidak ada lagi login otomatis dengan password bawaan
       if (!getAuthToken()) {
-        try {
-          const emailToLogin = currentUser?.email || 'inisiator@actgiving.com';
-          const loginRes = await api.post('/auth/login', {
-            email: emailToLogin,
-            password: 'password123',
-          });
-          if (loginRes.data?.data?.token) {
-            setAuthToken(loginRes.data.data.token);
-          }
-        } catch (authErr) {
-          console.warn('Auto auth inisiator fallback notice:', authErr);
-        }
+        showToast('Sesi login berakhir. Silakan masuk kembali dengan akun inisiator Anda.');
+        return;
       }
 
       await api.patch(`/volunteer-registrations/${regId}/status`, { status: newStatus });
@@ -237,17 +227,14 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
   // Filter campaigns belonging to this initiator
   // Filter campaigns belonging to this initiator (termasuk yang baru dibuat dari modal)
   const myCampaigns = React.useMemo(() => {
-    const currentUserName = currentUser?.name?.toLowerCase() || '';
     const managedIds = new Set(currentUser?.managedCampaignIds || []);
 
+    // Hanya kampanye milik pengguna ini (dicocokkan lewat ID pemilik, bukan nama atau status)
     const fromProps = (campaigns || []).filter(
       (c) =>
         Boolean(c) &&
         (managedIds.has(c.id) ||
-          (Boolean(c.initiatorName && currentUserName && c.initiatorName.toLowerCase().includes(currentUserName))) ||
-          c.status === 'pending_approval' ||
-          c.status === 'pending' ||
-          c.id === 'camp-01')
+          (c.user_id != null && String(c.user_id) === String(currentUser?.id)))
     );
 
     const combined = [...initiatorCampaigns, ...fromProps];
@@ -661,7 +648,7 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                   {currentUser.name}
                 </h1>
                 <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  Inisiator Lembaga Terverifikasi Kemenkumham
+                  Inisiator Kampanye
                 </span>
               </div>
               <p className="text-blue-200 text-xs sm:text-sm mb-2">
@@ -670,11 +657,11 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
               <div className="flex items-center gap-4 text-xs text-blue-300">
                 <span className="flex items-center gap-1">
                   <ShieldCheck className="w-4 h-4 text-sky-400" />
-                  SK Organisasi & Rekening Bank Sah
+                  Akun inisiator aktif
                 </span>
                 <span className="flex items-center gap-1">
                   <Sparkles className="w-4 h-4 text-blue-400" />
-                  Indeks Kepatuhan LPJ: <strong className="text-white">100% Sempurna</strong>
+                  Kampanye dikelola: <strong className="text-white">{myCampaigns.length} program</strong>
                 </span>
               </div>
             </div>
@@ -1655,6 +1642,18 @@ export const InisiatorDashboardView: React.FC<InisiatorDashboardViewProps> = ({
                                 <Clock className="w-3 h-3 text-amber-600" />
                                 <span>Menunggu Seleksi</span>
                               </span>
+                            )}
+                            {vol.status === 'accepted' && (
+                              <div className="mt-1">
+                                {vol.attended ? (
+                                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 bg-sky-100 text-sky-800 border border-sky-200">
+                                    <CheckCircle2 className="w-3 h-3 text-sky-600" />
+                                    <span>Hadir{vol.checked_in_at ? ` · ${new Date(vol.checked_in_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-medium text-slate-400">Belum hadir</span>
+                                )}
+                              </div>
                             )}
                           </td>
 

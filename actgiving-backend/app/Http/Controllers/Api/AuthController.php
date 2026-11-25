@@ -150,15 +150,22 @@ class AuthController extends Controller
             Log::error('Gagal mengirimkan email reset password: ' . $e->getMessage());
         }
 
+        $data = [
+            'email' => $request->email,
+            'expires_in_minutes' => 60,
+        ];
+
+        // Token HANYA boleh tampil di lingkungan lokal/testing (simulasi email & UAT).
+        // Di production token cukup dikirim lewat email, kalau tidak siapa pun bisa reset akun orang lain.
+        if (app()->environment(['local', 'testing'])) {
+            $data['reset_token'] = $token;
+            $data['reset_url'] = $resetUrl;
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Tautan dan token reset kata sandi berhasil dikirim ke email Anda (berlaku 60 menit).',
-            'data' => [
-                'email' => $request->email,
-                'reset_token' => $token, // Disajikan untuk simulasi pengiriman email / UAT
-                'reset_url' => $resetUrl,
-                'expires_in_minutes' => 60,
-            ],
+            'data' => $data,
         ]);
     }
 

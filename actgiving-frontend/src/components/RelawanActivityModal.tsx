@@ -23,7 +23,7 @@ export const RelawanActivityModal: React.FC<RelawanActivityModalProps> = ({
 
   // Filter campaigns that this volunteer joined
   const joinedCampaigns = campaigns.filter(
-    (c) => currentUser.joinedCampaignIds?.includes(c.id) || c.id === 'camp-01' || c.id === 'camp-02'
+    (c) => currentUser.joinedCampaignIds?.includes(c.id)
   );
 
   return (

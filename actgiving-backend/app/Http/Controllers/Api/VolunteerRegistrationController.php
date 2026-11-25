@@ -234,10 +234,19 @@ class VolunteerRegistrationController extends Controller
             ->latest()
             ->get();
 
-        $formatted = $registrations->map(function ($r) {
+        // Kehadiran relawan (kunci: "campaign_id-user_id") untuk ditampilkan ke inisiator
+        $attendanceMap = \App\Models\VolunteerAttendance::whereIn('campaign_id', $campaignIds)
+            ->get()
+            ->keyBy(fn ($a) => $a->campaign_id.'-'.$a->user_id);
+
+        $formatted = $registrations->map(function ($r) use ($attendanceMap) {
+            $attendance = $attendanceMap->get($r->campaign_id.'-'.$r->user_id);
+
             return [
                 'id' => $r->id,
                 'campaign_id' => $r->campaign_id,
+                'attended' => (bool) $attendance,
+                'checked_in_at' => $attendance?->checked_in_at?->toISOString(),
                 'campaignTitle' => $r->campaign?->title ?? 'Kampanye Sosial',
                 'user_id' => $r->user_id,
                 'name' => $r->user?->name ?? 'Relawan Terdaftar',

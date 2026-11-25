@@ -132,6 +132,13 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
         setRegisteredCampaigns(allRegCamps);
       }
 
+      // 1b. Ambil catatan kehadiran yang sudah tersimpan di server
+      const attRes = await api.get('/my-attendances').catch(() => null);
+      const attItems = attRes?.data?.data || [];
+      if (Array.isArray(attItems)) {
+        setCheckedInIds(attItems.map((a: any) => String(a.campaign_id)));
+      }
+
       // 2. Ambil data CampaignSchedule riil dari kampanye yang status relawannya 'accepted'
       const schedRes = await api.get('/my-volunteer-schedules').catch(() => null);
       const schedItems = schedRes?.data?.data || [];
@@ -185,11 +192,16 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleSimulateCheckIn = (campId: string) => {
-    if (!checkedInIds.includes(campId)) {
+  // Catat kehadiran ke backend (POST /campaigns/{id}/attendance) agar tersimpan permanen
+  const handleSimulateCheckIn = async (campId: string) => {
+    if (checkedInIds.includes(campId)) return;
+    try {
+      await api.post(`/campaigns/${campId}/attendance`);
       setCheckedInIds((prev) => [...prev, campId]);
-      showToast('Presensi kehadiran berhasil diverifikasi via GPS & QR Code!');
+      showToast('Kehadiran Anda berhasil dicatat.');
       setShowQrModal(null);
+    } catch (err: any) {
+      showToast(err?.response?.data?.message || 'Gagal mencatat kehadiran. Silakan coba lagi.');
     }
   };
 
@@ -985,7 +997,7 @@ export const RelawanDashboardView: React.FC<RelawanDashboardViewProps> = ({
             </div>
 
             <p className="text-[11px] text-slate-500">
-              Tunjukkan QR ini ke koordinator lapangan saat tiba di lokasi, atau klik konfirmasi mandiri jika Anda sudah di posko:
+              Klik konfirmasi untuk mencatat kehadiran Anda pada kegiatan ini. Catatan kehadiran dapat dilihat oleh inisiator kampanye:
             </p>
 
             <div className="flex items-center gap-2">

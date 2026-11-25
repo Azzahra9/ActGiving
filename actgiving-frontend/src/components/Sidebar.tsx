@@ -26,6 +26,7 @@ X,
   Flag
 } from 'lucide-react';
 import { Campaign, UserProfile, ActiveView } from '../types';
+import { formatRupiah } from '../utils/format';
 
 interface SidebarProps {
   currentUser: UserProfile;
@@ -70,13 +71,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   // Calculate dynamic badge counts from campaigns list
   const pendingCampaignsCount = campaigns.filter(c => c.status === 'pending_approval').length;
-  const myCampaignsCount = campaigns.filter(
-    c => currentUser.managedCampaignIds?.includes(c.id) ||
-         c.initiatorName.toLowerCase().includes(currentUser.name.toLowerCase()) ||
-         c.id === 'camp-01'
-  ).length;
+  // Kampanye milik pengguna: dicocokkan lewat ID pemilik (user_id), bukan lewat kecocokan nama
+  const ownedCampaigns = campaigns.filter(
+    c => Boolean(currentUser.managedCampaignIds?.includes(c.id)) ||
+         (c.user_id != null && String(c.user_id) === String(currentUser.id))
+  );
+  const myCampaignsCount = ownedCampaigns.length;
+  const ownedTotalFunds = ownedCampaigns.reduce((acc, c) => acc + (c.collectedFunds || 0), 0);
+  const ownedTotalVolunteers = ownedCampaigns.reduce((acc, c) => acc + (c.filledVolunteers || 0), 0);
   const joinedCampaignsCount = campaigns.filter(
-    c => currentUser.joinedCampaignIds?.includes(c.id) || c.id === 'camp-01' || c.id === 'camp-02'
+    c => currentUser.joinedCampaignIds?.includes(c.id)
   ).length;
   const availableVolunteerCount = campaigns.filter(
     c => (c.mode === 'relawan' || c.mode === 'keduanya') && 
@@ -374,7 +378,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/50 text-[11px] space-y-1.5">
                   <div className="flex justify-between text-slate-400">
                     <span>Jam Kontribusi:</span>
-                    <span className="font-bold text-sky-400">18 Jam</span>
+                    <span className="font-bold text-sky-400">{joinedCampaignsCount * 6} Jam</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>E-Sertifikat:</span>
@@ -382,7 +386,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>Reputasi Relawan:</span>
-                    <span className="font-bold text-blue-200">850 Poin</span>
+                    <span className="font-bold text-blue-200">{joinedCampaignsCount * 100} Poin</span>
                   </div>
                 </div>
               )}
@@ -495,15 +499,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="bg-slate-800/60 rounded-xl p-2.5 border border-slate-700/50 text-[11px] space-y-1.5">
                   <div className="flex justify-between text-slate-400">
                     <span>Total Donasi Masuk:</span>
-                    <span className="font-bold text-sky-400">Rp 87,5 Juta</span>
+                    <span className="font-bold text-sky-400">{formatRupiah(ownedTotalFunds)}</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>Relawan Terhimpun:</span>
-                    <span className="font-bold text-blue-300">48 Orang</span>
+                    <span className="font-bold text-blue-300">{ownedTotalVolunteers} Orang</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
-                    <span>Status Verifikasi:</span>
-                    <span className="font-bold text-blue-200">Dual-Role Aktif</span>
+                    <span>Kampanye Dikelola:</span>
+                    <span className="font-bold text-blue-200">{myCampaignsCount} Program</span>
                   </div>
                 </div>
               )}
