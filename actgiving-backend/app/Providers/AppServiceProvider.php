@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Gate otorisasi Admin
+        Gate::define('admin', function (User $user) {
+            return $user->isAdmin();
+        });
 
         // 1. Rate Limiter khusus untuk Guest Checkout (Anti-Spam Donasi Fiktif: Maks 10 request/menit/IP)
         RateLimiter::for('guest-checkout-limit', function (Request $request) {

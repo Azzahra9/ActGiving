@@ -63,9 +63,9 @@ class AdminController extends Controller
     }
 
     /**
-     * Hentikan / Suspend Kampanye (Admin)
+     * Hentikan Kampanye (Admin)
      *
-     * Admin: Menghentikan/menangguhkan kampanye secara paksa jika ada pelanggaran.
+     * Admin: Menghentikan kampanye secara paksa dengan mengubah status menjadi 'suspended'.
      */
     public function suspendCampaign(Request $request, $id): JsonResponse
     {
@@ -75,14 +75,15 @@ class AdminController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
+        $campaignTitle = $campaign->title;
         $campaign->status = 'suspended';
         $campaign->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Kampanye '{$campaign->title}' berhasil dihentikan/ditangguhkan oleh Admin.",
-            'data' => $campaign,
+            'message' => "Kampanye '{$campaignTitle}' berhasil dihentikan (suspended) oleh Admin.",
             'reason' => $validated['reason'] ?? null,
+            'data' => $campaign,
         ]);
     }
 
@@ -147,6 +148,42 @@ class AdminController extends Controller
             'message' => $user->is_verified
                 ? "Pengguna {$user->name} berhasil diverifikasi sebagai Inisiator Terpercaya."
                 : "Status verifikasi pengguna {$user->name} berhasil dicabut.",
+            'data' => $user,
+        ]);
+    }
+
+    /**
+     * Ubah Role Pengguna (Admin)
+     *
+     * Admin: Menetapkan atau mencabut peran Administrator pada pengguna.
+     */
+    public function updateUserRole(Request $request, $id): JsonResponse
+    {
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'role' => 'required|in:admin,user',
+        ], [
+            'role.required' => 'Peran (role) wajib dipilih.',
+            'role.in' => 'Peran tidak valid. Pilihan yang tersedia: admin, user.',
+        ]);
+
+        if ($request->user() && $request->user()->id === $user->id && $validated['role'] !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak dapat mencabut peran admin dari akun Anda sendiri.',
+            ], 422);
+        }
+
+        $user->role = $validated['role'];
+        if ($user->role === 'admin') {
+            $user->is_verified = true;
+        }
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Peran pengguna {$user->name} berhasil diubah menjadi: {$user->role}.",
             'data' => $user,
         ]);
     }

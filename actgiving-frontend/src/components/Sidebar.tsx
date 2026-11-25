@@ -240,6 +240,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <p className="text-[10px] text-slate-400 truncate">{currentUser.city || 'Indonesia'}</p>
                 </div>
               </div>
+
+              {/* Dual-Role Switcher for Regular Users */}
+              {currentRole === 'relawan' && (
+                <button
+                  onClick={() => {
+                    onSelectUser({ ...currentUser, role: 'inisiator' });
+                    onNavigateView('inisiator_dashboard');
+                  }}
+                  className="w-full mt-2.5 py-1.5 px-2 rounded-lg bg-sky-950/60 hover:bg-sky-900/60 text-sky-200 border border-sky-800/60 text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  title="Ganti persona ke Inisiator"
+                >
+                  <Building2 className="w-3 h-3 text-sky-400" />
+                  <span>Beralih ke Workspace Inisiator ⇄</span>
+                </button>
+              )}
+
+              {currentRole === 'inisiator' && (
+                <button
+                  onClick={() => {
+                    onSelectUser({ ...currentUser, role: 'relawan' });
+                    onNavigateView('relawan_dashboard');
+                  }}
+                  className="w-full mt-2.5 py-1.5 px-2 rounded-lg bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 border border-blue-800/60 text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  title="Ganti persona ke Relawan"
+                >
+                  <Award className="w-3 h-3 text-blue-400" />
+                  <span>Beralih ke Workspace Relawan ⇄</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1 pb-3 border-b border-slate-800">
@@ -375,7 +404,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onOpenCreateCampaign();
                   onCloseMobile();
                 }}
-                className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] ${
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all hover:scale-[1.02] cursor-pointer ${
                   isCollapsedDesktop && !isOpenMobile ? 'px-0' : ''
                 }`}
                 title="Buka Galang Aksi Baru"
@@ -388,7 +417,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <div>
                 {(!isCollapsedDesktop || isOpenMobile) && (
-                  <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-sky-400 mb-2 flex items-center justify-between">
+                  <p className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
                     <span>Manajemen Kampanye & LPJ</span>
                   </p>
                 )}
@@ -404,11 +433,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     } ${isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''}`}
                     title="Kampanye Kelolaan Saya"
                   >
-                    <Building2 className="w-4 h-4 shrink-0 text-sky-400" />
+                    <Building2 className="w-4 h-4 shrink-0 text-blue-400" />
                     {(!isCollapsedDesktop || isOpenMobile) && (
                       <div className="truncate flex-1 text-left flex items-center justify-between">
                         <span className="truncate">Kampanye Saya</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-sky-300 font-bold">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">
                           {myCampaignsCount}
                         </span>
                       </div>
@@ -496,6 +525,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span>Audit & Kontrol Moderasi</span>
                   </p>
                 )}
+
+                {/* Navigasi Cepat: Kembali ke Portal Publik */}
+                <button
+                  onClick={() => handlePublicNavClick()}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-800/80 mb-2 border border-slate-800 ${
+                    isCollapsedDesktop && !isOpenMobile ? 'justify-center px-0' : ''
+                  }`}
+                  title="Kembali ke Beranda & Katalog Publik"
+                >
+                  <Compass className="w-4 h-4 shrink-0 text-blue-400" />
+                  {(!isCollapsedDesktop || isOpenMobile) && (
+                    <span className="truncate">Lihat Portal Publik</span>
+                  )}
+                </button>
 
                 <nav className="space-y-1">
                   {/* 1. Antrean Moderasi Kampanye */}

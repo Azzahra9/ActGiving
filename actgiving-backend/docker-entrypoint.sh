@@ -9,6 +9,10 @@ export SERVER_ROOT="/app/public"
 echo "Running database migrations..."
 php artisan migrate --force || echo "Migration warning/skipped"
 
+# Pastikan akun admin produksi tersedia
+echo "Ensuring production admin account..."
+php artisan make:admin admin@actgiving.com --name="Admin ActGiving" --password="adminactgiving" --no-interaction || echo "Admin creation skipped"
+
 # Pastikan public storage symlink tersedia
 php artisan storage:link || true
 

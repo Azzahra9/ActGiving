@@ -96,9 +96,11 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
     setErrorMessage(null);
     let uploadedUrl = '';
 
-    const finalAmount = parseInt(lpjAmount) || 5000000;
-    const titleText = lpjTitle.trim() || 'Penyaluran Bantuan Lapangan';
-    const descText = lpjDesc.trim() || 'Distribusi kebutuhan logistik sesuai rencana anggaran belanja kampanye.';
+    const targetCamp = campaigns.find(c => c.id === activeUploadCampaignId);
+    const isVolOnly = targetCamp?.mode === 'relawan';
+    const finalAmount = isVolOnly ? 0 : (parseInt(lpjAmount) || 5000000);
+    const titleText = lpjTitle.trim() || (isVolOnly ? 'Laporan Kegiatan Relawan Lapangan' : 'Penyaluran Bantuan Lapangan');
+    const descText = lpjDesc.trim() || (isVolOnly ? 'Laporan pelaksanaan dan dokumentasi aksi relawan di lapangan.' : 'Distribusi kebutuhan logistik sesuai rencana anggaran belanja kampanye.');
 
     const formData = new FormData();
     formData.append('description', descText);
@@ -221,7 +223,11 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-blue-950 font-bold">
                   <Upload className="w-4 h-4 text-blue-600" />
-                  <span>Unggah LPJ & Kuitansi Penyaluran Dana</span>
+                  <span>
+                    {campaigns.find(c => c.id === activeUploadCampaignId)?.mode === 'relawan'
+                      ? 'Unggah Laporan Kegiatan Relawan'
+                      : 'Unggah LPJ & Kuitansi Penyaluran Dana'}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -291,32 +297,86 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
                   </div>
 
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Judul Penyaluran / Belanja</label>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      {campaigns.find(c => c.id === activeUploadCampaignId)?.mode === 'relawan'
+                        ? 'Judul Kegiatan Relawan'
+                        : 'Judul Penyaluran / Belanja'}
+                    </label>
                     <input
                       type="text"
                       required
                       value={lpjTitle}
                       onChange={(e) => setLpjTitle(e.target.value)}
-                      placeholder="Contoh: Penyaluran Sembako 100 KK & Obat-obatan"
+                      placeholder={
+                        campaigns.find(c => c.id === activeUploadCampaignId)?.mode === 'relawan'
+                          ? 'Contoh: Aksi Peduli Lingkungan & Edukasi Bersama Relawan'
+                          : 'Contoh: Penyaluran Sembako 100 KK & Obat-obatan'
+                      }
                       className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden text-xs"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Nominal Terealisasi (Rp)</label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={lpjAmount}
-                        onChange={(e) => setLpjAmount(e.target.value)}
-                        placeholder="Contoh: 12500000"
-                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden text-xs"
-                      />
+                  {campaigns.find(c => c.id === activeUploadCampaignId)?.mode !== 'relawan' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold text-slate-700 mb-1">Nominal Terealisasi (Rp)</label>
+                        <input
+                          type="number"
+                          required
+                          min="0"
+                          value={lpjAmount}
+                          onChange={(e) => setLpjAmount(e.target.value)}
+                          placeholder="Contoh: 12500000"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold text-slate-700 mb-1">Upload Kuitansi & Foto</label>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <div 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="border border-dashed border-slate-300 hover:border-blue-500 rounded-xl px-3 py-2 bg-white text-slate-600 text-[11px] flex items-center justify-between cursor-pointer transition-colors"
+                        >
+                          <span className="truncate max-w-[200px]">
+                            {proofFile ? proofFile.name : 'Pilih faktur/foto dari perangkat...'}
+                          </span>
+                          <Upload className="w-3.5 h-3.5 text-blue-600 shrink-0 ml-1" />
+                        </div>
+
+                        {proofPreview && (
+                          <div className="mt-2 flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                            <img
+                              src={proofPreview}
+                              alt="Preview Bukti"
+                              className="w-12 h-12 object-cover rounded-lg border border-slate-200"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[11px] text-slate-800 font-semibold truncate block">
+                                {proofFile?.name || 'Foto Dokumentasi'}
+                              </span>
+                              <span className="text-[10px] text-emerald-600 font-medium">Siap diunggah</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleRemoveProof}
+                              className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                              title="Hapus foto ini"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  ) : (
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Upload Kuitansi & Foto</label>
+                      <label className="block font-semibold text-slate-700 mb-1">Upload Foto Dokumentasi Kegiatan</label>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -329,7 +389,7 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
                         className="border border-dashed border-slate-300 hover:border-blue-500 rounded-xl px-3 py-2 bg-white text-slate-600 text-[11px] flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <span className="truncate max-w-[200px]">
-                          {proofFile ? proofFile.name : 'Pilih faktur/foto dari perangkat...'}
+                          {proofFile ? proofFile.name : 'Pilih foto dokumentasi dari perangkat...'}
                         </span>
                         <Upload className="w-3.5 h-3.5 text-blue-600 shrink-0 ml-1" />
                       </div>
@@ -358,16 +418,24 @@ export const InisiatorDashboardModal: React.FC<InisiatorDashboardModalProps> = (
                         </div>
                       )}
                     </div>
-                  </div>
+                  )}
 
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Deskripsi & Catatan Penyaluran</label>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      {campaigns.find(c => c.id === activeUploadCampaignId)?.mode === 'relawan'
+                        ? 'Deskripsi Kegiatan Relawan'
+                        : 'Deskripsi & Catatan Penyaluran'}
+                    </label>
                     <textarea
                       rows={2}
                       required
                       value={lpjDesc}
                       onChange={(e) => setLpjDesc(e.target.value)}
-                      placeholder="Jelaskan rincian barang yang dibeli dan lokasi distribusi..."
+                      placeholder={
+                        campaigns.find(c => c.id === activeUploadCampaignId)?.mode === 'relawan'
+                          ? 'Jelaskan jalannya aksi, antusiasme relawan, dan respon penerima manfaat di lapangan...'
+                          : 'Jelaskan rincian barang yang dibeli dan lokasi distribusi...'
+                      }
                       className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-hidden text-xs"
                     />
                   </div>

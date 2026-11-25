@@ -19,6 +19,17 @@ const BACKEND_ROOT = API_BASE_URL.replace(/\/api\/?$/, '');
  */
 export const resolveImageUrl = (url?: string | null): string | undefined => {
   if (!url) return undefined;
+  
+  // Jika URL mengarah ke localhost atau 127.0.0.1 tetapi aplikasi sedang berjalan di domain produksi (bukan localhost)
+  // ganti origin localhost dengan BACKEND_ROOT yang sesuai
+  if (url.startsWith('http://localhost') || url.startsWith('http://127.0.0.1') || url.startsWith('https://localhost')) {
+    if (BACKEND_ROOT && !BACKEND_ROOT.includes('localhost') && !BACKEND_ROOT.includes('127.0.0.1')) {
+      const pathOnly = url.replace(/^https?:\/\/[^\/]+/, '');
+      return `${BACKEND_ROOT}${pathOnly.startsWith('/') ? '' : '/'}${pathOnly}`;
+    }
+    return url;
+  }
+
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
   // Path relatif – tambahkan domain backend
   return `${BACKEND_ROOT}${url.startsWith('/') ? '' : '/'}${url}`;

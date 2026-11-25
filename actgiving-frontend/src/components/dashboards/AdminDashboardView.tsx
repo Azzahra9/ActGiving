@@ -617,6 +617,34 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
     }
   };
 
+  const [updatingRoleId, setUpdatingRoleId] = useState<number | null>(null);
+
+  const handleUpdateUserRole = async (userId: number, newRole: 'admin' | 'user') => {
+    setUpdatingRoleId(userId);
+    const previousUsers = [...adminUsers];
+    setAdminUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, role: newRole, is_verified: newRole === 'admin' ? true : u.is_verified } : u))
+    );
+
+    try {
+      const res = await api.patch(`/admin/users/${userId}/role`, { role: newRole });
+      const targetUser = adminUsers.find((u) => u.id === userId);
+      const name = targetUser?.name || `Pengguna #${userId}`;
+      const msg = res.data?.message || (newRole === 'admin'
+        ? `Pengguna "${name}" berhasil diangkat menjadi Administrator.`
+        : `Hak akses Admin untuk "${name}" berhasil dicabut.`);
+      showToast(msg);
+      await fetchAdminUsers();
+    } catch (err: any) {
+      console.error('Gagal mengubah role pengguna:', err);
+      setAdminUsers(previousUsers);
+      const errMsg = err?.response?.data?.message || 'Gagal memperbarui peran pengguna.';
+      showToast(`Error: ${errMsg}`);
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  };
+
   const unverifiedUsersCount = adminUsers.filter((u) => !u.is_verified).length;
   const verifiedUsersCount = adminUsers.filter((u) => u.is_verified).length;
 
@@ -1762,12 +1790,51 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                             {/* Action Buttons */}
                             <td className="py-3.5 px-4 text-right">
                               <div className="flex items-center justify-end gap-2">
+                                {/* Role Switcher: Admin / User */}
+                                {user.role === 'admin' ? (
+                                  String(user.id) === String(currentUser.id) ? (
+                                    <span className="px-2.5 py-1 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl" title="Akun Anda yang sedang aktif">
+                                      Admin Anda
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled={updatingRoleId === user.id}
+                                      onClick={() => handleUpdateUserRole(user.id, 'user')}
+                                      className="px-2.5 py-1.5 text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl text-xs font-semibold transition-colors border border-rose-200 flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                                      title="Cabut peran Administrator (ubah menjadi user biasa)"
+                                    >
+                                      {updatingRoleId === user.id ? (
+                                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                      ) : (
+                                        <ShieldCheck className="w-3.5 h-3.5 text-rose-500" />
+                                      )}
+                                      <span>Cabut Admin</span>
+                                    </button>
+                                  )
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={updatingRoleId === user.id}
+                                    onClick={() => handleUpdateUserRole(user.id, 'admin')}
+                                    className="px-2.5 py-1.5 text-blue-700 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 rounded-xl text-xs font-semibold transition-colors border border-blue-200 flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                                    title="Tetapkan sebagai Administrator platform"
+                                  >
+                                    {updatingRoleId === user.id ? (
+                                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                                    )}
+                                    <span>Jadikan Admin</span>
+                                  </button>
+                                )}
+
                                 {!user.is_verified ? (
                                   <button
                                     type="button"
                                     disabled={isVerifying}
                                     onClick={() => handleVerifyUser(user.id, true)}
-                                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                                     title="Verifikasi pengguna ini sebagai inisiator resmi"
                                   >
                                     {isVerifying ? (
@@ -1787,7 +1854,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                                     type="button"
                                     disabled={isVerifying}
                                     onClick={() => handleVerifyUser(user.id, false)}
-                                    className="px-2.5 py-1.5 text-slate-500 hover:text-amber-700 bg-slate-100 hover:bg-amber-50 rounded-xl text-xs font-semibold transition-colors border border-slate-200 flex items-center gap-1 disabled:opacity-50"
+                                    className="px-2.5 py-1.5 text-slate-500 hover:text-amber-700 bg-slate-100 hover:bg-amber-50 rounded-xl text-xs font-semibold transition-colors border border-slate-200 flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                                     title="Batalkan status verifikasi inisiator"
                                   >
                                     {isVerifying ? (

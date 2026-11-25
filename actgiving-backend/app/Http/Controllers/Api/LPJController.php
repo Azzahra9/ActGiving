@@ -128,24 +128,32 @@ class LPJController extends Controller
 
         $activityPhotoUrls = array_values(array_unique($activityPhotoUrls));
 
+        $isVolunteerOnly = ($campaign->campaign_mode === 'volunteer_only');
+
         // Parse budget_items jika berbentuk JSON string
         $budgetItems = $request->input('budget_items');
         if (is_string($budgetItems)) {
             $budgetItems = json_decode($budgetItems, true);
         }
 
-        // Ambil nominal realisasi secara presisi: total_realisasi / amount_spent / realized_amount / kalkulasi budget_items
-        $amountSpent = $request->input('total_realisasi')
-            ?? $request->input('amount_spent')
-            ?? $request->input('realized_amount');
+        if ($isVolunteerOnly) {
+            // Kampanye relawan murni tidak memiliki pos belanja & nominal pengeluaran
+            $budgetItems = null;
+            $amountSpent = 0;
+        } else {
+            // Ambil nominal realisasi secara presisi: total_realisasi / amount_spent / realized_amount / kalkulasi budget_items
+            $amountSpent = $request->input('total_realisasi')
+                ?? $request->input('amount_spent')
+                ?? $request->input('realized_amount');
 
-        if ((is_null($amountSpent) || floatval($amountSpent) <= 0) && is_array($budgetItems) && count($budgetItems) > 0) {
-            $amountSpent = array_reduce($budgetItems, function ($carry, $item) {
-                return $carry + floatval($item['amount'] ?? 0);
-            }, 0);
+            if ((is_null($amountSpent) || floatval($amountSpent) <= 0) && is_array($budgetItems) && count($budgetItems) > 0) {
+                $amountSpent = array_reduce($budgetItems, function ($carry, $item) {
+                    return $carry + floatval($item['amount'] ?? 0);
+                }, 0);
+            }
+
+            $amountSpent = floatval($amountSpent ?? 0);
         }
-
-        $amountSpent = floatval($amountSpent ?? 0);
 
         $isFinal = false;
         if ($request->has('is_final')) {
@@ -224,19 +232,30 @@ class LPJController extends Controller
             'activity_photos.*' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        if ($request->has('total_realisasi') || $request->has('amount_spent') || $request->has('realized_amount')) {
-            $val = $request->input('total_realisasi')
-                ?? $request->input('amount_spent')
-                ?? $request->input('realized_amount');
-            $validated['amount_spent'] = floatval($val ?? 0);
-        } elseif ($request->has('budget_items')) {
-            $bItems = is_string($request->input('budget_items')) 
-                ? json_decode($request->input('budget_items'), true) 
-                : $request->input('budget_items');
-            if (is_array($bItems) && count($bItems) > 0) {
-                $validated['amount_spent'] = array_reduce($bItems, function ($carry, $item) {
-                    return $carry + floatval($item['amount'] ?? 0);
-                }, 0);
+        $isVolunteerOnly = ($campaign->campaign_mode === 'volunteer_only');
+
+        if ($isVolunteerOnly) {
+            $validated['amount_spent'] = 0;
+            $validated['budget_items'] = null;
+        } else {
+            if ($request->has('total_realisasi') || $request->has('amount_spent') || $request->has('realized_amount')) {
+                $val = $request->input('total_realisasi')
+                    ?? $request->input('amount_spent')
+                    ?? $request->input('realized_amount');
+                $validated['amount_spent'] = floatval($val ?? 0);
+            } elseif ($request->has('budget_items')) {
+                $bItems = is_string($request->input('budget_items')) 
+                    ? json_decode($request->input('budget_items'), true) 
+                    : $request->input('budget_items');
+                if (is_array($bItems) && count($bItems) > 0) {
+                    $validated['amount_spent'] = array_reduce($bItems, function ($carry, $item) {
+                        return $carry + floatval($item['amount'] ?? 0);
+                    }, 0);
+                }
+            }
+
+            if ($request->has('budget_items') && is_string($request->input('budget_items'))) {
+                $validated['budget_items'] = json_decode($request->input('budget_items'), true);
             }
         }
 
@@ -270,7 +289,7 @@ class LPJController extends Controller
             $validated['activity_photos'] = array_values(array_unique($currentPhotos));
         }
 
-        if ($request->has('budget_items') && is_string($request->input('budget_items'))) {
+        if (!$isVolunteerOnly && $request->has('budget_items') && is_string($request->input('budget_items'))) {
             $validated['budget_items'] = json_decode($request->input('budget_items'), true);
         }
 
